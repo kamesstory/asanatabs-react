@@ -1,0 +1,46 @@
+{
+  "manifest_version": 2,
+  "name": "Webpack Chrome Extension Reloader Sample",
+  "version": "0.1",
+  "background": {
+    "scripts": [
+      "background.bundle.js"
+    ]
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "<all_urls>"
+      ],
+      "js": [
+        "content-script.bundle.js"
+      ],
+      "css": [
+        "style.css"
+      ]
+    }
+  ],
+  "content_security_policy": "script-src 'self'; object-src 'self'",
+  "description": "Quickly view Asana tasks from the new tab page.",
+  "icons": {
+    "16": "webpack.16.png",
+    "48": "webpack.48.png",
+    "128": "webpack.128.png"
+  },
+  "chrome_url_overrides": {
+    "newtab": "index.html"
+  },
+  "permissions": [
+    "background",
+    "tabs",
+    "storage",
+    "cookies",
+    "activeTab",
+    "notifications",
+    "webRequest",
+    "webRequestBlocking",
+    "*://*.asana.com/*",
+    "http://*/*",
+    "https://*/*"
+  ]
+}
