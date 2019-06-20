@@ -1,34 +1,50 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import styled from '@emotion/styled';
-import { Global, css } from '@emotion/core'
+import { Global, css } from '@emotion/core';
+import background from './joe-mania-227005-unsplash.jpg';
+import DateTime from './DateTime.js';
+import TaskCard from './TaskCard.js';
 
-const BigText = styled.h1`
-  color: ${props => props.textColor};
-`;
+const customBackground = ({ backgroundImage }) => css`
+  html {
+    height: 100%;
+  }
 
-const customBackground = ({backgroundImage}) => css`
   body {
-    background-image: url(${backgroundImage});
+    background: url(${backgroundImage}) no-repeat;
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    height: 100%;
+    font-family: 'Libre Franklin', sans-serif;
+  }
+
+  #root {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 0 48px;
   }
 `;
 
 const App = () => {
+  const tasks = [
+    { id: 4326, title: 'something chickenified' },
+    { id: 9548, title: 'two' },
+    { id: 9517, title: 'kingdom in south korea' }
+  ];
   return (
     <>
       <Global
         styles={customBackground({
-          backgroundImage:
-            "https://images.unsplash.com/photo-1558980394-4c7c9299fe96?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1000&q=80"
+          backgroundImage: background
         })}
       />
-      <BigText textColor="green">Hello World asdfasds</BigText>
-      <span>asdasdasds</span>
+      <DateTime />
+      <TaskCard title="Today" tasks={tasks} />
     </>
   );
-}
+};
 
-ReactDOM.render(
-  <App></App>,
-  document.getElementById("root") 
-);
+ReactDOM.render(<App />, document.getElementById('root'));
