@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import ReactDOM from 'react-dom';
 import styled from '@emotion/styled';
 import { Global, css } from '@emotion/core';
@@ -18,6 +18,10 @@ const customBackground = ({ backgroundImage }) => css`
     background-attachment: fixed;
     height: 100%;
     font-family: 'Libre Franklin', sans-serif;
+
+    ::-webkit-scrollbar {
+      width: 0 !important;
+    }
   }
 
   #root {
@@ -29,11 +33,13 @@ const customBackground = ({ backgroundImage }) => css`
 `;
 
 const App = () => {
-  const tasks = [
+  const [tasks, setTasks] = useState([
     { id: 4326, title: 'something chickenified' },
     { id: 9548, title: 'two' },
     { id: 9517, title: 'kingdom in south korea' }
-  ];
+  ]);
+
+  const filteredTasks = tasks.filter(task => !task.done);
   return (
     <>
       <Global
@@ -42,7 +48,7 @@ const App = () => {
         })}
       />
       <DateTime />
-      <TaskCard title="Today" tasks={tasks} />
+      <TaskCard title="Today" tasks={filteredTasks} onTasksChanged={setTasks} />
     </>
   );
 };
