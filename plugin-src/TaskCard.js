@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo, useCallback, useState } from 'react';
 import ReactDOM from 'react-dom';
 import styled from '@emotion/styled';
 import { Global, css } from '@emotion/core';
@@ -36,10 +36,9 @@ const RowTextPadding = css`
 const WorkspaceName = styled.span`
   color: ${props => props.color};
   font-weight: 600;
-  width: 150px;
+  width: 0px;
   white-space: nowrap;
   overflow: hidden;
-  text-overflow: ellipsis;
   margin-right: 18px;
   ${RowTextPadding}
 `;
@@ -71,11 +70,13 @@ const TaskRowOuter = styled.div`
   }
 `;
 
-const TaskRow = ({ task, onTaskChanged }) => {
+const TaskRow = ({ task, onTaskChanged, workspaceRef }) => {
   return (
     <TaskRowOuter>
       <CheckBox clickityClick={() => onTaskChanged({ ...task, done: true })} />
-      <WorkspaceName color={task.color}>{task.workspace}</WorkspaceName>
+      <WorkspaceName ref={workspaceRef} color={task.color}>
+        {task.workspace}
+      </WorkspaceName>
       <TaskTitle>{task.title}</TaskTitle>
       <DueDate>{task.duedate}</DueDate>
     </TaskRowOuter>
@@ -96,16 +97,34 @@ const CardBox = styled.div`
 `;
 
 const TaskCard = ({ title, tasks, onTasksChanged }) => {
+  const [workspaceWidth, setWorkspaceWidth] = useState(0);
+  const updateWorkspaceWidth = useCallback(widths => {
+    console.log('foo');
+    setWorkspaceWidth(widths.reduce((acc, val) => Math.max(acc, val), 0));
+  });
+  const taskWorkspaceRefs = useMemo(() => {
+    const widths = Array(tasks.length).fill(null);
+    return widths.map((_, i) => el => {
+      if (el != null) {
+        widths[i] = el.scrollWidth;
+        if (widths.every(el => el != null)) {
+          updateWorkspaceWidth(widths);
+        }
+      }
+    });
+  }, [tasks.length, updateWorkspaceWidth]);
+
   return (
     <CardBox>
       <Title>{title}</Title>
-      {tasks.map(task => (
+      {tasks.map((task, i) => (
         <TaskRow
           key={task.id}
           task={task}
           onTaskChanged={newTask =>
             onTasksChanged(tasks.map(t => (t.id === newTask.id ? newTask : t)))
           }
+          workspaceRef={taskWorkspaceRefs[i]}
         />
       ))}
     </CardBox>
