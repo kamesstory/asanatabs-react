@@ -29,20 +29,32 @@ const CheckBox = ({ clickityClick }) => {
   );
 };
 
+const RowTextPadding = css`
+  padding: 5px 0;
+`;
+
 const WorkspaceName = styled.span`
   color: ${props => props.color};
   font-weight: 600;
-  min-width: 150px;
+  width: 150px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-right: 18px;
+  ${RowTextPadding}
 `;
 
 const TaskTitle = styled.span`
   flex-grow: 1;
+  white-space: pre-line;
+  ${RowTextPadding}
 `;
 
 const DueDate = styled.span`
   font-weight: 600;
   min-width: 90px;
   text-align: right;
+  ${RowTextPadding}
 `;
 
 const TaskRowOuter = styled.div`
@@ -51,7 +63,7 @@ const TaskRowOuter = styled.div`
   font-size: 14px;
   display: flex;
   flex-direction: row;
-  align-items: center;
+  align-items: flex-start;
 
   :last-child {
     padding-bottom: 0;
