@@ -1,4 +1,4 @@
-import React, { useMemo, useCallback, useState } from 'react';
+import React, { useMemo, useCallback, useState, useEffect } from 'react';
 import ReactDOM from 'react-dom';
 import styled from '@emotion/styled';
 import { Global, css } from '@emotion/core';
@@ -33,13 +33,24 @@ const RowTextPadding = css`
   padding: 5px 0;
 `;
 
+const MAX_WORKSPACE_WIDTH_PX = 180;
+
 const WorkspaceName = styled.span`
   color: ${props => props.color};
   font-weight: 600;
-  width: 0px;
   white-space: nowrap;
   overflow: hidden;
-  margin-right: 18px;
+  margin-right: 36px;
+  ${({ workspaceWidth }) =>
+    workspaceWidth != 0 &&
+    css`
+      width: ${Math.min(MAX_WORKSPACE_WIDTH_PX, workspaceWidth)}px;
+      ${workspaceWidth >= MAX_WORKSPACE_WIDTH_PX &&
+        css`
+          white-space: nowrap;
+          text-overflow: ellipsis;
+        `}
+    `};
   ${RowTextPadding}
 `;
 
@@ -70,11 +81,15 @@ const TaskRowOuter = styled.div`
   }
 `;
 
-const TaskRow = ({ task, onTaskChanged, workspaceRef }) => {
+const TaskRow = ({ task, onTaskChanged, workspaceRef, workspaceWidth }) => {
   return (
     <TaskRowOuter>
       <CheckBox clickityClick={() => onTaskChanged({ ...task, done: true })} />
-      <WorkspaceName ref={workspaceRef} color={task.color}>
+      <WorkspaceName
+        workspaceWidth={workspaceWidth}
+        ref={workspaceRef}
+        color={task.color}
+      >
         {task.workspace}
       </WorkspaceName>
       <TaskTitle>{task.title}</TaskTitle>
@@ -99,8 +114,7 @@ const CardBox = styled.div`
 const TaskCard = ({ title, tasks, onTasksChanged }) => {
   const [workspaceWidth, setWorkspaceWidth] = useState(0);
   const updateWorkspaceWidth = useCallback(widths => {
-    console.log('foo');
-    setWorkspaceWidth(widths.reduce((acc, val) => Math.max(acc, val), 0));
+    setWorkspaceWidth(Math.max(...widths));
   });
   const taskWorkspaceRefs = useMemo(() => {
     const widths = Array(tasks.length).fill(null);
@@ -125,6 +139,7 @@ const TaskCard = ({ title, tasks, onTasksChanged }) => {
             onTasksChanged(tasks.map(t => (t.id === newTask.id ? newTask : t)))
           }
           workspaceRef={taskWorkspaceRefs[i]}
+          workspaceWidth={workspaceWidth}
         />
       ))}
     </CardBox>

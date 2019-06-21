@@ -49,7 +49,7 @@ const App = () => {
     {
       id: 9517,
       title: 'kingdom in south korea\nsadfsdfsd',
-      workspace: 'conservation tech asdas asdas asdasd asd asdas',
+      workspace: 'conservation',
       duedate: 'JUN 22'
     }
   ]);
