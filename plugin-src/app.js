@@ -34,9 +34,24 @@ const customBackground = ({ backgroundImage }) => css`
 
 const App = () => {
   const [tasks, setTasks] = useState([
-    { id: 4326, title: 'something chickenified' },
-    { id: 9548, title: 'two' },
-    { id: 9517, title: 'kingdom in south korea' }
+    {
+      id: 4326,
+      title: 'something chickenified',
+      workspace: 'tech & check',
+      duedate: 'TMRW'
+    },
+    {
+      id: 9548,
+      title: 'sometimes i eat salad',
+      workspace: 'smart home IoT',
+      duedate: 'TODAY'
+    },
+    {
+      id: 9517,
+      title: 'kingdom in south korea',
+      workspace: 'conservation tech',
+      duedate: 'JUN 22'
+    }
   ]);
 
   const filteredTasks = tasks.filter(task => !task.done);
