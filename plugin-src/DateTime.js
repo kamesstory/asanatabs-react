@@ -12,6 +12,7 @@ const DateTimeOuter = styled.div`
   text-shadow: 0px 8px 16px rgba(0, 0, 0, 0.15);
   height: calc(100vh - 150px);
   justify-content: center;
+  user-select: none;
 `;
 
 const Time = styled.span`

@@ -5,6 +5,7 @@ import { Global, css } from '@emotion/core';
 import background from './joe-mania-227005-unsplash.jpg';
 import DateTime from './DateTime.js';
 import TaskCard from './TaskCard.js';
+import CreateTask from './CreateTask.js';
 
 const customBackground = ({ backgroundImage }) => css`
   html {
@@ -37,7 +38,7 @@ const App = () => {
     {
       id: 4326,
       title: 'something chickenified',
-      workspace: 'tech & check',
+      workspace: 'tech',
       duedate: 'TMRW'
     },
     {
@@ -48,8 +49,8 @@ const App = () => {
     },
     {
       id: 9517,
-      title: 'kingdom in south korea\nsadfsdfsd',
-      workspace: 'conservation',
+      title: "kingdom in south korea\nbut wait isn't lee chinese?",
+      workspace: 'conservation technology',
       duedate: 'JUN 22'
     }
   ]);
@@ -64,6 +65,7 @@ const App = () => {
       />
       <DateTime />
       <TaskCard title="Today" tasks={filteredTasks} onTasksChanged={setTasks} />
+      <CreateTask />
     </>
   );
 };
