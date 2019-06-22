@@ -9,7 +9,7 @@ const DateTimeOuter = styled.div`
   flex-direction: column;
   align-items: center;
   color: white;
-  text-shadow: 0px 8px 16px rgba(0, 0, 0, 0.15);
+  text-shadow: 0px 8px 16px rgba(0, 0, 0, 0.25);
   height: calc(100vh - 150px);
   justify-content: center;
   user-select: none;

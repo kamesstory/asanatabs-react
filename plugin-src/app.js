@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import ReactDOM from 'react-dom';
 import styled from '@emotion/styled';
 import { Global, css } from '@emotion/core';
-import background from './joe-mania-227005-unsplash.jpg';
+import background from './brice-brown-1512234-unsplash.jpg';
 import DateTime from './DateTime.js';
 import TaskCard from './TaskCard.js';
 import CreateTask from './CreateTask.js';
