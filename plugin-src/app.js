@@ -37,21 +37,36 @@ const App = () => {
   const [tasks, setTasks] = useState([
     {
       id: 4326,
-      title: 'something chickenified',
-      workspace: 'tech',
+      title: 'set up BERT implementation for NLP claim matching',
+      workspace: 'tech & check',
       duedate: 'TMRW'
     },
     {
       id: 9548,
-      title: 'sometimes i eat salad',
+      title: 'allow diverse queries for smart home lights Alexa skill',
       workspace: 'smart home IoT',
       duedate: 'TODAY'
     },
     {
       id: 9517,
-      title: "kingdom in south korea\nbut wait isn't lee chinese?",
+      title:
+        'reach out to WWF and Microsoft Earth for AI contacts for project ideas',
       workspace: 'conservation technology',
-      duedate: 'JUN 22'
+      duedate: 'JUN 27'
+    },
+    {
+      id: 9517,
+      title:
+        'start thinking about blueprint conference organizers for next year',
+      workspace: 'conservation technology',
+      duedate: 'JUL 02'
+    },
+    {
+      id: 9517,
+      title:
+        'conduct elastic search QA on results returned from Share the Facts',
+      workspace: 'tech & check',
+      duedate: '5 DAYS'
     }
   ]);
 

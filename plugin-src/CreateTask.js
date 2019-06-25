@@ -1,14 +1,61 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import ReactDOM from 'react-dom';
 import styled from '@emotion/styled';
 import { Global, css } from '@emotion/core';
-import { Overlay } from 'react-overlays';
+import Overlay from './Overlay';
+
+const FormLabel = styled.label`
+  color: #939393;
+  font-size: 12px;
+`;
+
+const FormFieldDiv = styled.div`
+  padding-bottom: 28px;
+`;
+
+const DescFormInput = styled.textarea`
+  color: #2b2647;
+  font-size: 18px;
+  width: 100%;
+  border: none;
+  outline: none;
+`;
+
+const DescFormField = ({ labelText, inputText }) => {
+  return (
+    <FormFieldDiv>
+      <FormLabel>{labelText}</FormLabel>
+      <div>
+        <DescFormInput placeholder={inputText} />
+      </div>
+    </FormFieldDiv>
+  );
+};
+
+const DateFormInput = styled.input`
+  color: #2b2647;
+  font-size: 14px;
+  border: none;
+  outline: none;
+`;
+
+const DateFormField = ({ labelText, inputText }) => {
+  return (
+    <FormFieldDiv>
+      <FormLabel>{labelText}</FormLabel>
+      <div>
+        <DateFormInput placeholder={inputText} />
+      </div>
+    </FormFieldDiv>
+  );
+};
 
 const Popover = styled.div`
+  display: grid;
   background: white;
   width: 420px;
   border-radius: 8px;
-  padding: 12px;
+  padding: 32px 28px;
   color: #2b2647;
   position: fixed;
   bottom: 108px;
@@ -60,24 +107,25 @@ const FabPlus = styled.span`
 
 const CreateTask = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const fabRef = useRef(null);
+
+  const descInputText = 'Try to complete this Create New Task by myself!';
 
   return (
     <>
-      <FabOuter onClick={() => setIsOpen(!isOpen)}>
+      <FabOuter ref={fabRef} onClick={() => setIsOpen(!isOpen)}>
         <FabPlus isOpen={isOpen}>+</FabPlus>
       </FabOuter>
-      <Popover isOpen={isOpen}>
-        <p>asdjaksjdkasda</p>
-        <p>asdjaksjdkasda</p>
-        <p>asdjaksjdkasda</p>
-        <p>asdjaksjdkasda</p>
-        <p>asdjaksjdkasda</p>
-        <p>asdjaksjdkasda</p>
-        <p>asdjaksjdkasda</p>
-        <p>asdjaksjdkasda</p>
-        <p>asdjaksjdkasda</p>
-        <p>asdjaksjdkasda</p>
-      </Popover>
+      <Overlay
+        openerRef={fabRef}
+        isOpen={isOpen}
+        onClickOutside={() => setIsOpen(false)}
+      >
+        <Popover isOpen>
+          <DescFormField labelText="Description" inputText={descInputText} />
+          <DateFormField labelText="testTitle" inputText="testInput" />
+        </Popover>
+      </Overlay>
     </>
   );
 };
