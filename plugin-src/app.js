@@ -38,39 +38,50 @@ const App = () => {
     {
       id: 4326,
       title: 'set up BERT implementation for NLP claim matching',
-      workspace: 'tech & check',
+      workspace: 'Tech & Check',
       duedate: 'TMRW'
     },
     {
       id: 9548,
       title: 'allow diverse queries for smart home lights Alexa skill',
-      workspace: 'smart home IoT',
+      workspace: 'Smart Home IoT',
       duedate: 'TODAY'
     },
     {
       id: 9517,
       title:
         'reach out to WWF and Microsoft Earth for AI contacts for project ideas',
-      workspace: 'conservation technology',
+      workspace: 'Conservation Technology',
       duedate: 'JUN 27'
     },
     {
       id: 9517,
       title:
         'start thinking about blueprint conference organizers for next year',
-      workspace: 'conservation technology',
+      workspace: 'Conservation Technology',
       duedate: 'JUL 02'
     },
     {
       id: 9517,
-      title:
-        'conduct elastic search QA on results returned from Share the Facts',
-      workspace: 'tech & check',
+      title: 'finish identifying cart and adjustment book changes for coupons',
+      workspace: 'Farmers Business Network',
       duedate: '5 DAYS'
     }
   ]);
 
-  const filteredTasks = tasks.filter(task => !task.done);
+  const workspaceColors = {
+    'Tech & Check': '#FF5252',
+    'Smart Home IoT': '#7C4DFF',
+    'Conservation Technology': '#4CAF50',
+    'Farmers Business Network': '#FFB300'
+  };
+
+  const filteredTasks = tasks
+    .filter(task => !task.done)
+    .map(task => {
+      task['color'] = workspaceColors[task['workspace']];
+      return task;
+    });
   return (
     <>
       <Global
@@ -80,6 +91,11 @@ const App = () => {
       />
       <DateTime />
       <TaskCard title="Today" tasks={filteredTasks} onTasksChanged={setTasks} />
+      <TaskCard
+        title="Tomorrow"
+        tasks={filteredTasks}
+        onTasksChanged={setTasks}
+      />
       <CreateTask />
     </>
   );

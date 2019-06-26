@@ -4,16 +4,16 @@ import styled from '@emotion/styled';
 import { Global, css } from '@emotion/core';
 
 const Title = styled.h1`
-  font-size: 18px;
+  font-size: 20px;
   font-weight: 600;
-  margin-bottom: 6px;
+  margin-bottom: 8px;
 `;
 
 const CheckBoxOuter = styled.div`
   background-color: #f2f1f7;
   border-radius: 50%;
-  height: 28px;
-  width: 28px;
+  height: 26px;
+  width: 26px;
   display: flex;
   align-items: center;
   justify-content: center;
