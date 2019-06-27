@@ -10,7 +10,8 @@ module.exports = {
   entry: {
     'content-script': './plugin-src/my-content-script.js',
     background: './plugin-src/background-scripts/background.js',
-    app: './plugin-src/app.js'
+    app: './plugin-src/app.js',
+    main: './plugin-src/main.js'
   },
   output: {
     publicPath: '.',

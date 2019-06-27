@@ -74,6 +74,12 @@ class AsanaBridge {
       return;
     }
 
+    if (http_method === 'PINGTEST') {
+      console.log('### AsanaBridge: ping test registered!');
+      // alert('Greetings from AsanaBridge! Ping test received.');
+      return;
+    }
+
     console.info(
       '### AsanaBridge: Server API Request',
       http_method,
