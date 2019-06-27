@@ -10,39 +10,39 @@
  * an auth token to communicate with the API.
  */
 
-export const AsanaBridge = {
+class AsanaBridge {
   /**
    * @type {String} Version of the Asana API to use.
    */
-  API_VERSION: '1.0',
+  API_VERSION = '1.0';
 
   /**
    * @type {Integer} How long an entry stays in the cache.
    */
-  CACHE_TTL_MS: 15 * 60 * 1000,
+  CACHE_TTL_MS = 15 * 60 * 1000;
 
   /**
    * @type {Boolean} Set to true on the server (background page), which will
    *     actually make the API requests. Clients will just talk to the API
    *     through the ExtensionServer.
    */
-  is_server: false,
+  is_server = false;
 
   /**
    * @type {dict} Map from API path to cache entry for recent GET requests.
    *     date {Date} When cache entry was last refreshed
    *     response {*} Cached request.
    */
-  _cache: {},
+  _cache = {};
 
   /**
    * @param opt_options {dict} Options to use; if unspecified will be loaded.
    * @return {String} The base URL to use for API requests.
    */
-  baseApiUrl: function(opt_options) {
-    var options = opt_options || Options.loadOptions();
+  baseApiUrl(opt_options) {
+    let options = opt_options || Options.loadOptions();
     return 'https://' + options.asana_host_port + '/api/' + this.API_VERSION;
-  },
+  }
 
   /**
    * Make a request to the Asana API.
@@ -58,55 +58,41 @@ export const AsanaBridge = {
    * @param options {dict?}
    *     miss_cache {Boolean} Do not check cache before requesting
    */
-
-  request: function(http_method, path, params, callback, options) {
-    var me = this;
+  request(http_method, path, params, callback, options) {
     http_method = http_method.toUpperCase();
 
     // If we're not the server page, send a message to it to make the
     // API request.
-    if (!me.is_server) {
-      console.log('We are not the server page!');
-      console.info('SENT: Client API Request', http_method, path, params);
-      chrome.runtime.sendMessage(
-        {
-          type: 'api',
-          method: http_method,
-          path: path,
-          params: params,
-          options: options || {}
-        },
-        callback
+    if (!this.is_server) {
+      console.log('### AsanaBridge: We are not the server page!');
+      console.info(
+        '### AsanaBridge: Received Client API Request',
+        http_method,
+        path,
+        params
       );
       return;
     }
 
-    console.info('Server API Request', http_method, path, params);
-
-    // Serve from cache first.
-    // TODO: Implement cache
-    /*
-    if (!options.miss_cache && http_method === "GET") {
-      var data = me._readCache(path, new Date());
-      if (data) {
-        console.log("Serving request from cache", path);
-        callback(data);
-        return;
-      }
-    }
-    */
+    console.info(
+      '### AsanaBridge: Server API Request',
+      http_method,
+      path,
+      params
+    );
 
     // Be polite to Asana API and tell them who we are.
-    var manifest = chrome.runtime.getManifest();
-    var client_name = [
+    let manifest = chrome.runtime.getManifest();
+    let client_name = [
       'chrome-extension',
       chrome.i18n.getMessage('@@extension_id'),
       manifest.version,
       manifest.name
     ].join(':');
 
-    var url = me.baseApiUrl() + path;
-    var body_data;
+    //
+    let url = this.baseApiUrl() + path;
+    let body_data;
     if (http_method === 'PUT' || http_method === 'POST') {
       // POST/PUT request, put params in body
       body_data = {
@@ -115,18 +101,22 @@ export const AsanaBridge = {
       };
     } else {
       // GET/DELETE request, add params as URL parameters.
-      var url_params = me.update({ opt_client_name: client_name }, params);
-      url += '?' + $.param(url_params);
+      let url_params = { opt_client_name: client_name, ...params };
+      url +=
+        '?' +
+        Object.entries(url_params)
+          .map(([key, value]) => key + '=' + value)
+          .join('&');
     }
 
-    console.log('Making request to API', http_method, url);
+    console.log('### AsanaBridge: Making request to API', http_method, url);
 
     chrome.cookies.get(
       {
         url: url,
         name: 'ticket'
       },
-      function(cookie) {
+      cookie => {
         if (!cookie) {
           callback({
             status: 401,
@@ -137,73 +127,37 @@ export const AsanaBridge = {
 
         // Note that any URL fetched here must be matched by a permission in
         // the manifest.json file!
-        var attrs = {
-          type: http_method,
-          url: url,
-          timeout: 30000, // 30 second timeout
-          headers: {
-            'X-Requested-With': 'XMLHttpRequest',
-            'X-Allow-Asana-Client': '1'
-          },
-          accept: 'application/json',
-          success: function(data, status, xhr) {
-            if (http_method === 'GET') {
-              me._writeCache(path, data, new Date());
-            }
-            callback(data);
-          },
-          error: function(xhr, status, error) {
-            // jQuery's ajax() method has some rather funky error-handling.
-            // We try to accommodate that and normalize so that all types of
-            // errors look the same.
-            if (status === 'error' && xhr.responseText) {
-              var response;
-              try {
-                response = $.parseJSON(xhr.responseText);
-              } catch (e) {
-                response = {
-                  errors: [{ message: 'Could not parse response from server' }]
-                };
-              }
-              callback(response);
-            } else {
-              callback({ errors: [{ message: error || status }] });
-            }
-          },
-          xhrFields: {
-            withCredentials: true
+        let asanaRequest = new XMLHttpRequest();
+        asanaRequest.addEventListener('loadend', e => {
+          if (http_method === 'GET') {
+            this._writeCache(path, e, new Date());
           }
-        };
-        if (http_method === 'POST' || http_method === 'PUT') {
-          attrs.data = JSON.stringify(body_data);
-          attrs.dataType = 'json';
-          attrs.processData = false;
-          attrs.contentType = 'application/json';
-        }
-        $.ajax(attrs);
+          console.log('### AsanaBridge:' + http_method + 'request returned!');
+          callback(e);
+        });
+        asanaRequest.open(http_method, url);
+        asanaRequest.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+        asanaRequest.setRequestHeader('X-Allow-Asana-Client', '1');
+        asanaRequest.setRequestHeader('Content-Type', 'application/json');
+        asanaRequest.send(JSON.stringify(body_data));
       }
     );
-  },
+  }
 
-  _readCache: function(path, date) {
-    var entry = this._cache[path];
+  _readCache(path, date) {
+    let entry = this._cache[path];
     if (entry && entry.date >= date - this.CACHE_TTL_MS) {
       return entry.response;
     }
     return null;
-  },
+  }
 
-  _writeCache: function(path, response, date) {
+  _writeCache(path, response, date) {
     this._cache[path] = {
       response: response,
       date: date
     };
-  },
-
-  update: function(to, from) {
-    for (var k in from) {
-      to[k] = from[k];
-    }
-    return to;
   }
-};
+}
+
+export default AsanaBridge;

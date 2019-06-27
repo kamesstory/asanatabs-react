@@ -52,7 +52,10 @@ module.exports = {
               require('@babel/preset-env'),
               require('@babel/preset-react')
             ],
-            plugins: ['babel-plugin-emotion']
+            plugins: [
+              'babel-plugin-emotion',
+              '@babel/plugin-proposal-class-properties'
+            ]
           }
         }
       },

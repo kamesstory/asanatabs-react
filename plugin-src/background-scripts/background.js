@@ -1,4 +1,34 @@
-import { listen } from './extension_server.js';
+import AsanaBridge from './asana_bridge.js';
 
-listen();
-console.log('This should appear!');
+const asanaBridge = new AsanaBridge();
+asanaBridge.is_server = true;
+
+/**
+ * The "server" portion of the chrome extension, which listens to events
+ * from other clients such as the popup or per-page content windows.
+ */
+/**
+ * Call from the background page: listen to chrome events and
+ * requests from page clients, which can't make cross-domain requests.
+ */
+// Mark our Api Bridge as the server side (the one that actually makes
+// API requests to Asana vs. just forwarding them to the server window).
+console.log('ExtensionServer reloaded at ' + new Date().toString());
+
+chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
+  if (request.type === 'api') {
+    // Request to the API. Pass it on to the bridge.
+    asanaBridge.request(
+      request.method,
+      request.path,
+      request.params,
+      sendResponse,
+      request.options || {}
+    );
+    return true; // will call sendResponse asynchronously
+  } else if (request.type === 'notification') {
+    chrome.notifications.create(request.title, request.options, function(
+      notificationID
+    ) {});
+  }
+});
