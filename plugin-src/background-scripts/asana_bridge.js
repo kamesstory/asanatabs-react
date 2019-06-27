@@ -1,3 +1,5 @@
+import { Options } from './options.js';
+
 /**
  * Functionality to communicate with the Asana API. This should get loaded
  * in the "server" portion of the chrome extension because it will make
