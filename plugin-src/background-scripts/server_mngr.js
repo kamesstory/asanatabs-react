@@ -57,7 +57,7 @@ export const ServerManager = {
   isLoggedIn: function(callback) {
     chrome.cookies.get(
       {
-        url: ASANA_BRIDGE_BASE_URL,
+        url: this.ASANA_BRIDGE_BASE_URL,
         name: 'ticket'
       },
       function(cookie) {

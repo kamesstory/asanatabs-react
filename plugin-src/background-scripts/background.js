@@ -15,7 +15,7 @@ asanaBridge.is_server = true;
 // Mark our Api Bridge as the server side (the one that actually makes
 // API requests to Asana vs. just forwarding them to the server window).
 console.log('ExtensionServer reloaded at ' + new Date().toString());
-console.log('Background check: version 27');
+console.log('Background check: version 32');
 
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
   if (request.type === 'api') {
@@ -36,4 +36,19 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 });
 
 // Immediately start preloading - set timer to ping login every 15 seconds
+setInterval(() => {
+  ServerManager.isLoggedIn(function(isLoggedIn) {
+    console.log('### Background: logged in is ' + isLoggedIn);
+  });
+}, 15 * 1000);
+
 // Refresh workspaces and tasks every minute and push to localStorage / cache
+setInterval(() => {
+  ServerManager.workspaces(function(workspaces) {
+    console.log(
+      '### Background: GET request has retrieved ' +
+        workspaces.length +
+        ' workspaces.'
+    );
+  });
+}, 60 * 1000);
