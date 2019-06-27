@@ -10,6 +10,13 @@ document.addEventListener('DOMContentLoaded', function() {
     () => console.log('### Main.js: pingtest sent!')
   );
 
+  // BIG TODO: https://stackoverflow.com/questions/48969495/in-javascript-how-do-i-should-i-use-async-await-with-xmlhttprequest
+
   // Immediately load workspaces from cache
   // If cache is empty, request all tasks from server
+  ServerManager.workspaces(function(workspaces) {
+    console.log(
+      'GET request has retrieved ' + workspaces.length + ' workspaces.'
+    );
+  });
 });
