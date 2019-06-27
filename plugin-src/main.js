@@ -15,8 +15,7 @@ document.addEventListener('DOMContentLoaded', function() {
   // Immediately load workspaces from cache
   // If cache is empty, request all tasks from server
   ServerManager.workspaces(function(workspaces) {
-    console.log(
-      'GET request has retrieved ' + workspaces.length + ' workspaces.'
-    );
+    alert('Hello from the extension!');
+    console.log('GET request has retrieved workspaces.', workspaces);
   });
 });

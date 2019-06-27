@@ -135,36 +135,36 @@ class AsanaBridge {
 
         // Note that any URL fetched here must be matched by a permission in
         // the manifest.json file!
-        let asanaRequest = new XMLHttpRequest();
-        asanaRequest.addEventListener('loadend', e => {
-          if (http_method === 'GET') {
-            this._writeCache(path, e, new Date());
-          }
-          console.log(
-            '### AsanaBridge: ' +
-              http_method +
-              ' request returned ' +
-              asanaRequest.status +
-              '! Details are as follows:',
-            asanaRequest.response
-          );
-          callback(asanaRequest.response);
-        });
-        asanaRequest.addEventListener('abort', e => {
-          console.log(
-            '### AsanaBridge: ' + http_method + ' request threw an ABORT!'
-          );
-        });
-        asanaRequest.addEventListener('error', e => {
-          console.log(
-            '### AsanaBridge: ' + http_method + ' request threw an ERROR!'
-          );
-        });
-        asanaRequest.open(http_method, url, true);
-        asanaRequest.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
-        asanaRequest.setRequestHeader('X-Allow-Asana-Client', '1');
-        asanaRequest.setRequestHeader('Content-Type', 'application/json');
-        asanaRequest.send(JSON.stringify(body_data));
+        fetch(url, {
+          method: http_method,
+          mode: 'cors',
+          cache: 'no-cache',
+          headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+            'X-Allow-Asana-Client': '1',
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(body_data)
+        })
+          .then(response => {
+            if (response.status !== 200) {
+              console.log(
+                '### AsanaBridge: ERROR, response status ' + response.status
+              );
+            }
+
+            // if (http_method === 'GET') {
+            //   this._writeCache(path, e, new Date());
+            // }
+            return response.json();
+          })
+          .then(json => {
+            console.log('### AsanaBridge: JSON response', json['data']);
+            callback(json['data']);
+          })
+          .catch(response => {
+            console.log('### AsanaBridge: request threw an ERROR!', response);
+          });
       }
     );
   }
