@@ -124,6 +124,8 @@ class AsanaBridge {
       name: 'ticket'
     });
 
+    console.log('### AsanaBridge: Cookie is ', cookie);
+
     if (!cookie) {
       return {
         status: 401,
