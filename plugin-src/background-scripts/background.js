@@ -18,24 +18,20 @@ asanaBridge.is_server = true;
 console.log('ExtensionServer reloaded at ' + new Date().toString());
 console.log('Background check: version 45');
 
-chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.type === 'api') {
     // Request to the API. Pass it on to the bridge.
-    const data = await asanaBridge.request(
-      request.method,
-      request.path,
-      request.params,
-      request.options || {}
-    );
-
-    if (data) {
-      sendResponse(data);
-    }
+    asanaBridge
+      .request(
+        request.method,
+        request.path,
+        request.params,
+        request.options || {}
+      )
+      .then(data => data && sendResponse(data));
+    return true;
   } else if (request.type === 'notification') {
-    const _notificationID = await chrome.notifications.create(
-      request.title,
-      request.options
-    );
+    chrome.notifications.create(request.title, request.options);
   }
 });
 
