@@ -55,14 +55,14 @@ const App = () => {
       duedate: 'JUN 27'
     },
     {
-      id: 9517,
+      id: 2368,
       title:
         'start thinking about blueprint conference organizers for next year',
       workspace: 'Conservation Technology',
       duedate: 'JUL 02'
     },
     {
-      id: 9517,
+      id: 1,
       title: 'finish identifying cart and adjustment book changes for coupons',
       workspace: 'Farmers Business Network',
       duedate: '5 DAYS'

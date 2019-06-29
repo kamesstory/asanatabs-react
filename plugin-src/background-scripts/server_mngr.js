@@ -54,16 +54,11 @@ export const ServerManager = {
    * @param callback {Function(is_logged_in)} Called when request complete.
    *     is_logged_in {Boolean} True iff the user is logged in to Asana.
    */
-  isLoggedIn: function(callback) {
-    chrome.cookies.get(
-      {
-        url: this.ASANA_BRIDGE_BASE_URL,
-        name: 'ticket'
-      },
-      function(cookie) {
-        callback(!!(cookie && cookie.value));
-      }
-    );
+  isLoggedIn: async function() {
+    return await chrome.cookies.get({
+      url: this.ASANA_BRIDGE_BASE_URL,
+      name: 'ticket'
+    });
   },
 
   /**
@@ -82,8 +77,8 @@ export const ServerManager = {
     callback(url);
   },
 
-  __request: function(http_method, path, params, callback, options) {
-    chrome.runtime.sendMessage(
+  __request: function(http_method, path, params, options) {
+    return chrome.runtime.sendMessage(
       {
         type: 'api',
         method: http_method,
@@ -91,7 +86,10 @@ export const ServerManager = {
         params: params,
         options: options || {}
       },
-      callback
+      arg => {
+        console.log('arg', arg);
+        console.log('lasterror', chrome.runtime.lastError);
+      }
     );
   },
 
@@ -101,16 +99,10 @@ export const ServerManager = {
    * @param callback {Function(workspaces)} Callback on success.
    *     workspaces {dict[]}
    */
-  workspaces: function(callback, errback, options) {
-    this.__request(
-      'GET',
-      '/workspaces',
-      {},
-      function(response) {
-        this._makeCallback(response, callback, errback);
-      },
-      options
-    );
+  workspaces: async function(options) {
+    const retrieved = await this.__request('GET', '/workspaces', {}, options);
+    console.log('retrieved', retrieved);
+    return this._processResponse(retrieved);
   },
 
   /**
@@ -119,23 +111,16 @@ export const ServerManager = {
    * @param callback {Function(workspaces)} Callback on success.
    *     workspaces {dict[]}
    */
-  tasks: function(workspace_id, callback, errback, options) {
+  tasks: async function(workspace_id, options) {
     var params = {
       assignee: 'me',
       completed_since: 'now',
       limit: 100,
       workspace: workspace_id
     }; // assignee=me&completed_since=now&limit=100&workspace=[workspace_id]
-    this.__request(
-      'GET',
-      '/tasks',
-      params,
-      function(response) {
-        // console.log( "" + response );
-        this._makeCallback(response, callback, errback);
-      },
-      options
-    );
+    const retrieved = await this.__request('GET', '/tasks', params, options);
+
+    return this._processResponse(retrieved);
   },
 
   /**
@@ -144,19 +129,16 @@ export const ServerManager = {
    * @param callback {Function(users)} Callback on success.
    *     users {dict[]}
    */
-  users: function(workspace_id, callback, errback, options) {
-    this.__request(
+  users: async function(workspace_id, options) {
+    const retrieved = await this.__request(
       'GET',
       '/workspaces/' + workspace_id + '/users',
       { opt_fields: 'name,photo.image_60x60' },
-      function(response) {
-        response.forEach(function(user) {
-          this._updateUser(workspace_id, user);
-        });
-        this._makeCallback(response, callback, errback);
-      },
       options
     );
+
+    retrieved.forEach(user => this._updateUser(workspace_id, user));
+    return this._processResponse(retrieved);
   },
 
   /**
@@ -165,16 +147,10 @@ export const ServerManager = {
    * @param callback {Function(user)} Callback on success.
    *     user {dict[]}
    */
-  me: function(callback, errback, options) {
-    this.__request(
-      'GET',
-      '/users/me',
-      {},
-      function(response) {
-        this._makeCallback(response, callback, errback);
-      },
-      options
-    );
+  me: async function(options) {
+    const retrieved = await this.__request('GET', '/users/me', {}, options);
+
+    return this._processResponse(retrieved);
   },
 
   /**
@@ -183,15 +159,14 @@ export const ServerManager = {
    * @param task {dict} Task fields.
    * @param callback {Function(response)} Callback on success.
    */
-  createTask: function(workspace_id, task, callback, errback) {
-    this.__request(
+  createTask: async function(workspace_id, task) {
+    const retrieved = await this.__request(
       'POST',
       '/workspaces/' + workspace_id + '/tasks',
-      task,
-      function(response) {
-        this._makeCallback(response, callback, errback);
-      }
+      task
     );
+
+    return this._processResponse(retrieved);
   },
 
   /**
@@ -200,17 +175,21 @@ export const ServerManager = {
    * @param task {dict} Task fields.
    * @param callback {Function(response)} Callback on success.
    */
-  modifyTask: function(task_id, task, callback, errback) {
-    this.__request('PUT', '/tasks/' + task_id + '', task, function(response) {
-      this._makeCallback(response, callback, errback);
-    });
+  modifyTask: async function(task_id, task) {
+    const retrieved = await this.__request(
+      'PUT',
+      '/tasks/' + task_id + '',
+      task
+    );
+
+    return this._processResponse(retrieved);
   },
 
   /**
    * Requests user type-ahead completions for a query.
    */
-  userTypeahead: function(workspace_id, query, callback, errback) {
-    this.__request(
+  userTypeahead: async function(workspace_id, query) {
+    const retrieved = await this.__request(
       'GET',
       '/workspaces/' + workspace_id + '/typeahead',
       {
@@ -219,26 +198,22 @@ export const ServerManager = {
         count: 10,
         opt_fields: 'name,photo.image_60x60'
       },
-      function(response) {
-        this._makeCallback(
-          response,
-          function(users) {
-            users.forEach(function(user) {
-              this._updateUser(workspace_id, user);
-            });
-            callback(users);
-          },
-          errback
-        );
-      },
       {
         miss_cache: true // Always skip the cache.
       }
     );
+
+    // callback(retrieved, function(users) {
+    //         users.forEach(function(user) {
+    //           this._updateUser(workspace_id, user);
+    //         });
+    //         callback(users);
+    //       }, errback);
+    return this._processResponse(retrieved);
   },
 
-  logEvent: function(event) {
-    this.__request('POST', '/logs', event, function(response) {});
+  logEvent: async function(event) {
+    await this.__request('POST', '/logs', event);
   },
 
   /**
@@ -252,26 +227,12 @@ export const ServerManager = {
     this._cacheUserPhoto(user);
   },
 
-  // WHY THE HECK IS RESPONSE UNDEFINED MOTHER OF GOD
-  _makeCallback: function(response, callback, errback) {
-    // console.log( "_makeCallback method has been entered." );
-    if (response === undefined) {
-      // Send a message that there was an error!
-      var notifOptions = {
-        type: 'basic',
-        iconUrl: '/assets/icon128.png',
-        title: 'AsanaTabs Error',
-        message: 'Could not connect to Asana API.'
-      };
-      sendNotification('AsanaError', notifOptions, function() {});
+  _processResponse: function(response) {
+    // console.log( "_processResponse method has been entered." );
+    if (response === undefined || response.errors) {
+      console.log('### ServerManager: ERROR on _processResponse');
     }
-    if (response.errors) {
-      console.log('ERROR on _makeCallback of server_mngr.js');
-      (errback || this.onError).call(null, response);
-    } else {
-      printForUser('SUCCESS on _MakeCallback of server_mngr.js');
-      callback(response.data);
-    }
+    return response;
   },
 
   _cacheUserPhoto: function(user) {
@@ -301,6 +262,7 @@ export const ServerManager = {
   refreshCache: function() {
     var me = this;
     // Fetch logged-in user.
+    // TODO: figure it out
     me.me(
       function(user) {
         if (!user.errors) {

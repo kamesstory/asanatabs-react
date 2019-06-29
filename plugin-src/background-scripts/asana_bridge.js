@@ -60,7 +60,7 @@ class AsanaBridge {
    * @param options {dict?}
    *     miss_cache {Boolean} Do not check cache before requesting
    */
-  request(http_method, path, params, callback, options) {
+  async request(http_method, path, params, options) {
     http_method = http_method.toUpperCase();
 
     // If we're not the server page, send a message to it to make the
@@ -119,54 +119,38 @@ class AsanaBridge {
 
     console.log('### AsanaBridge: Making request to API', http_method, url);
 
-    chrome.cookies.get(
-      {
-        url: url,
-        name: 'ticket'
+    const cookie = await chrome.cookies.get({
+      url: url,
+      name: 'ticket'
+    });
+
+    if (!cookie) {
+      return {
+        status: 401,
+        error: 'Not Authorized'
+      };
+    }
+
+    // Note that any URL fetched here must be matched by a permission in
+    // the manifest.json file!
+    const response = await fetch(url, {
+      method: http_method,
+      mode: 'cors',
+      cache: 'no-cache',
+      headers: {
+        'X-Requested-With': 'XMLHttpRequest',
+        'X-Allow-Asana-Client': '1',
+        'Content-Type': 'application/json'
       },
-      cookie => {
-        if (!cookie) {
-          callback({
-            status: 401,
-            error: 'Not Authorized'
-          });
-          return;
-        }
+      body: JSON.stringify(body_data)
+    });
+    if (response.status !== 200) {
+      console.log('### AsanaBridge: ERROR, response status ' + response.status);
+    }
 
-        // Note that any URL fetched here must be matched by a permission in
-        // the manifest.json file!
-        fetch(url, {
-          method: http_method,
-          mode: 'cors',
-          cache: 'no-cache',
-          headers: {
-            'X-Requested-With': 'XMLHttpRequest',
-            'X-Allow-Asana-Client': '1',
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(body_data)
-        })
-          .then(response => {
-            if (response.status !== 200) {
-              console.log(
-                '### AsanaBridge: ERROR, response status ' + response.status
-              );
-            }
-
-            // if (http_method === 'GET') {
-            //   this._writeCache(path, e, new Date());
-            // }
-            return response.json();
-          })
-          .then(json => {
-            console.log('### AsanaBridge: JSON response', json['data']);
-            callback(json['data']);
-          })
-          .catch(response => {
-            console.log('### AsanaBridge: request threw an ERROR!', response);
-          });
-      }
-    );
+    const json = await response.json();
+    console.log('### AsanaBridge: JSON response', json['data']);
+    return json.data;
   }
 
   _readCache(path, date) {

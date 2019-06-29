@@ -1,3 +1,4 @@
+import 'chrome-extension-async';
 import AsanaBridge from './asana_bridge.js';
 import { ServerManager } from './server_mngr.js';
 
@@ -15,40 +16,41 @@ asanaBridge.is_server = true;
 // Mark our Api Bridge as the server side (the one that actually makes
 // API requests to Asana vs. just forwarding them to the server window).
 console.log('ExtensionServer reloaded at ' + new Date().toString());
-console.log('Background check: version 39');
+console.log('Background check: version 45');
 
-chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
+chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
   if (request.type === 'api') {
     // Request to the API. Pass it on to the bridge.
-    asanaBridge.request(
+    const data = await asanaBridge.request(
       request.method,
       request.path,
       request.params,
-      sendResponse,
       request.options || {}
     );
-    return true; // will call sendResponse asynchronously
+
+    if (data) {
+      sendResponse(data);
+    }
   } else if (request.type === 'notification') {
-    chrome.notifications.create(request.title, request.options, function(
-      notificationID
-    ) {});
+    const _notificationID = await chrome.notifications.create(
+      request.title,
+      request.options
+    );
   }
 });
 
 // Immediately start preloading - set timer to ping login every 15 seconds
-setInterval(() => {
-  ServerManager.isLoggedIn(function(isLoggedIn) {
-    console.log('### Background: logged in is ' + isLoggedIn);
-  });
-}, 15 * 1000);
+setInterval(async () => {
+  const isLoggedIn = await ServerManager.isLoggedIn();
+  console.log('### Background: logged in is ', isLoggedIn);
+}, 5 * 1000);
 
 // Refresh workspaces and tasks every minute and push to localStorage / cache
-setInterval(() => {
-  ServerManager.workspaces(function(workspaces) {
-    console.log(
-      '### Background: GET request has retrieved ' +
-        workspaces.length +
-        ' workspaces.'
-    );
-  });
-}, 60 * 1000);
+setInterval(async () => {
+  const workspaces = await ServerManager.workspaces();
+  console.log(
+    '### Background: GET request has retrieved ' +
+      workspaces.length +
+      ' workspaces.'
+  );
+}, 10 * 1000);
