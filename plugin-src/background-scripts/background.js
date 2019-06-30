@@ -16,9 +16,9 @@ asanaBridge.is_server = true;
 // Mark our Api Bridge as the server side (the one that actually makes
 // API requests to Asana vs. just forwarding them to the server window).
 console.log('ExtensionServer reloaded at ' + new Date().toString());
-console.log('Background check: version 49');
+console.log('Background check: version 50');
 
-chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
   chrome.extension
     .getBackgroundPage()
     .console.log('### Background: chrome runtime request sent from ', sender);
@@ -27,14 +27,13 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     chrome.extension
       .getBackgroundPage()
       .console.log('### Background: api request sent from ', sender);
-    asanaBridge
-      .request(
-        request.method,
-        request.path,
-        request.params,
-        request.options || {}
-      )
-      .then(data => data && sendResponse(data));
+    const data = await asanaBridge.request(
+      request.method,
+      request.path,
+      request.params,
+      request.options || {}
+    );
+    sendResponse(data);
     return true;
   } else if (request.type === 'notification') {
     chrome.notifications.create(request.title, request.options);
@@ -45,14 +44,14 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 setInterval(async () => {
   const isLoggedIn = await ServerManager.isLoggedIn();
   console.log('### Background: logged in is ', isLoggedIn);
-}, 5 * 1000);
 
-// Refresh workspaces and tasks every minute and push to localStorage / cache
-setInterval(async () => {
+  chrome.extension
+    .getBackgroundPage()
+    .console.log('### Background: retrieving workspaces in the background!');
   const workspaces = await ServerManager.workspaces();
   console.log(
     '### Background: GET request has retrieved ' +
       workspaces.length +
       ' workspaces.'
   );
-}, 10 * 1000);
+}, 5 * 1000);

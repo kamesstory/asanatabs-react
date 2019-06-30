@@ -9,12 +9,7 @@
     "persistent": true,
     "scripts": ["background.bundle.js"]
   },
-  "content_scripts": [
-    {
-      "matches": ["<all_urls>"],
-      "js": ["content-script.bundle.js"]
-    }
-  ],
+  "content_scripts": [],
 
   "icons": {
     "16": "webpack.16.png",

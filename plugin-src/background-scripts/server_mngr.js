@@ -55,10 +55,12 @@ export const ServerManager = {
    *     is_logged_in {Boolean} True iff the user is logged in to Asana.
    */
   isLoggedIn: async function() {
-    return await chrome.cookies.get({
+    const cookie = await chrome.cookies.get({
       url: this.ASANA_BRIDGE_BASE_URL,
       name: 'ticket'
     });
+
+    return !!(cookie && cookie.value);
   },
 
   /**
@@ -94,8 +96,13 @@ export const ServerManager = {
         options: options || {}
       },
       arg => {
-        console.log('arg', arg);
-        console.log('lasterror', chrome.runtime.lastError);
+        chrome.extension
+          .getBackgroundPage()
+          .console.log('### SM: Response received!');
+        chrome.extension.getBackgroundPage().console.log('arg', arg);
+        chrome.extension
+          .getBackgroundPage()
+          .console.log('lasterror', chrome.runtime.lastError);
       }
     );
   },
@@ -107,6 +114,9 @@ export const ServerManager = {
    *     workspaces {dict[]}
    */
   workspaces: async function(options) {
+    chrome.extension
+      .getBackgroundPage()
+      .console.log('### ServerManager: inside workspaces!');
     const retrieved = await this.__request('GET', '/workspaces', {}, options);
     chrome.extension.getBackgroundPage().console.log('retrieved', retrieved);
     return this._processResponse(retrieved);
