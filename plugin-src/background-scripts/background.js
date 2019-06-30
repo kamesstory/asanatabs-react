@@ -16,11 +16,17 @@ asanaBridge.is_server = true;
 // Mark our Api Bridge as the server side (the one that actually makes
 // API requests to Asana vs. just forwarding them to the server window).
 console.log('ExtensionServer reloaded at ' + new Date().toString());
-console.log('Background check: version 47');
+console.log('Background check: version 49');
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+  chrome.extension
+    .getBackgroundPage()
+    .console.log('### Background: chrome runtime request sent from ', sender);
   if (request.type === 'api') {
     // Request to the API. Pass it on to the bridge.
+    chrome.extension
+      .getBackgroundPage()
+      .console.log('### Background: api request sent from ', sender);
     asanaBridge
       .request(
         request.method,

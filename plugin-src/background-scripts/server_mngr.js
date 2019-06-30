@@ -78,6 +78,13 @@ export const ServerManager = {
   },
 
   __request: function(http_method, path, params, options) {
+    chrome.extension
+      .getBackgroundPage()
+      .console.log(
+        '### ServerManager: sending message to chrome runtime!',
+        http_method,
+        path
+      );
     return chrome.runtime.sendMessage(
       {
         type: 'api',
@@ -101,7 +108,7 @@ export const ServerManager = {
    */
   workspaces: async function(options) {
     const retrieved = await this.__request('GET', '/workspaces', {}, options);
-    console.log('retrieved', retrieved);
+    chrome.extension.getBackgroundPage().console.log('retrieved', retrieved);
     return this._processResponse(retrieved);
   },
 
@@ -230,7 +237,9 @@ export const ServerManager = {
   _processResponse: function(response) {
     // console.log( "_processResponse method has been entered." );
     if (response === undefined || response.errors) {
-      console.log('### ServerManager: ERROR on _processResponse');
+      chrome.extension
+        .getBackgroundPage()
+        .console.log('### ServerManager: ERROR on _processResponse');
     }
     return response;
   },
