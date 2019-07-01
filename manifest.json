@@ -7,7 +7,7 @@
 
   "background": {
     "persistent": true,
-    "scripts": ["background.bundle.js"]
+    "scripts": ["background.bundle.js", "refreshData.bundle.js"]
   },
   "content_scripts": [],
 

@@ -79,7 +79,7 @@ export const ServerManager = {
     callback(url);
   },
 
-  __request: function(http_method, path, params, options) {
+  __request: function(port, http_method, path, params, options) {
     chrome.extension
       .getBackgroundPage()
       .console.log(
@@ -87,7 +87,7 @@ export const ServerManager = {
         http_method,
         path
       );
-    return chrome.runtime.sendMessage(
+    return port.postMessage(
       {
         type: 'api',
         method: http_method,
@@ -113,11 +113,17 @@ export const ServerManager = {
    * @param callback {Function(workspaces)} Callback on success.
    *     workspaces {dict[]}
    */
-  workspaces: async function(options) {
+  workspaces: async function(port, options) {
     chrome.extension
       .getBackgroundPage()
       .console.log('### ServerManager: inside workspaces!');
-    const retrieved = await this.__request('GET', '/workspaces', {}, options);
+    const retrieved = await this.__request(
+      port,
+      'GET',
+      '/workspaces',
+      {},
+      options
+    );
     chrome.extension.getBackgroundPage().console.log('retrieved', retrieved);
     return this._processResponse(retrieved);
   },
@@ -128,14 +134,20 @@ export const ServerManager = {
    * @param callback {Function(workspaces)} Callback on success.
    *     workspaces {dict[]}
    */
-  tasks: async function(workspace_id, options) {
+  tasks: async function(port, workspace_id, options) {
     var params = {
       assignee: 'me',
       completed_since: 'now',
       limit: 100,
       workspace: workspace_id
     }; // assignee=me&completed_since=now&limit=100&workspace=[workspace_id]
-    const retrieved = await this.__request('GET', '/tasks', params, options);
+    const retrieved = await this.__request(
+      port,
+      'GET',
+      '/tasks',
+      params,
+      options
+    );
 
     return this._processResponse(retrieved);
   },
@@ -146,8 +158,9 @@ export const ServerManager = {
    * @param callback {Function(users)} Callback on success.
    *     users {dict[]}
    */
-  users: async function(workspace_id, options) {
+  users: async function(port, workspace_id, options) {
     const retrieved = await this.__request(
+      port,
       'GET',
       '/workspaces/' + workspace_id + '/users',
       { opt_fields: 'name,photo.image_60x60' },
@@ -164,8 +177,14 @@ export const ServerManager = {
    * @param callback {Function(user)} Callback on success.
    *     user {dict[]}
    */
-  me: async function(options) {
-    const retrieved = await this.__request('GET', '/users/me', {}, options);
+  me: async function(port, options) {
+    const retrieved = await this.__request(
+      port,
+      'GET',
+      '/users/me',
+      {},
+      options
+    );
 
     return this._processResponse(retrieved);
   },
@@ -176,8 +195,9 @@ export const ServerManager = {
    * @param task {dict} Task fields.
    * @param callback {Function(response)} Callback on success.
    */
-  createTask: async function(workspace_id, task) {
+  createTask: async function(port, workspace_id, task) {
     const retrieved = await this.__request(
+      port,
       'POST',
       '/workspaces/' + workspace_id + '/tasks',
       task
@@ -192,8 +212,9 @@ export const ServerManager = {
    * @param task {dict} Task fields.
    * @param callback {Function(response)} Callback on success.
    */
-  modifyTask: async function(task_id, task) {
+  modifyTask: async function(port, task_id, task) {
     const retrieved = await this.__request(
+      port,
       'PUT',
       '/tasks/' + task_id + '',
       task
@@ -205,8 +226,9 @@ export const ServerManager = {
   /**
    * Requests user type-ahead completions for a query.
    */
-  userTypeahead: async function(workspace_id, query) {
+  userTypeahead: async function(port, workspace_id, query) {
     const retrieved = await this.__request(
+      port,
       'GET',
       '/workspaces/' + workspace_id + '/typeahead',
       {
@@ -229,8 +251,8 @@ export const ServerManager = {
     return this._processResponse(retrieved);
   },
 
-  logEvent: async function(event) {
-    await this.__request('POST', '/logs', event);
+  logEvent: async function(port, event) {
+    await this.__request(port, 'POST', '/logs', event);
   },
 
   /**
