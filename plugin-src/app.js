@@ -33,18 +33,22 @@ const customBackground = ({ backgroundImage }) => css`
 `;
 
 export const App = ({ workspaces, inputTasks, refetch }) => {
-  const tasks = inputTasks.map(({ id, name, workspace_name }) => ({
+  inputTasks.sort(() => Math.random() - 0.5);
+  const tasks = inputTasks.map(({ id, name, workspace_name, due_on }) => ({
     id,
     title: name,
     workspace: workspace_name,
-    duedate: 'TMRW' // TODO: to be replaced
+    duedate: due_on // TODO: to be replaced
   }));
 
+  // TODO: fix the workspace color generation so that it looks better!
+  //  can even do fancy color prioritization based on number of tasks (so it doesn't
+  //  look overwhelming)
   const workspaceColors = {
     'Tech & Check': '#FF5252',
-    'Smart Home IoT': '#7C4DFF',
+    'Smart Home IoT': '#FFB300',
     DCT: '#4CAF50',
-    'Personal Projects': '#FFB300'
+    'Personal Projects': '#7C4DFF'
   };
 
   const filteredTasks = tasks
