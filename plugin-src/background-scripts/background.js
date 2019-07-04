@@ -3,14 +3,17 @@ import { ServerManager } from './server_mngr.js';
 
 const GET_WORKSPACE_KEY = workspace_id => 'workspace_' + workspace_id;
 
+const checkLogin = async () => {
+  const loggedIn = await ServerManager.isLoggedIn();
+  if (!loggedIn) console.log('### Background: not logged in!');
+  return loggedIn;
+};
+
 const update = async () => {
   console.log('### Background: this is version 1');
 
-  const loggedIn = await ServerManager.isLoggedIn();
-  if (!loggedIn) {
-    console.log('### Background: not logged in!');
-    return;
-  }
+  const loggedIn = await checkLogin();
+  if (!loggedIn) return;
 
   const workspaces = await ServerManager.workspaces();
   if (!workspaces) {
