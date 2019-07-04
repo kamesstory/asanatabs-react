@@ -24,13 +24,10 @@ export const update = async () => {
   }
   chrome.storage.local.set({ [WORKSPACES_KEY]: workspaces });
 
-  chrome.storage.local.get(['key'], function(result) {
-    console.log('Value currently is ' + result.key);
-  });
-
   const getAndSaveTasks = async workspace => {
     const { id: wid, name: wname } = workspace;
-    const tasksForWorkspace = await ServerManager.tasks(wid);
+    let options = ['due_on', 'name'];
+    const tasksForWorkspace = await ServerManager.tasks(wid, options);
     if (!tasksForWorkspace) {
       console.log('### Background: no tasks for workspace ' + wname);
       return;

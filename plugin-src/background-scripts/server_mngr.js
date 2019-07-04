@@ -87,12 +87,16 @@ export const ServerManager = {
       };
     } else {
       // GET/DELETE request, add params as URL parameters.
+      let optionsString =
+        options != null ? 'opt_fields=' + options.join(',') + '&' : '';
       let url_params = { opt_client_name: client_name, ...params };
       url +=
         '?' +
+        optionsString +
         Object.entries(url_params)
           .map(([key, value]) => key + '=' + value)
           .join('&');
+      console.log('### ServerManager: url is ', url);
     }
 
     const cookie = await chrome.cookies.get({
