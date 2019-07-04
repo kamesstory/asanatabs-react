@@ -10,7 +10,6 @@ module.exports = {
   entry: {
     'content-script': './plugin-src/my-content-script.js',
     background: './plugin-src/background-scripts/background.js',
-    refreshData: './plugin-src/background-scripts/refreshData.js',
     app: './plugin-src/app.js',
     main: './plugin-src/main.js'
   },

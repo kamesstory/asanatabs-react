@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import ReactDOM from 'react-dom';
 import styled from '@emotion/styled';
 import { Global, css } from '@emotion/core';
 import background from './images/ales-krivec-623996-unsplash.jpg';
@@ -33,7 +32,7 @@ const customBackground = ({ backgroundImage }) => css`
   }
 `;
 
-const App = () => {
+export const App = () => {
   const [tasks, setTasks] = useState([
     {
       id: 4326,
@@ -100,5 +99,3 @@ const App = () => {
     </>
   );
 };
-
-ReactDOM.render(<App />, document.getElementById('root'));

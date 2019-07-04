@@ -8,14 +8,7 @@ import { Options } from './options.js';
  * to the Asana API to get results.
  */
 export const ServerManager = {
-  // Make requests to API to refresh cache at this interval.
-  CACHE_REFRESH_INTERVAL_MS: 15 * 60 * 1000, // 15 minutes
-
-  API_Version: '1.0',
-
   ASANA_BRIDGE_BASE_URL: Options.loginUrl('') + 'api/' + '1.0',
-
-  _url_to_cached_image: {},
 
   /**
    * Called by the model whenever a request is made and error occurs.
@@ -25,7 +18,9 @@ export const ServerManager = {
    *
    * @param response {dict} Response from the server.
    */
-  onError: function(response) {},
+  onError: function(response) {
+    console.error('### ServerManager: ERROR thrown!');
+  },
 
   /**
    * Requests the user's preferences for the extension.
@@ -63,48 +58,77 @@ export const ServerManager = {
     return !!(cookie && cookie.value);
   },
 
-  /**
-   * Get the URL of a task given some of its data.
-   *
-   * @param task {dict}
-   * @param callback {Function(url)}
-   */
-  taskViewUrl: function(task, callback) {
-    // We don't know what pot to view it in so we just use the task ID
-    // and Asana will choose a suitable default.
-    var options = Options.loadOptions();
-    var pot_id = task.id;
-    var url =
-      'https://' + options.asana_host_port + '/0/' + pot_id + '/' + task.id;
-    callback(url);
-  },
+  __request: async function(http_method, path, params, options) {
+    http_method = http_method.toUpperCase();
 
-  __request: function(port, http_method, path, params, options) {
-    chrome.extension
-      .getBackgroundPage()
-      .console.log(
-        '### ServerManager: sending message to chrome runtime!',
-        http_method,
-        path
-      );
-    return port.postMessage(
-      {
-        type: 'api',
-        method: http_method,
-        path: path,
-        params: params,
-        options: options || {}
+    if (http_method === 'PINGTEST') {
+      console.log('### ServerManager: ping test registered!');
+      // alert('Greetings from ServerManager! Ping test received.');
+      return;
+    }
+
+    // Be polite to Asana API and tell them who we are.
+    let manifest = chrome.runtime.getManifest();
+    let client_name = [
+      'chrome-extension',
+      chrome.i18n.getMessage('@@extension_id'),
+      manifest.version,
+      manifest.name
+    ].join(':');
+
+    //
+    let url = this.ASANA_BRIDGE_BASE_URL + path;
+    let body_data;
+    if (http_method === 'PUT' || http_method === 'POST') {
+      // POST/PUT request, put params in body
+      body_data = {
+        data: params,
+        options: { client_name: client_name }
+      };
+    } else {
+      // GET/DELETE request, add params as URL parameters.
+      let url_params = { opt_client_name: client_name, ...params };
+      url +=
+        '?' +
+        Object.entries(url_params)
+          .map(([key, value]) => key + '=' + value)
+          .join('&');
+    }
+
+    const cookie = await chrome.cookies.get({
+      url: url,
+      name: 'ticket'
+    });
+
+    if (!cookie) {
+      return {
+        status: 401,
+        error: 'Not Authorized'
+      };
+    }
+
+    // Note that any URL fetched here must be matched by a permission in
+    // the manifest.json file!
+    const response = await fetch(url, {
+      method: http_method,
+      mode: 'cors',
+      cache: 'no-cache',
+      headers: {
+        'X-Requested-With': 'XMLHttpRequest',
+        'X-Allow-Asana-Client': '1',
+        'Content-Type': 'application/json'
       },
-      arg => {
-        chrome.extension
-          .getBackgroundPage()
-          .console.log('### SM: Response received!');
-        chrome.extension.getBackgroundPage().console.log('arg', arg);
-        chrome.extension
-          .getBackgroundPage()
-          .console.log('lasterror', chrome.runtime.lastError);
-      }
-    );
+      body: JSON.stringify(body_data)
+    });
+    if (response.status !== 200) {
+      console.log(
+        '### ServerManager: ERROR, response status ' + response.status
+      );
+    }
+
+    const json = await response.json();
+    console.log('### ServerManager: JSON response', json['data']);
+    return json.data;
   },
 
   /**
@@ -113,18 +137,10 @@ export const ServerManager = {
    * @param callback {Function(workspaces)} Callback on success.
    *     workspaces {dict[]}
    */
-  workspaces: async function(port, options) {
-    chrome.extension
-      .getBackgroundPage()
-      .console.log('### ServerManager: inside workspaces!');
-    const retrieved = await this.__request(
-      port,
-      'GET',
-      '/workspaces',
-      {},
-      options
-    );
-    chrome.extension.getBackgroundPage().console.log('retrieved', retrieved);
+  workspaces: async function(options) {
+    console.log('### ServerManager: inside workspaces!');
+
+    const retrieved = await this.__request('GET', '/workspaces', {}, options);
     return this._processResponse(retrieved);
   },
 
@@ -134,20 +150,14 @@ export const ServerManager = {
    * @param callback {Function(workspaces)} Callback on success.
    *     workspaces {dict[]}
    */
-  tasks: async function(port, workspace_id, options) {
+  tasks: async function(workspace_id, options) {
     var params = {
       assignee: 'me',
       completed_since: 'now',
       limit: 100,
       workspace: workspace_id
     }; // assignee=me&completed_since=now&limit=100&workspace=[workspace_id]
-    const retrieved = await this.__request(
-      port,
-      'GET',
-      '/tasks',
-      params,
-      options
-    );
+    const retrieved = await this.__request('GET', '/tasks', params, options);
 
     return this._processResponse(retrieved);
   },
@@ -158,9 +168,8 @@ export const ServerManager = {
    * @param callback {Function(users)} Callback on success.
    *     users {dict[]}
    */
-  users: async function(port, workspace_id, options) {
+  users: async function(workspace_id, options) {
     const retrieved = await this.__request(
-      port,
       'GET',
       '/workspaces/' + workspace_id + '/users',
       { opt_fields: 'name,photo.image_60x60' },
@@ -177,14 +186,8 @@ export const ServerManager = {
    * @param callback {Function(user)} Callback on success.
    *     user {dict[]}
    */
-  me: async function(port, options) {
-    const retrieved = await this.__request(
-      port,
-      'GET',
-      '/users/me',
-      {},
-      options
-    );
+  me: async function(options) {
+    const retrieved = await this.__request('GET', '/users/me', {}, options);
 
     return this._processResponse(retrieved);
   },
@@ -195,9 +198,8 @@ export const ServerManager = {
    * @param task {dict} Task fields.
    * @param callback {Function(response)} Callback on success.
    */
-  createTask: async function(port, workspace_id, task) {
+  createTask: async function(workspace_id, task) {
     const retrieved = await this.__request(
-      port,
       'POST',
       '/workspaces/' + workspace_id + '/tasks',
       task
@@ -212,9 +214,8 @@ export const ServerManager = {
    * @param task {dict} Task fields.
    * @param callback {Function(response)} Callback on success.
    */
-  modifyTask: async function(port, task_id, task) {
+  modifyTask: async function(task_id, task) {
     const retrieved = await this.__request(
-      port,
       'PUT',
       '/tasks/' + task_id + '',
       task
@@ -226,9 +227,8 @@ export const ServerManager = {
   /**
    * Requests user type-ahead completions for a query.
    */
-  userTypeahead: async function(port, workspace_id, query) {
+  userTypeahead: async function(workspace_id, query) {
     const retrieved = await this.__request(
-      port,
       'GET',
       '/workspaces/' + workspace_id + '/typeahead',
       {
@@ -251,70 +251,15 @@ export const ServerManager = {
     return this._processResponse(retrieved);
   },
 
-  logEvent: async function(port, event) {
-    await this.__request(port, 'POST', '/logs', event);
-  },
-
-  /**
-   * All the users that have been seen so far, keyed by workspace and user.
-   */
-  _known_users: {},
-
-  _updateUser: function(workspace_id, user) {
-    this._known_users[workspace_id] = this._known_users[workspace_id] || {};
-    this._known_users[workspace_id][user.id] = user;
-    this._cacheUserPhoto(user);
+  logEvent: async function(event) {
+    await this.__request('POST', '/logs', event);
   },
 
   _processResponse: function(response) {
     // console.log( "_processResponse method has been entered." );
     if (response === undefined || response.errors) {
-      chrome.extension
-        .getBackgroundPage()
-        .console.log('### ServerManager: ERROR on _processResponse');
+      console.log('### ServerManager: ERROR on _processResponse');
     }
     return response;
-  },
-
-  _cacheUserPhoto: function(user) {
-    var me = this;
-    if (user.photo) {
-      var url = user.photo.image_60x60;
-      if (!(url in me._url_to_cached_image)) {
-        var image = new Image();
-        image.src = url;
-        me._url_to_cached_image[url] = image;
-      }
-    }
-  },
-
-  /**
-   * Start fetching all the data needed by the extension so it is available
-   * whenever a popup is opened.
-   */
-  startPrimingCache: function() {
-    var me = this;
-    me._cache_refresh_interval = setInterval(function() {
-      me.refreshCache();
-    }, me.CACHE_REFRESH_INTERVAL_MS);
-    me.refreshCache();
-  },
-
-  refreshCache: function() {
-    var me = this;
-    // Fetch logged-in user.
-    // TODO: figure it out
-    me.me(
-      function(user) {
-        if (!user.errors) {
-          // Fetch list of workspaces.
-          me.workspaces(function(workspaces) {}, null, {
-            miss_cache: true
-          });
-        }
-      },
-      null,
-      { miss_cache: true }
-    );
   }
 };
