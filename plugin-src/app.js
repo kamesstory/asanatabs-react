@@ -32,47 +32,19 @@ const customBackground = ({ backgroundImage }) => css`
   }
 `;
 
-export const App = () => {
-  const [tasks, setTasks] = useState([
-    {
-      id: 4326,
-      title: 'set up BERT implementation for NLP claim matching',
-      workspace: 'Tech & Check',
-      duedate: 'TMRW'
-    },
-    {
-      id: 9548,
-      title: 'allow diverse queries for smart home lights Alexa skill',
-      workspace: 'Smart Home IoT',
-      duedate: 'TODAY'
-    },
-    {
-      id: 9517,
-      title:
-        'reach out to WWF and Microsoft Earth for AI contacts for project ideas',
-      workspace: 'Conservation Technology',
-      duedate: 'JUN 27'
-    },
-    {
-      id: 2368,
-      title:
-        'start thinking about blueprint conference organizers for next year',
-      workspace: 'Conservation Technology',
-      duedate: 'JUL 02'
-    },
-    {
-      id: 1,
-      title: 'finish identifying cart and adjustment book changes for coupons',
-      workspace: 'Farmers Business Network',
-      duedate: '5 DAYS'
-    }
-  ]);
+export const App = ({ workspaces, inputTasks, refetch }) => {
+  const tasks = inputTasks.map(({ id, name, workspace_name }) => ({
+    id,
+    title: name,
+    workspace: workspace_name,
+    duedate: 'TMRW' // TODO: to be replaced
+  }));
 
   const workspaceColors = {
     'Tech & Check': '#FF5252',
     'Smart Home IoT': '#7C4DFF',
-    'Conservation Technology': '#4CAF50',
-    'Farmers Business Network': '#FFB300'
+    DCT: '#4CAF50',
+    'Personal Projects': '#FFB300'
   };
 
   const filteredTasks = tasks
@@ -89,11 +61,11 @@ export const App = () => {
         })}
       />
       <DateTime />
-      <TaskCard title="Today" tasks={filteredTasks} onTasksChanged={setTasks} />
+      <TaskCard title="Today" tasks={filteredTasks} onTasksChanged={refetch} />
       <TaskCard
         title="Tomorrow"
         tasks={filteredTasks}
-        onTasksChanged={setTasks}
+        onTasksChanged={refetch}
       />
       <CreateTask />
     </>

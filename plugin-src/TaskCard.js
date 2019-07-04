@@ -15,6 +15,7 @@ const CheckBoxOuter = styled.div`
   height: 26px;
   width: 26px;
   display: flex;
+  flex-shrink: 0;
   align-items: center;
   justify-content: center;
   margin-right: 18px;
@@ -38,6 +39,7 @@ const MAX_WORKSPACE_WIDTH_PX = 180;
 const WorkspaceName = styled.span`
   color: ${props => props.color};
   font-weight: 600;
+  flex-shrink: 0;
   white-space: nowrap;
   overflow: hidden;
   margin-right: 36px;
@@ -61,6 +63,7 @@ const TaskTitle = styled.span`
 `;
 
 const DueDate = styled.span`
+  flex-shrink: 0;
   font-weight: 600;
   min-width: 90px;
   text-align: right;
