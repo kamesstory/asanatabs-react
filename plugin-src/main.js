@@ -12,30 +12,36 @@ import * as AsanaFetcher from './background-scripts/fetchFromAsana.js';
 const main = async () => {
   // TODO: let the user know if they are not logged into Asana / have cookies enabled!
   // immediately pull storage
-  const [tasks, workspaces] = await Promise.all([
+  const [localTasks, localWorkspaces] = await Promise.all([
     chrome.storage.local.get([AsanaFetcher.TASKS_KEY]),
     chrome.storage.local.get([AsanaFetcher.WORKSPACES_KEY])
   ]);
-  const renderApp = () =>
+  const renderApp = (tasks, workspaces) =>
     ReactDOM.render(
-      <App
-        inputWorkspaces={workspaces[AsanaFetcher.WORKSPACES_KEY]}
-        inputTasks={tasks[AsanaFetcher.TASKS_KEY]}
-      />,
+      <App inputWorkspaces={workspaces} inputTasks={tasks} />,
       document.getElementById('root')
     );
 
   console.log(
     '### Main: workspaces and tasks retrieved from local storage! ',
-    tasks,
-    workspaces
+    localTasks,
+    localWorkspaces
   );
-  renderApp();
+  renderApp(
+    localTasks[AsanaFetcher.TASKS_KEY],
+    localWorkspaces[AsanaFetcher.WORKSPACES_KEY]
+  );
 
   // then immediate request from asana
-  const updatedTasks = await AsanaFetcher.update();
+  const [updatedTasks, updatedWorkspaces] = await AsanaFetcher.update();
+  console.log(
+    '### Main: workspaces and tasks retrieved from update! ',
+    updatedTasks.flat(),
+    updatedWorkspaces
+  );
 
   // then render update
+  renderApp(updatedTasks.flat(), updatedWorkspaces);
 };
 
 main();

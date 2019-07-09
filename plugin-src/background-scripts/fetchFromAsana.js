@@ -51,5 +51,5 @@ export const update = async () => {
     tasks.flat()
   );
 
-  return tasks;
+  return [tasks, workspaces];
 };
