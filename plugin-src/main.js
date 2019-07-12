@@ -11,7 +11,7 @@ import { randomColor } from 'randomcolor';
 
 // yo im gonna start a connection to the background
 const main = async () => {
-  chrome.storage.local.clear();
+  // chrome.storage.local.clear();
 
   // TODO: let the user know if they are not logged into Asana / have cookies enabled!
   // immediately pull storage
@@ -37,10 +37,12 @@ const main = async () => {
     localWorkspaces,
     workspaceColors
   );
-  const aatk = AsanaFetcher.ALL_TASKS_KEY;
-  const awk = AsanaFetcher.ALL_WORKSPACES_KEY;
-  const wck = AsanaFetcher.WORKSPACE_COLORS_KEY;
-  if (aatk in localTasks && awk in localWorkspaces && wck in workspaceColors) {
+
+  if (
+    AsanaFetcher.ALL_TASKS_KEY in localTasks &&
+    AsanaFetcher.ALL_WORKSPACES_KEY in localWorkspaces &&
+    AsanaFetcher.WORKSPACE_COLORS_KEY in workspaceColors
+  ) {
     renderApp(
       localTasks[AsanaFetcher.ALL_TASKS_KEY],
       localWorkspaces[AsanaFetcher.ALL_WORKSPACES_KEY],
@@ -56,24 +58,20 @@ const main = async () => {
     updatedWorkspaces
   );
 
-  console.log('### TEST: randomcolor has generated color ', randomColor());
-
-  const updatedColors = updatedWorkspaces
-    .map(workspace => workspace.name)
-    .reduce(
-      (colorsMap, wsn) => ({
-        ...colorsMap,
-        [wsn]: workspaceColors[wsn]
-          ? workspaceColors[wsn]
-          : randomColor({ seed: wsn })
-      }),
-      {}
-    );
+  const updatedColors = updatedWorkspaces.reduce(
+    (colorsMap, workspace) => ({
+      ...colorsMap,
+      [workspace.name]: workspaceColors[workspace.name]
+        ? workspaceColors[workspace.name]
+        : randomColor({ seed: workspace.id })
+    }),
+    {}
+  );
   chrome.storage.local.set({
     [AsanaFetcher.WORKSPACE_COLORS_KEY]: updatedColors
   });
 
-  console.log('### MAIN: workspace colors are ', updatedColors);
+  console.log('### Main: workspace colors are ', updatedColors);
 
   // then render update
   renderApp(updatedTasks.flat(), updatedWorkspaces, updatedColors);

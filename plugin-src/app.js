@@ -5,6 +5,7 @@ import background from './images/ales-krivec-623996-unsplash.jpg';
 import DateTime from './DateTime.js';
 import TaskCard from './TaskCard.js';
 import CreateTask from './CreateTask.js';
+import { endOfDay, endOfTomorrow } from 'date-fns';
 
 const customBackground = ({ backgroundImage }) => css`
   html {
@@ -38,7 +39,7 @@ export const App = ({ workspaces, tasks, workspaceColors, refetch }) => {
   //  powerful Today/Tomorrow/Upcoming labels!
   // also think about how to get upcoming to have a user-controlled reminder
   //  date to see when to update the task to be worked on!
-  tasks.sort(() => Math.random() - 0.5);
+  // tasks.sort(() => Math.random() - 0.5);
   const mapped_tasks = tasks.map(({ id, name, workspace_name, due_on }) => ({
     id,
     title: name,
@@ -49,12 +50,30 @@ export const App = ({ workspaces, tasks, workspaceColors, refetch }) => {
   const filteredTasks = mapped_tasks
     .filter(task => !task.done)
     .map(task => {
-      task['color'] = workspaceColors[task['workspace']];
+      task.color = workspaceColors[task.workspace];
       return task;
     });
 
-  console.log('### App: colors are ', workspaceColors);
-  console.log('### App: filtered tasks are ', filteredTasks);
+  // TODO: decide if I want to include this on the App rendering method or
+  //  somewhere else, parsed out
+  const mingTian = endOfDay(new Date());
+  const houTian = endOfTomorrow();
+  mingTian.setDate(mingTian.getDate() + 1);
+  houTian.setDate(houTian.getDate() + 2);
+  // TODO: fix this bs regarding date comparisons
+  const todayTasks = filteredTasks.filter(
+    task => task.duedate && Date.parse(task.duedate) <= Date.parse(mingTian)
+  );
+  const tomorrowTasks = filteredTasks.filter(
+    task =>
+      task.duedate &&
+      Date.parse(task.duedate) >= Date.parse(mingTian) &&
+      Date.parse(task.duedate) <= Date.parse(houTian)
+  );
+  const upcomingTasks = filteredTasks.filter(
+    task => !task.duedate || Date.parse(task.duedate) >= Date.parse(houTian)
+  );
+
   return (
     <>
       <Global
@@ -63,10 +82,15 @@ export const App = ({ workspaces, tasks, workspaceColors, refetch }) => {
         })}
       />
       <DateTime />
-      <TaskCard title="Today" tasks={filteredTasks} onTasksChanged={refetch} />
+      <TaskCard title="Today" tasks={todayTasks} onTasksChanged={refetch} />
       <TaskCard
         title="Tomorrow"
-        tasks={filteredTasks}
+        tasks={tomorrowTasks}
+        onTasksChanged={refetch}
+      />
+      <TaskCard
+        title="Upcoming"
+        tasks={upcomingTasks}
         onTasksChanged={refetch}
       />
       <CreateTask />
