@@ -2,8 +2,9 @@ import 'chrome-extension-async';
 import { ServerManager } from './server_mngr.js';
 
 const GET_WORKSPACE_KEY = workspace_id => 'workspace_' + workspace_id;
-export const TASKS_KEY = 'all_tasks';
-export const WORKSPACES_KEY = 'all_workspaces';
+export const ALL_TASKS_KEY = 'all_tasks';
+export const ALL_WORKSPACES_KEY = 'all_workspaces';
+export const WORKSPACE_COLORS_KEY = 'all_workspace_colors';
 
 const checkLogin = async () => {
   const loggedIn = await ServerManager.isLoggedIn();
@@ -22,7 +23,7 @@ export const update = async () => {
     console.log('### Background: no workspaces!');
     return;
   }
-  chrome.storage.local.set({ [WORKSPACES_KEY]: workspaces });
+  chrome.storage.local.set({ [ALL_WORKSPACES_KEY]: workspaces });
 
   const getAndSaveTasks = async workspace => {
     const { id: wid, name: wname } = workspace;
@@ -44,7 +45,7 @@ export const update = async () => {
     workspaces.map(workspace => getAndSaveTasks(workspace))
   );
 
-  chrome.storage.local.set({ [TASKS_KEY]: tasks.flat() });
+  chrome.storage.local.set({ [ALL_TASKS_KEY]: tasks.flat() });
 
   console.log(
     '### Background: all the tasks retrieved, flattened!',

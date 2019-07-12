@@ -131,6 +131,8 @@ const TaskCard = ({ title, tasks, onTasksChanged }) => {
     });
   }, [tasks.length, updateWorkspaceWidth]);
 
+  // console.log('### TaskCard: the tasks are here:', tasks);
+
   return (
     <CardBox>
       <Title>{title}</Title>

@@ -32,31 +32,29 @@ const customBackground = ({ backgroundImage }) => css`
   }
 `;
 
-export const App = ({ workspaces, inputTasks, refetch }) => {
-  inputTasks.sort(() => Math.random() - 0.5);
-  const tasks = inputTasks.map(({ id, name, workspace_name, due_on }) => ({
+export const App = ({ workspaces, tasks, workspaceColors, refetch }) => {
+  // TODO: sort tasks into different TaskCards depending on their duedate
+  //  assignee_status! use that in conjunction with other labels to provide
+  //  powerful Today/Tomorrow/Upcoming labels!
+  // also think about how to get upcoming to have a user-controlled reminder
+  //  date to see when to update the task to be worked on!
+  tasks.sort(() => Math.random() - 0.5);
+  const mapped_tasks = tasks.map(({ id, name, workspace_name, due_on }) => ({
     id,
     title: name,
     workspace: workspace_name,
     duedate: due_on // TODO: to be replaced
   }));
 
-  // TODO: fix the workspace color generation so that it looks better!
-  //  can even do fancy color prioritization based on number of tasks (so it doesn't
-  //  look overwhelming)
-  const workspaceColors = {
-    'Tech & Check': '#FF5252',
-    'Smart Home IoT': '#FFB300',
-    DCT: '#4CAF50',
-    'Personal Projects': '#7C4DFF'
-  };
-
-  const filteredTasks = tasks
+  const filteredTasks = mapped_tasks
     .filter(task => !task.done)
     .map(task => {
       task['color'] = workspaceColors[task['workspace']];
       return task;
     });
+
+  console.log('### App: colors are ', workspaceColors);
+  console.log('### App: filtered tasks are ', filteredTasks);
   return (
     <>
       <Global
