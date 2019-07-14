@@ -88,11 +88,12 @@ const main = async () => {
   workspaceColors = updatedWorkspaces.reduce(
     (colorsMap, workspace) => ({
       ...colorsMap,
-      [workspace.name]: workspaceColors[workspace.name]
-        ? workspaceColors[workspace.name]
-        : randomColor({
-            seed: workspace.id
-          })
+      [workspace.name]:
+        workspaceColors && workspaceColors[workspace.name]
+          ? workspaceColors[workspace.name]
+          : randomColor({
+              seed: workspace.id
+            })
     }),
     {}
   );
