@@ -113,7 +113,7 @@ export const ServerManager = {
 
     // Note that any URL fetched here must be matched by a permission in
     // the manifest.json file!
-    const response = await fetch(url, {
+    const fetchInit = {
       method: http_method,
       mode: 'cors',
       cache: 'no-cache',
@@ -123,7 +123,9 @@ export const ServerManager = {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify(body_data)
-    });
+    };
+    console.log('### ServerManager: fetching with ', fetchInit);
+    const response = await fetch(url, fetchInit);
     if (response.status !== 200) {
       console.log(
         '### ServerManager: ERROR, response status ' + response.status
@@ -218,11 +220,11 @@ export const ServerManager = {
    * @param task {dict} Task fields.
    * @param callback {Function(response)} Callback on success.
    */
-  modifyTask: async function(task_id, task) {
+  modifyTask: async function(taskChangedID, changeMade) {
     const retrieved = await this.__request(
       'PUT',
-      '/tasks/' + task_id + '',
-      task
+      '/tasks/' + taskChangedID + '',
+      changeMade
     );
 
     return this._processResponse(retrieved);

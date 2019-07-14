@@ -16,6 +16,7 @@ const main = async () => {
   // TODO: let the user know if they are not logged into Asana / have cookies enabled!
   // immediately pull storage
   let tasks, workspaces, workspaceColors;
+  let onChange;
   let [localTasks, localWorkspaces, localColors] = await Promise.all([
     chrome.storage.local.get([AsanaFetcher.ALL_TASKS_KEY]),
     chrome.storage.local.get([AsanaFetcher.ALL_WORKSPACES_KEY]),
@@ -28,6 +29,7 @@ const main = async () => {
         workspaces={workspaces}
         tasks={tasks}
         workspaceColors={workspaceColors}
+        refetch={onChange}
       />,
       document.getElementById('root')
     );
@@ -41,13 +43,23 @@ const main = async () => {
 
   // callbacks and render
   // lexical scoping up there
-  const refetchTasksAndUpdate = task => {
-    renderApp(
-      updatedTasks.flat(),
-      updatedWorkspaces,
-      updatedColors,
-      refetchTasksAndUpdate
+  onChange = (changeType, taskChangedID, changeMade) => {
+    tasks = tasks.map(t =>
+      t.id === taskChangedID || t.gid === taskChangedID
+        ? { ...t, ...changeMade }
+        : t
     );
+    console.log(
+      '### onChange: called with task ID ' + taskChangedID,
+      changeMade
+    );
+    console.log('### onChange: new tasks are ', tasks);
+    switch (changeType) {
+      case 'markdone':
+        AsanaFetcher.updateTask(taskChangedID, changeMade);
+    }
+
+    renderApp();
   };
 
   if (

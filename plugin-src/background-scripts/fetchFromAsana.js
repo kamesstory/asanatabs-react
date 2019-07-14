@@ -54,3 +54,10 @@ export const update = async () => {
 
   return [tasks, workspaces];
 };
+
+export const updateTask = async (taskChangedID, changeMade) => {
+  const loggedIn = await checkLogin();
+  // TODO: make the error available to users!
+  if (!loggedIn) return;
+  await ServerManager.modifyTask(taskChangedID, changeMade);
+};

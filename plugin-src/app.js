@@ -40,15 +40,18 @@ export const App = ({ workspaces, tasks, workspaceColors, refetch }) => {
   // also think about how to get upcoming to have a user-controlled reminder
   //  date to see when to update the task to be worked on!
   // tasks.sort(() => Math.random() - 0.5);
-  const mapped_tasks = tasks.map(({ id, name, workspace_name, due_on }) => ({
-    id,
-    title: name,
-    workspace: workspace_name,
-    duedate: due_on // TODO: to be replaced
-  }));
+  const mapped_tasks = tasks.map(
+    ({ id, name, workspace_name, due_on, completed }) => ({
+      id,
+      title: name,
+      workspace: workspace_name,
+      duedate: due_on, // TODO: to be replaced
+      completed
+    })
+  );
 
   const filteredTasks = mapped_tasks
-    .filter(task => !task.done)
+    .filter(task => !task.completed)
     .map(task => ({
       ...task,
       color: workspaceColors[task.workspace]
@@ -74,6 +77,12 @@ export const App = ({ workspaces, tasks, workspaceColors, refetch }) => {
     task => !task.duedate || Date.parse(task.duedate) >= Date.parse(houTian)
   );
 
+  // need aggregator at this top level
+  const singleTaskChanged = (changeType, taskChangedID, changesMade) => {
+    console.log('### SingleTaskChanged: ID of task changed is ', taskChangedID);
+    refetch(changeType, taskChangedID, changesMade);
+  };
+
   return (
     <>
       <Global
@@ -82,16 +91,20 @@ export const App = ({ workspaces, tasks, workspaceColors, refetch }) => {
         })}
       />
       <DateTime />
-      <TaskCard title="Today" tasks={todayTasks} onTasksChanged={refetch} />
+      <TaskCard
+        title="Today"
+        tasks={todayTasks}
+        onTasksChanged={singleTaskChanged}
+      />
       <TaskCard
         title="Tomorrow"
         tasks={tomorrowTasks}
-        onTasksChanged={refetch}
+        onTasksChanged={singleTaskChanged}
       />
       <TaskCard
         title="Upcoming"
         tasks={upcomingTasks}
-        onTasksChanged={refetch}
+        onTasksChanged={singleTaskChanged}
       />
       <CreateTask />
     </>

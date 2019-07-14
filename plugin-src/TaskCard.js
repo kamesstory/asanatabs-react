@@ -90,11 +90,6 @@ const TaskRowOuter = styled.div`
 
 const processDueDates = duedate => {
   if (!duedate) return null;
-  console.log('### TaskCard: duedates ', duedate);
-  console.log(
-    '### TaskCard: formatted ',
-    formatDate(parse(duedate, 'YYYY-MM-DD', new Date()), 'MMM DD')
-  );
   return formatDate(
     parse(duedate, 'YYYY-MM-DD', new Date()),
     'MMM DD'
@@ -104,7 +99,11 @@ const processDueDates = duedate => {
 const TaskRow = ({ task, onTaskChanged, workspaceRef, workspaceWidth }) => {
   return (
     <TaskRowOuter>
-      <CheckBox clickityClick={() => onTaskChanged({ ...task, done: true })} />
+      <CheckBox
+        clickityClick={() =>
+          onTaskChanged('markdone', task.id, { completed: true })
+        }
+      />
       <WorkspaceName
         workspaceWidth={workspaceWidth}
         ref={workspaceRef}
@@ -157,9 +156,7 @@ const TaskCard = ({ title, tasks, onTasksChanged }) => {
         <TaskRow
           key={task.id}
           task={task}
-          onTaskChanged={newTask =>
-            onTasksChanged(tasks.map(t => (t.id === newTask.id ? newTask : t)))
-          }
+          onTaskChanged={onTasksChanged}
           workspaceRef={taskWorkspaceRefs[i]}
           workspaceWidth={workspaceWidth}
         />
