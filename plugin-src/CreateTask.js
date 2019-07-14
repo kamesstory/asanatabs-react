@@ -11,6 +11,7 @@ const FormLabel = styled.label`
 
 const FormFieldDiv = styled.div`
   padding-bottom: 28px;
+  flex-grow: 1;
 `;
 
 const DescFormInput = styled.textarea`
@@ -46,6 +47,34 @@ const DateFormField = ({ labelText, inputText }) => {
       <div>
         <DateFormInput placeholder={inputText} />
       </div>
+    </FormFieldDiv>
+  );
+};
+
+const HorizontalFlex = styled.div`
+  display: flex;
+  flex-direction: horizontal;
+`;
+
+const WorkspaceFormInput = styled.input`
+  color: #2b2647;
+  font-size: 14px;
+  border: none;
+  outline: none;
+`;
+
+const WorkspaceFormField = ({ workspaces }) => {
+  // TODO: insert workspace selection for inputs here!
+  // TODO: need colors here too!
+  console.log('### CreateTask: workspaces are ', workspaces);
+  return (
+    <FormFieldDiv>
+      <FormLabel>Workspace</FormLabel>
+      <HorizontalFlex>
+        <WorkspaceFormInput
+          placeholder={workspaces[workspaces.length - 1].name}
+        />
+      </HorizontalFlex>
     </FormFieldDiv>
   );
 };
@@ -105,7 +134,7 @@ const FabPlus = styled.span`
     `}
 `;
 
-const CreateTask = () => {
+const CreateTask = ({ workspaces }) => {
   const [isOpen, setIsOpen] = useState(false);
   const fabRef = useRef(null);
 
@@ -123,7 +152,11 @@ const CreateTask = () => {
       >
         <Popover isOpen>
           <DescFormField labelText="Description" inputText={descInputText} />
-          <DateFormField labelText="testTitle" inputText="testInput" />
+          <HorizontalFlex>
+            <DateFormField labelText="Start Date" inputText="Today" />
+            <DateFormField labelText="Due Date" inputText="Today" />
+          </HorizontalFlex>
+          <WorkspaceFormField workspaces={workspaces} />
         </Popover>
       </Overlay>
     </>

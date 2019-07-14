@@ -106,7 +106,7 @@ export const App = ({ workspaces, tasks, workspaceColors, refetch }) => {
         tasks={upcomingTasks}
         onTasksChanged={singleTaskChanged}
       />
-      <CreateTask />
+      <CreateTask workspaces={workspaces} />
     </>
   );
 };
