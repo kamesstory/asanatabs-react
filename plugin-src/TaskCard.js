@@ -2,6 +2,8 @@ import React, { useMemo, useCallback, useState, useEffect } from 'react';
 import ReactDOM from 'react-dom';
 import styled from '@emotion/styled';
 import { Global, css } from '@emotion/core';
+import { format } from 'url';
+import { parse, format as formatDate } from 'date-fns';
 
 const Title = styled.h1`
   font-size: 20px;
@@ -67,6 +69,8 @@ const DueDate = styled.span`
   font-weight: 600;
   min-width: 90px;
   text-align: right;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12px;
   ${RowTextPadding}
 `;
 
@@ -84,6 +88,19 @@ const TaskRowOuter = styled.div`
   }
 `;
 
+const processDueDates = duedate => {
+  if (!duedate) return null;
+  console.log('### TaskCard: duedates ', duedate);
+  console.log(
+    '### TaskCard: formatted ',
+    formatDate(parse(duedate, 'YYYY-MM-DD', new Date()), 'MMM DD')
+  );
+  return formatDate(
+    parse(duedate, 'YYYY-MM-DD', new Date()),
+    'MMM DD'
+  ).toUpperCase();
+};
+
 const TaskRow = ({ task, onTaskChanged, workspaceRef, workspaceWidth }) => {
   return (
     <TaskRowOuter>
@@ -96,7 +113,7 @@ const TaskRow = ({ task, onTaskChanged, workspaceRef, workspaceWidth }) => {
         {task.workspace}
       </WorkspaceName>
       <TaskTitle>{task.title}</TaskTitle>
-      <DueDate>{task.duedate}</DueDate>
+      <DueDate>{processDueDates(task.duedate)}</DueDate>
     </TaskRowOuter>
   );
 };
