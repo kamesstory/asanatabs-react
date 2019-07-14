@@ -15,13 +15,14 @@ const main = async () => {
 
   // TODO: let the user know if they are not logged into Asana / have cookies enabled!
   // immediately pull storage
-  const [localTasks, localWorkspaces, workspaceColors] = await Promise.all([
+  let tasks, workspaces, workspaceColors;
+  let [localTasks, localWorkspaces, localColors] = await Promise.all([
     chrome.storage.local.get([AsanaFetcher.ALL_TASKS_KEY]),
     chrome.storage.local.get([AsanaFetcher.ALL_WORKSPACES_KEY]),
     chrome.storage.local.get([AsanaFetcher.WORKSPACE_COLORS_KEY])
   ]);
 
-  const renderApp = (tasks, workspaces, workspaceColors) =>
+  const renderApp = () =>
     ReactDOM.render(
       <App
         workspaces={workspaces}
@@ -35,19 +36,29 @@ const main = async () => {
     '### Main: workspaces and tasks retrieved from local storage!',
     localTasks,
     localWorkspaces,
-    workspaceColors
+    localColors
   );
+
+  // callbacks and render
+  // lexical scoping up there
+  const refetchTasksAndUpdate = task => {
+    renderApp(
+      updatedTasks.flat(),
+      updatedWorkspaces,
+      updatedColors,
+      refetchTasksAndUpdate
+    );
+  };
 
   if (
     AsanaFetcher.ALL_TASKS_KEY in localTasks &&
     AsanaFetcher.ALL_WORKSPACES_KEY in localWorkspaces &&
-    AsanaFetcher.WORKSPACE_COLORS_KEY in workspaceColors
+    AsanaFetcher.WORKSPACE_COLORS_KEY in localColors
   ) {
-    renderApp(
-      localTasks[AsanaFetcher.ALL_TASKS_KEY],
-      localWorkspaces[AsanaFetcher.ALL_WORKSPACES_KEY],
-      workspaceColors[AsanaFetcher.WORKSPACE_COLORS_KEY]
-    );
+    tasks = localTasks[AsanaFetcher.ALL_TASKS_KEY];
+    workspaces = localWorkspaces[AsanaFetcher.ALL_WORKSPACES_KEY];
+    workspaceColors = localColors[AsanaFetcher.WORKSPACE_COLORS_KEY];
+    renderApp();
   }
 
   // then immediate request from asana
@@ -57,24 +68,30 @@ const main = async () => {
     updatedTasks.flat(),
     updatedWorkspaces
   );
+  if (updatedTasks && updatedWorkspaces) {
+    tasks = updatedTasks.flat();
+    workspaces = updatedWorkspaces;
+  }
 
-  const updatedColors = updatedWorkspaces.reduce(
+  workspaceColors = updatedWorkspaces.reduce(
     (colorsMap, workspace) => ({
       ...colorsMap,
       [workspace.name]: workspaceColors[workspace.name]
         ? workspaceColors[workspace.name]
-        : randomColor({ seed: workspace.id })
+        : randomColor({
+            seed: workspace.id
+          })
     }),
     {}
   );
   chrome.storage.local.set({
-    [AsanaFetcher.WORKSPACE_COLORS_KEY]: updatedColors
+    [AsanaFetcher.WORKSPACE_COLORS_KEY]: workspaceColors
   });
 
-  console.log('### Main: workspace colors are ', updatedColors);
+  console.log('### Main: workspace colors are ', workspaceColors);
 
   // then render update
-  renderApp(updatedTasks.flat(), updatedWorkspaces, updatedColors);
+  renderApp();
 };
 
 main();

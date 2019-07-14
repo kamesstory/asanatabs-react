@@ -49,10 +49,10 @@ export const App = ({ workspaces, tasks, workspaceColors, refetch }) => {
 
   const filteredTasks = mapped_tasks
     .filter(task => !task.done)
-    .map(task => {
-      task.color = workspaceColors[task.workspace];
-      return task;
-    });
+    .map(task => ({
+      ...task,
+      color: workspaceColors[task.workspace]
+    }));
 
   // TODO: decide if I want to include this on the App rendering method or
   //  somewhere else, parsed out
