@@ -79,6 +79,16 @@ const WorkspaceFormField = ({ workspaces }) => {
   );
 };
 
+const SubmitTaskButton = styled.button`
+  border-radius: 5px;
+  width: 150px;
+  height: 50px;
+  color: #2b2647;
+  background-color: #f2f1f7;
+  border: none;
+  outline: none;
+`;
+
 const Popover = styled.div`
   display: grid;
   background: white;
@@ -157,6 +167,7 @@ const CreateTask = ({ workspaces }) => {
             <DateFormField labelText="Due Date" inputText="Today" />
           </HorizontalFlex>
           <WorkspaceFormField workspaces={workspaces} />
+          <SubmitTaskButton>Submit Task</SubmitTaskButton>
         </Popover>
       </Overlay>
     </>
