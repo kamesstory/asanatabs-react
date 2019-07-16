@@ -61,3 +61,9 @@ export const updateTask = async (taskChangedID, changeMade) => {
   if (!loggedIn) return;
   await ServerManager.modifyTask(taskChangedID, changeMade);
 };
+
+export const createTask = async (workspace_id, task) => {
+  const loggedIn = await checkLogin();
+  if (!loggedIn) return;
+  await ServerManager.createTask(workspace_id, task);
+};

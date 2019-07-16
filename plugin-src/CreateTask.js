@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom';
 import styled from '@emotion/styled';
 import { Global, css } from '@emotion/core';
 import Overlay from './Overlay';
+import { parseDate } from 'chrono-node';
 
 const FormLabel = styled.label`
   color: #939393;
@@ -22,12 +23,21 @@ const DescFormInput = styled.textarea`
   outline: none;
 `;
 
-const DescFormField = ({ labelText, inputText }) => {
+const DescFormField = ({
+  labelText,
+  inputText,
+  description,
+  setDescription
+}) => {
   return (
     <FormFieldDiv>
       <FormLabel>{labelText}</FormLabel>
       <div>
-        <DescFormInput placeholder={inputText} />
+        <DescFormInput
+          placeholder={inputText}
+          value={description}
+          onChange={e => setDescription(e.target.value)}
+        />
       </div>
     </FormFieldDiv>
   );
@@ -40,12 +50,16 @@ const DateFormInput = styled.input`
   outline: none;
 `;
 
-const DateFormField = ({ labelText, inputText }) => {
+const DateFormField = ({ labelText, inputText, parsedDate, setStartDate }) => {
   return (
     <FormFieldDiv>
       <FormLabel>{labelText}</FormLabel>
       <div>
-        <DateFormInput placeholder={inputText} />
+        <DateFormInput
+          placeholder={inputText}
+          value={parsedDate}
+          onChange={e => setStartDate(e.target.value)}
+        />
       </div>
     </FormFieldDiv>
   );
@@ -63,16 +77,17 @@ const WorkspaceFormInput = styled.input`
   outline: none;
 `;
 
-const WorkspaceFormField = ({ workspaces }) => {
+const WorkspaceFormField = ({ workspaces, workspaceState, setWorkspace }) => {
   // TODO: insert workspace selection for inputs here!
   // TODO: need colors here too!
-  console.log('### CreateTask: workspaces are ', workspaces);
   return (
     <FormFieldDiv>
       <FormLabel>Workspace</FormLabel>
       <HorizontalFlex>
         <WorkspaceFormInput
           placeholder={workspaces[workspaces.length - 1].name}
+          value={workspaceState}
+          onChange={e => setWorkspace(e.target.value)}
         />
       </HorizontalFlex>
     </FormFieldDiv>
@@ -87,6 +102,7 @@ const SubmitTaskButton = styled.button`
   background-color: #f2f1f7;
   border: none;
   outline: none;
+  cursor: pointer;
 `;
 
 const Popover = styled.div`
@@ -144,11 +160,29 @@ const FabPlus = styled.span`
     `}
 `;
 
-const CreateTask = ({ workspaces }) => {
+const CreateTask = ({ workspaces, onCreateTask }) => {
+  const descInputText = 'description + title of your task';
+
   const [isOpen, setIsOpen] = useState(false);
+  const [description, setDescription] = useState('');
+  const [startDate, setStartDate] = useState('');
+  const [dueDate, setDueDate] = useState('');
+  const [workspaceState, setWorkspace] = useState('');
   const fabRef = useRef(null);
 
-  const descInputText = 'Try to complete this Create New Task by myself!';
+  console.log(
+    '### CreateTask: workspaces are ',
+    workspaces.filter(ws => ws.name === workspaceState)
+  );
+
+  // TODO: need to sanitize inputs more
+  const readyForSubmit =
+    isOpen &&
+    description != null &&
+    description.length > 0 &&
+    parseDate(startDate) instanceof Date &&
+    parseDate(dueDate) instanceof Date &&
+    workspaces.filter(ws => ws.name === workspaceState).length > 0;
 
   return (
     <>
@@ -161,13 +195,46 @@ const CreateTask = ({ workspaces }) => {
         onClickOutside={() => setIsOpen(false)}
       >
         <Popover isOpen>
-          <DescFormField labelText="Description" inputText={descInputText} />
+          <DescFormField
+            labelText="Description"
+            inputText={descInputText}
+            description={description}
+            setDescription={setDescription}
+          />
           <HorizontalFlex>
-            <DateFormField labelText="Start Date" inputText="Today" />
-            <DateFormField labelText="Due Date" inputText="Today" />
+            <DateFormField
+              labelText="Start Date"
+              inputText="e.g. in 5 days"
+              parsedDate={startDate}
+              setStartDate={setStartDate}
+            />
+            <DateFormField
+              labelText="Due Date"
+              inputText="e.g. next Friday"
+              parsedDate={dueDate}
+              setStartDate={setDueDate}
+            />
           </HorizontalFlex>
-          <WorkspaceFormField workspaces={workspaces} />
-          <SubmitTaskButton>Submit Task</SubmitTaskButton>
+          <WorkspaceFormField
+            workspaces={workspaces}
+            workspaceState={workspaceState}
+            setWorkspace={setWorkspace}
+          />
+          <SubmitTaskButton
+            disabled={!readyForSubmit}
+            onClick={() => {
+              // TODO: get onCreateTask to work properly!
+              console.log('HELLO FROM THE UNDERWORLD!');
+              onCreateTask(
+                description,
+                parseDate(startDate),
+                parseDate(dueDate),
+                workspaces.filter(ws => ws.name === workspaceState)[0].id
+              );
+            }}
+          >
+            Submit Task
+          </SubmitTaskButton>
         </Popover>
       </Overlay>
     </>

@@ -33,7 +33,13 @@ const customBackground = ({ backgroundImage }) => css`
   }
 `;
 
-export const App = ({ workspaces, tasks, workspaceColors, refetch }) => {
+export const App = ({
+  workspaces,
+  tasks,
+  workspaceColors,
+  refetch,
+  createTask
+}) => {
   // TODO: sort tasks into different TaskCards depending on their duedate
   //  assignee_status! use that in conjunction with other labels to provide
   //  powerful Today/Tomorrow/Upcoming labels!
@@ -106,7 +112,7 @@ export const App = ({ workspaces, tasks, workspaceColors, refetch }) => {
         tasks={upcomingTasks}
         onTasksChanged={singleTaskChanged}
       />
-      <CreateTask workspaces={workspaces} />
+      <CreateTask workspaces={workspaces} onCreateTask={createTask} />
     </>
   );
 };

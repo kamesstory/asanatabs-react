@@ -17,6 +17,7 @@ const main = async () => {
   // immediately pull storage
   let tasks, workspaces, workspaceColors;
   let onChange;
+  let onCreateTask;
   let [localTasks, localWorkspaces, localColors] = await Promise.all([
     chrome.storage.local.get([AsanaFetcher.ALL_TASKS_KEY]),
     chrome.storage.local.get([AsanaFetcher.ALL_WORKSPACES_KEY]),
@@ -30,6 +31,7 @@ const main = async () => {
         tasks={tasks}
         workspaceColors={workspaceColors}
         refetch={onChange}
+        createTask={onCreateTask}
       />,
       document.getElementById('root')
     );
@@ -41,8 +43,10 @@ const main = async () => {
     localColors
   );
 
-  // callbacks and render
-  // lexical scoping up there
+  // ----------------------------------------------------
+  // CALLBACKS
+  // ----------------------------------------------------
+
   onChange = (changeType, taskChangedID, changeMade) => {
     tasks = tasks.map(t =>
       t.id === taskChangedID || t.gid === taskChangedID
@@ -53,14 +57,25 @@ const main = async () => {
       '### onChange: called with task ID ' + taskChangedID,
       changeMade
     );
-    console.log('### onChange: new tasks are ', tasks);
     switch (changeType) {
       case 'markdone':
         AsanaFetcher.updateTask(taskChangedID, changeMade);
     }
-
     renderApp();
   };
+
+  onCreateTask = (description, startDate, dueDate, workspace) => {
+    console.log('### Main: description is ', description);
+    console.log('### Main: startDate is ', startDate);
+    console.log('### Main: dueDate is ', dueDate);
+    console.log('### Main: workspace is ', workspace);
+    //   const start =
+    //   AsanaFetcher.createTask( workspace.id, task )
+  };
+
+  // ----------------------------------------------------
+  // MAIN RENDER APPS
+  // ----------------------------------------------------
 
   if (
     AsanaFetcher.ALL_TASKS_KEY in localTasks &&
