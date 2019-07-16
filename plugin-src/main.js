@@ -5,9 +5,11 @@ import ReactDOM from 'react-dom';
 import './style.css';
 import * as AsanaFetcher from './background-scripts/fetchFromAsana.js';
 import { randomColor } from 'randomcolor';
+import { format as dateFormat } from 'date-fns';
 
 // re-renders on background update
 // refetches on task update
+// TODO: need to set assignee_status
 
 // yo im gonna start a connection to the background
 const main = async () => {
@@ -65,12 +67,19 @@ const main = async () => {
   };
 
   onCreateTask = (description, startDate, dueDate, workspace) => {
+    // TODO: need to incorporate startDate! might need custom server implementation!
     console.log('### Main: description is ', description);
     console.log('### Main: startDate is ', startDate);
     console.log('### Main: dueDate is ', dueDate);
     console.log('### Main: workspace is ', workspace);
-    //   const start =
-    //   AsanaFetcher.createTask( workspace.id, task )
+
+    // TODO: need to incorporate *my* user ID in order to see updates!
+    const task = {
+      name: description,
+      due_on: dateFormat(dueDate, 'YYYY-MM-DD')
+    };
+    AsanaFetcher.createTask(workspace, task);
+    // TODO: add tasks to the list!
   };
 
   // ----------------------------------------------------

@@ -126,7 +126,7 @@ export const ServerManager = {
     };
     console.log('### ServerManager: fetching with ', fetchInit);
     const response = await fetch(url, fetchInit);
-    if (response.status !== 200) {
+    if (response.status !== 200 || response.status !== 201) {
       console.log(
         '### ServerManager: ERROR, response status ' + response.status
       );
