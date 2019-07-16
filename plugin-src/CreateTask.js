@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
 import ReactDOM from 'react-dom';
 import styled from '@emotion/styled';
-import { Global, css } from '@emotion/core';
+import { Global, css, cx } from '@emotion/core';
 import Overlay from './Overlay';
 import { parseDate } from 'chrono-node';
 
@@ -116,18 +116,16 @@ const Popover = styled.div`
   bottom: 108px;
   right: 28px;
   box-shadow: 0 10px 20px rgba(0, 0, 0, 0.25);
+
   opacity: 0;
-  pointer-events: none;
-  transform: scale(0);
-  transform-origin: right bottom;
-  transition: opacity 0.1s, transform 0.1s;
-  ${props =>
-    props.isOpen &&
+  transform: translateY(8px);
+  transition: opacity 0.15s, transform 0.15s;
+  ${({ isOpen }) =>
+    isOpen &&
     css`
-      pointer-events: auto;
       opacity: 1;
-      transform: scale(1);
-    `};
+      transform: translateY(0);
+    `}
 `;
 
 const FabOuter = styled.div`
@@ -194,7 +192,7 @@ const CreateTask = ({ workspaces, onCreateTask }) => {
         isOpen={isOpen}
         onClickOutside={() => setIsOpen(false)}
       >
-        <Popover isOpen>
+        <Popover isOpen={isOpen}>
           <DescFormField
             labelText="Description"
             inputText={descInputText}
