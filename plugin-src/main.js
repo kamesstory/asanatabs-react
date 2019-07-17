@@ -13,7 +13,7 @@ import { format as dateFormat } from 'date-fns';
 
 // yo im gonna start a connection to the background
 const main = async () => {
-  chrome.storage.local.clear();
+  // chrome.storage.local.clear();
 
   // TODO: let the user know if they are not logged into Asana / have cookies enabled!
   // immediately pull storage
@@ -57,7 +57,7 @@ const main = async () => {
   // CALLBACKS
   // ----------------------------------------------------
 
-  onChange = (changeType, taskChangedID, changeMade) => {
+  onChange = async (changeType, taskChangedID, changeMade) => {
     tasks = tasks.map(t =>
       t.id === taskChangedID || t.gid === taskChangedID
         ? { ...t, ...changeMade }
@@ -74,23 +74,36 @@ const main = async () => {
     renderApp();
   };
 
-  onCreateTask = (description, startDate, dueDate, workspace) => {
+  onCreateTask = async (description, startDate, dueDate, workspace) => {
     // TODO: need to incorporate startDate! might need custom server implementation!
     console.log('### Main: description is ', description);
     console.log('### Main: startDate is ', startDate);
     console.log('### Main: dueDate is ', dueDate);
     console.log('### Main: workspace is ', workspace);
 
-    // TODO: need to incorporate *my* user ID in order to see updates!
     const task = {
       name: description,
       due_on: dateFormat(dueDate, 'YYYY-MM-DD'),
       assignee: { id: me.id }
     };
-    AsanaFetcher.createTask(workspace, task);
+    AsanaFetcher.createTask(workspace.id, task);
 
-    // TODO: add tasks to the list!
+    // TODO: add tasks to the list! bigger problem because of waiting for createTask
+    //  to update
+    // TODO: check for how to manage "fake_id" state
+    const fake_id = +new Date();
+    const fake_gid = fake_id.toString(36);
+
+    tasks.push({
+      ...task,
+      workspace: workspace.id,
+      workspace_name: workspace.name,
+      gid: fake_gid,
+      id: fake_id
+    });
+
     // Now re-render
+    renderApp();
   };
 
   // ----------------------------------------------------

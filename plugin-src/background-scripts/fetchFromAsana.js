@@ -60,14 +60,19 @@ export const updateTask = async (taskChangedID, changeMade) => {
   const loggedIn = await checkLogin();
   // TODO: make the error available to users!
   if (!loggedIn) return;
-  await ServerManager.modifyTask(taskChangedID, changeMade);
+  const modifiedTask = await ServerManager.modifyTask(
+    taskChangedID,
+    changeMade
+  );
+  return modifiedTask;
 };
 
 export const createTask = async (workspace_id, task) => {
   const loggedIn = await checkLogin();
   if (!loggedIn) return;
   console.log('### AsanaFetcher: workspace ID is ', workspace_id);
-  await ServerManager.createTask(workspace_id, task);
+  const createdTask = await ServerManager.createTask(workspace_id, task);
+  return createdTask;
 };
 
 export const retrieveMe = async () => {

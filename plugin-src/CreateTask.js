@@ -227,7 +227,7 @@ const CreateTask = ({ workspaces, onCreateTask }) => {
                 description,
                 parseDate(startDate),
                 parseDate(dueDate),
-                workspaces.filter(ws => ws.name === workspaceState)[0].id
+                workspaces.filter(ws => ws.name === workspaceState)[0]
               );
             }}
           >
