@@ -168,10 +168,10 @@ const CreateTask = ({ workspaces, onCreateTask }) => {
   const [workspaceState, setWorkspace] = useState('');
   const fabRef = useRef(null);
 
-  console.log(
-    '### CreateTask: workspaces are ',
-    workspaces.filter(ws => ws.name === workspaceState)
-  );
+  // console.log(
+  //   '### CreateTask: workspaces are ',
+  //   workspaces.filter(ws => ws.name === workspaceState)
+  // );
 
   // TODO: need to sanitize inputs more
   const readyForSubmit =

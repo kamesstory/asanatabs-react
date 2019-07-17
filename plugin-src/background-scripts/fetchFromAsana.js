@@ -5,6 +5,7 @@ const GET_WORKSPACE_KEY = workspace_id => 'workspace_' + workspace_id;
 export const ALL_TASKS_KEY = 'all_tasks';
 export const ALL_WORKSPACES_KEY = 'all_workspaces';
 export const WORKSPACE_COLORS_KEY = 'all_workspace_colors';
+export const ME_INFO = 'me_info';
 
 const checkLogin = async () => {
   const loggedIn = await ServerManager.isLoggedIn();
@@ -69,8 +70,9 @@ export const createTask = async (workspace_id, task) => {
   await ServerManager.createTask(workspace_id, task);
 };
 
-export const fetchMyInfo = async () => {
+export const retrieveMe = async () => {
   const loggedIn = await checkLogin();
   if (!loggedIn) return;
-  await ServerManager.me();
+  const me = await ServerManager.me();
+  return me;
 };

@@ -13,18 +13,26 @@ import { format as dateFormat } from 'date-fns';
 
 // yo im gonna start a connection to the background
 const main = async () => {
-  // chrome.storage.local.clear();
+  chrome.storage.local.clear();
 
   // TODO: let the user know if they are not logged into Asana / have cookies enabled!
   // immediately pull storage
   let tasks, workspaces, workspaceColors;
   let onChange;
   let onCreateTask;
-  let [localTasks, localWorkspaces, localColors] = await Promise.all([
+  let [me, localTasks, localWorkspaces, localColors] = await Promise.all([
+    chrome.storage.local.get([AsanaFetcher.ME_INFO]),
     chrome.storage.local.get([AsanaFetcher.ALL_TASKS_KEY]),
     chrome.storage.local.get([AsanaFetcher.ALL_WORKSPACES_KEY]),
     chrome.storage.local.get([AsanaFetcher.WORKSPACE_COLORS_KEY])
   ]);
+
+  // TODO: figure out how to best architect this
+  const retrieveMe = async () => {
+    me = await AsanaFetcher.retrieveMe();
+    chrome.storage.local.set({ [AsanaFetcher.ME_INFO]: me });
+    console.log('### Main: me is ', me);
+  };
 
   const renderApp = () =>
     ReactDOM.render(
@@ -76,10 +84,13 @@ const main = async () => {
     // TODO: need to incorporate *my* user ID in order to see updates!
     const task = {
       name: description,
-      due_on: dateFormat(dueDate, 'YYYY-MM-DD')
+      due_on: dateFormat(dueDate, 'YYYY-MM-DD'),
+      assignee: { id: me.id }
     };
     AsanaFetcher.createTask(workspace, task);
+
     // TODO: add tasks to the list!
+    // Now re-render
   };
 
   // ----------------------------------------------------
@@ -129,6 +140,12 @@ const main = async () => {
 
   // then render update
   renderApp();
+
+  // ----------------------------------------------------
+  // SECONDARY FUNCTIONS AFTER MAIN RENDERS
+  // ----------------------------------------------------
+
+  retrieveMe();
 };
 
 main();
