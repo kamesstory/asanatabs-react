@@ -4,6 +4,7 @@ import styled from '@emotion/styled';
 import { Global, css } from '@emotion/core';
 import { format } from 'url';
 import { parse, format as formatDate } from 'date-fns';
+import { Flipped, Flipper } from 'react-flip-toolkit';
 
 const Title = styled.h1`
   font-size: 20px;
@@ -96,9 +97,15 @@ const processDueDates = duedate => {
   ).toUpperCase();
 };
 
-const TaskRow = ({ task, onTaskChanged, workspaceRef, workspaceWidth }) => {
+const TaskRow = ({
+  task,
+  onTaskChanged,
+  workspaceRef,
+  workspaceWidth,
+  ...rest
+}) => {
   return (
-    <TaskRowOuter>
+    <TaskRowOuter {...rest}>
       <CheckBox
         clickityClick={() =>
           onTaskChanged('markdone', task.id, { completed: true })
@@ -130,7 +137,7 @@ const CardBox = styled.div`
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
 `;
 
-const TaskCard = ({ title, tasks, onTasksChanged }) => {
+const TaskCard = ({ title, tasks, onTasksChanged, ...rest }) => {
   const [workspaceWidth, setWorkspaceWidth] = useState(0);
   const updateWorkspaceWidth = useCallback(widths => {
     setWorkspaceWidth(Math.max(...widths));
@@ -150,18 +157,26 @@ const TaskCard = ({ title, tasks, onTasksChanged }) => {
   // console.log('### TaskCard: the tasks are here:', tasks);
 
   return (
-    <CardBox>
-      <Title>{title}</Title>
-      {tasks.map((task, i) => (
-        <TaskRow
-          key={task.id}
-          task={task}
-          onTaskChanged={onTasksChanged}
-          workspaceRef={taskWorkspaceRefs[i]}
-          workspaceWidth={workspaceWidth}
-        />
-      ))}
-    </CardBox>
+    <Flipped flipId={title}>
+      <CardBox {...rest}>
+        <Title>{title}</Title>
+        {tasks.map((task, i) => (
+          <Flipped
+            flipId={task.id.toString()}
+            key={task.id.toString()}
+            translate
+            opacity
+          >
+            <TaskRow
+              task={task}
+              onTaskChanged={onTasksChanged}
+              workspaceRef={taskWorkspaceRefs[i]}
+              workspaceWidth={workspaceWidth}
+            />
+          </Flipped>
+        ))}
+      </CardBox>
+    </Flipped>
   );
 };
 

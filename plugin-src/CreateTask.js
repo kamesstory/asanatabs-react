@@ -6,6 +6,8 @@ import Overlay from './Overlay';
 import { parseDate } from 'chrono-node';
 
 const FormLabel = styled.label`
+  position: relative;
+  z-index: ${({ zIndex }) => zIndex || 997};
   color: #939393;
   font-size: 12px;
 `;
@@ -13,6 +15,7 @@ const FormLabel = styled.label`
 const FormFieldDiv = styled.div`
   padding-bottom: 28px;
   flex-grow: 1;
+  position: relative;
 `;
 
 const DescFormInput = styled.textarea`
@@ -27,7 +30,8 @@ const DescFormField = ({
   labelText,
   inputText,
   description,
-  setDescription
+  setDescription,
+  setActiveInput
 }) => {
   return (
     <FormFieldDiv>
@@ -37,30 +41,60 @@ const DescFormField = ({
           placeholder={inputText}
           value={description}
           onChange={e => setDescription(e.target.value)}
+          onFocus={e => setActiveInput()}
         />
       </div>
     </FormFieldDiv>
   );
 };
 
+const roundedBox = css`
+  display: grid;
+  background: white;
+  border-radius: 8px;
+  color: #2b2647;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.25);
+  z-index: 998;
+`;
+
+const DateSuggestionsPopup = styled.div`
+  position: absolute;
+  width: 210px;
+  height: 150px;
+  left: -12px;
+  top: -12px;
+  ${roundedBox};
+`;
+
 const DateFormInput = styled.input`
+  position: relative;
   color: #2b2647;
   font-size: 14px;
   border: none;
   outline: none;
+  z-index: ${({ zIndex }) => zIndex || 997};
 `;
 
-const DateFormField = ({ labelText, inputText, parsedDate, setStartDate }) => {
+const DateFormField = ({
+  labelText,
+  inputText,
+  parsedDate,
+  setStartDate,
+  isOpen,
+  setActiveInput
+}) => {
+  const zIndex = isOpen ? 999 : 997;
   return (
     <FormFieldDiv>
-      <FormLabel>{labelText}</FormLabel>
-      <div>
-        <DateFormInput
-          placeholder={inputText}
-          value={parsedDate}
-          onChange={e => setStartDate(e.target.value)}
-        />
-      </div>
+      {isOpen && <DateSuggestionsPopup />}
+      <FormLabel zIndex={zIndex}>{labelText}</FormLabel>
+      <DateFormInput
+        placeholder={inputText}
+        value={parsedDate}
+        onChange={e => setStartDate(e.target.value)}
+        onFocus={e => setActiveInput()}
+        zIndex={zIndex}
+      />
     </FormFieldDiv>
   );
 };
@@ -71,23 +105,35 @@ const HorizontalFlex = styled.div`
 `;
 
 const WorkspaceFormInput = styled.input`
+  position: relative;
+  z-index: ${({ zIndex }) => zIndex || 997};
   color: #2b2647;
   font-size: 14px;
   border: none;
   outline: none;
 `;
 
-const WorkspaceFormField = ({ workspaces, workspaceState, setWorkspace }) => {
+const WorkspaceFormField = ({
+  workspaces,
+  workspaceState,
+  setWorkspace,
+  isOpen,
+  setActiveInput
+}) => {
+  const zIndex = isOpen ? 999 : 997;
   // TODO: insert workspace selection for inputs here!
   // TODO: need colors here too!
   return (
     <FormFieldDiv>
-      <FormLabel>Workspace</FormLabel>
+      {isOpen && <DateSuggestionsPopup />}
+      <FormLabel zIndex={zIndex}>Workspace</FormLabel>
       <HorizontalFlex>
         <WorkspaceFormInput
           placeholder={workspaces[workspaces.length - 1].name}
           value={workspaceState}
           onChange={e => setWorkspace(e.target.value)}
+          onFocus={e => setActiveInput()}
+          zIndex={zIndex}
         />
       </HorizontalFlex>
     </FormFieldDiv>
@@ -106,18 +152,14 @@ const SubmitTaskButton = styled.button`
 `;
 
 const Popover = styled.div`
-  display: grid;
-  background: white;
+  opacity: 0;
   width: 420px;
-  border-radius: 8px;
   padding: 32px 28px;
-  color: #2b2647;
   position: fixed;
   bottom: 108px;
   right: 28px;
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.25);
+  ${roundedBox}
 
-  opacity: 0;
   transform: translateY(8px);
   transition: opacity 0.15s, transform 0.15s;
   ${({ isOpen }) =>
@@ -167,6 +209,7 @@ const CreateTask = ({ workspaces, onCreateTask }) => {
   const [dueDate, setDueDate] = useState('');
   const [workspaceState, setWorkspace] = useState('');
   const fabRef = useRef(null);
+  const [suggestionPopup, setOpenSuggestionPopup] = useState('');
 
   // console.log(
   //   '### CreateTask: workspaces are ',
@@ -198,6 +241,7 @@ const CreateTask = ({ workspaces, onCreateTask }) => {
             inputText={descInputText}
             description={description}
             setDescription={setDescription}
+            setActiveInput={e => setOpenSuggestionPopup('')}
           />
           <HorizontalFlex>
             <DateFormField
@@ -205,18 +249,24 @@ const CreateTask = ({ workspaces, onCreateTask }) => {
               inputText="e.g. in 5 days"
               parsedDate={startDate}
               setStartDate={setStartDate}
+              isOpen={suggestionPopup == 'start_date'}
+              setActiveInput={() => setOpenSuggestionPopup('start_date')}
             />
             <DateFormField
               labelText="Due Date"
               inputText="e.g. next Friday"
               parsedDate={dueDate}
               setStartDate={setDueDate}
+              isOpen={suggestionPopup == 'due_date'}
+              setActiveInput={() => setOpenSuggestionPopup('due_date')}
             />
           </HorizontalFlex>
           <WorkspaceFormField
             workspaces={workspaces}
             workspaceState={workspaceState}
             setWorkspace={setWorkspace}
+            isOpen={suggestionPopup == 'workspace'}
+            setActiveInput={() => setOpenSuggestionPopup('workspace')}
           />
           <SubmitTaskButton
             disabled={!readyForSubmit}

@@ -6,6 +6,7 @@ import DateTime from './DateTime.js';
 import TaskCard from './TaskCard.js';
 import CreateTask from './CreateTask.js';
 import { endOfDay, endOfTomorrow } from 'date-fns';
+import { Flipper } from 'react-flip-toolkit';
 
 const customBackground = ({ backgroundImage }) => css`
   html {
@@ -67,8 +68,6 @@ export const App = ({
   //  somewhere else, parsed out
   const mingTian = endOfDay(new Date());
   const houTian = endOfTomorrow();
-  mingTian.setDate(mingTian.getDate() + 1);
-  houTian.setDate(houTian.getDate() + 2);
   // TODO: fix this bs regarding date comparisons
   const todayTasks = filteredTasks.filter(
     task => task.duedate && Date.parse(task.duedate) <= Date.parse(mingTian)
@@ -97,21 +96,24 @@ export const App = ({
         })}
       />
       <DateTime />
-      <TaskCard
-        title="Today"
-        tasks={todayTasks}
-        onTasksChanged={singleTaskChanged}
-      />
-      <TaskCard
-        title="Tomorrow"
-        tasks={tomorrowTasks}
-        onTasksChanged={singleTaskChanged}
-      />
-      <TaskCard
-        title="Upcoming"
-        tasks={upcomingTasks}
-        onTasksChanged={singleTaskChanged}
-      />
+      <Flipper flipKey={tasks}>
+        <TaskCard
+          title="Today"
+          tasks={todayTasks}
+          onTasksChanged={singleTaskChanged}
+        />
+        <TaskCard
+          title="Tomorrow"
+          tasks={tomorrowTasks}
+          onTasksChanged={singleTaskChanged}
+        />
+        <TaskCard
+          title="Upcoming"
+          tasks={upcomingTasks}
+          onTasksChanged={singleTaskChanged}
+        />
+      </Flipper>
+
       <CreateTask workspaces={workspaces} onCreateTask={createTask} />
     </>
   );

@@ -68,8 +68,11 @@ const main = async () => {
       changeMade
     );
     switch (changeType) {
-      case 'markdone':
+      case 'markdone': {
         AsanaFetcher.updateTask(taskChangedID, changeMade);
+        // TODO: need to propogate that change to localStorage
+        chrome.storage.local.set({ [AsanaFetcher.ALL_TASKS_KEY]: tasks });
+      }
     }
     renderApp();
   };
@@ -94,6 +97,8 @@ const main = async () => {
     const fake_id = +new Date();
     const fake_gid = fake_id.toString(36);
 
+    // TODO: can migrate to offline fake_id-based model that has queue of changes
+    //  then we also need full diff strategy
     tasks.push({
       ...task,
       workspace: workspace.id,

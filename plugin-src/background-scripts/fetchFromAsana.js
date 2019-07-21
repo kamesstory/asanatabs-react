@@ -72,6 +72,8 @@ export const createTask = async (workspace_id, task) => {
   if (!loggedIn) return;
   console.log('### AsanaFetcher: workspace ID is ', workspace_id);
   const createdTask = await ServerManager.createTask(workspace_id, task);
+  update();
+
   return createdTask;
 };
 
