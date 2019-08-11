@@ -195,6 +195,7 @@ const FabPlus = styled.span`
   transition: transform 0.2s;
   ${props =>
     props.isOpen &&
+    props.rotationEnabled &&
     css`
       transform: rotate(135deg);
     `}
@@ -229,7 +230,9 @@ const CreateTask = ({ workspaces, onCreateTask, requestLogin }) => {
   return (
     <>
       <FabOuter ref={fabRef} onClick={() => setIsOpen(!isOpen)}>
-        <FabPlus isOpen={isOpen}>{requestLogin ? '!' : '+'}</FabPlus>
+        <FabPlus isOpen={isOpen} rotationEnabled={!requestLogin}>
+          {requestLogin ? '!' : '+'}
+        </FabPlus>
       </FabOuter>
       <Overlay
         openerRef={fabRef}
