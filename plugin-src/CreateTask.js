@@ -200,7 +200,7 @@ const FabPlus = styled.span`
     `}
 `;
 
-const CreateTask = ({ workspaces, onCreateTask }) => {
+const CreateTask = ({ workspaces, onCreateTask, requestLogin }) => {
   const descInputText = 'description + title of your task';
 
   const [isOpen, setIsOpen] = useState(false);
@@ -225,10 +225,11 @@ const CreateTask = ({ workspaces, onCreateTask }) => {
     parseDate(dueDate) instanceof Date &&
     workspaces.filter(ws => ws.name === workspaceState).length > 0;
 
+  // TODO: switch overlay to "log into asana" overlay when requestLogin is true
   return (
     <>
       <FabOuter ref={fabRef} onClick={() => setIsOpen(!isOpen)}>
-        <FabPlus isOpen={isOpen}>+</FabPlus>
+        <FabPlus isOpen={isOpen}>{requestLogin ? '!' : '+'}</FabPlus>
       </FabOuter>
       <Overlay
         openerRef={fabRef}

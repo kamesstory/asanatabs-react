@@ -7,10 +7,14 @@ export const ALL_WORKSPACES_KEY = 'all_workspaces';
 export const WORKSPACE_COLORS_KEY = 'all_workspace_colors';
 export const ME_INFO = 'me_info';
 
-const checkLogin = async () => {
-  const loggedIn = await ServerManager.isLoggedIn();
-  if (!loggedIn) console.log('### Background: not logged in!');
-  return loggedIn;
+export const checkLogin = async () => {
+  let [connected, loggedIn] = await Promise.all([
+    ServerManager.ping(),
+    ServerManager.isLoggedIn()
+  ]);
+  if (!loggedIn)
+    console.log('### Background: not logged in according to cookies!');
+  return !connected || loggedIn;
 };
 
 export const update = async () => {

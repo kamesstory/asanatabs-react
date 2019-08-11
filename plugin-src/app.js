@@ -39,7 +39,8 @@ export const App = ({
   tasks,
   workspaceColors,
   refetch,
-  createTask
+  createTask,
+  loggedIn
 }) => {
   // TODO: sort tasks into different TaskCards depending on their duedate
   //  assignee_status! use that in conjunction with other labels to provide
@@ -96,25 +97,31 @@ export const App = ({
         })}
       />
       <DateTime />
-      <Flipper flipKey={tasks}>
-        <TaskCard
-          title="Today"
-          tasks={todayTasks}
-          onTasksChanged={singleTaskChanged}
-        />
-        <TaskCard
-          title="Tomorrow"
-          tasks={tomorrowTasks}
-          onTasksChanged={singleTaskChanged}
-        />
-        <TaskCard
-          title="Upcoming"
-          tasks={upcomingTasks}
-          onTasksChanged={singleTaskChanged}
-        />
-      </Flipper>
+      {workspaces && (
+        <Flipper flipKey={tasks}>
+          <TaskCard
+            title="Today"
+            tasks={todayTasks}
+            onTasksChanged={singleTaskChanged}
+          />
+          <TaskCard
+            title="Tomorrow"
+            tasks={tomorrowTasks}
+            onTasksChanged={singleTaskChanged}
+          />
+          <TaskCard
+            title="Upcoming"
+            tasks={upcomingTasks}
+            onTasksChanged={singleTaskChanged}
+          />
+        </Flipper>
+      )}
 
-      <CreateTask workspaces={workspaces} onCreateTask={createTask} />
+      <CreateTask
+        workspaces={workspaces}
+        onCreateTask={createTask}
+        requestLogin={!loggedIn}
+      />
     </>
   );
 };

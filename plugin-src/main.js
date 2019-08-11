@@ -20,6 +20,7 @@ const main = async () => {
   let tasks, workspaces, workspaceColors;
   let onChange;
   let onCreateTask;
+  let loggedIn;
   let [me, localTasks, localWorkspaces, localColors] = await Promise.all([
     chrome.storage.local.get([AsanaFetcher.ME_INFO]),
     chrome.storage.local.get([AsanaFetcher.ALL_TASKS_KEY]),
@@ -27,11 +28,13 @@ const main = async () => {
     chrome.storage.local.get([AsanaFetcher.WORKSPACE_COLORS_KEY])
   ]);
 
-  // TODO: figure out how to best architect this
   const retrieveMe = async () => {
     me = await AsanaFetcher.retrieveMe();
-    chrome.storage.local.set({ [AsanaFetcher.ME_INFO]: me });
-    console.log('### Main: me is ', me);
+    if (me) {
+      chrome.storage.local.set({ [AsanaFetcher.ME_INFO]: me });
+      console.log('### Main: me is ', me);
+      loggedIn = true;
+    }
   };
 
   const renderApp = () =>
@@ -42,6 +45,7 @@ const main = async () => {
         workspaceColors={workspaceColors}
         refetch={onChange}
         createTask={onCreateTask}
+        loggedIn={loggedIn}
       />,
       document.getElementById('root')
     );
@@ -123,6 +127,7 @@ const main = async () => {
     tasks = localTasks[AsanaFetcher.ALL_TASKS_KEY];
     workspaces = localWorkspaces[AsanaFetcher.ALL_WORKSPACES_KEY];
     workspaceColors = localColors[AsanaFetcher.WORKSPACE_COLORS_KEY];
+    loggedIn = !!workspaces;
     renderApp();
   }
 
@@ -136,6 +141,7 @@ const main = async () => {
   if (updatedTasks && updatedWorkspaces) {
     tasks = updatedTasks.flat();
     workspaces = updatedWorkspaces;
+    loggedIn = true;
   }
 
   workspaceColors = updatedWorkspaces.reduce(

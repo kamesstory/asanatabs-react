@@ -33,6 +33,21 @@ export const ServerManager = {
   },
 
   /**
+   * Pings the asana server to make sure that connection is possible.
+   *
+   * @param callback {Function(options)} Callback on completion.
+   *     options {dict} See Options for details.
+   */
+  ping: async function() {
+    try {
+      await fetch('https://asana.com');
+    } catch {
+      return false;
+    }
+    return true;
+  },
+
+  /**
    * Saves the user's preferences for the extension.
    *
    * @param options {dict} See Options for details.
@@ -60,12 +75,6 @@ export const ServerManager = {
 
   __request: async function(http_method, path, params, options) {
     http_method = http_method.toUpperCase();
-
-    if (http_method === 'PINGTEST') {
-      console.log('### ServerManager: ping test registered!');
-      // alert('Greetings from ServerManager! Ping test received.');
-      return;
-    }
 
     // Be polite to Asana API and tell them who we are.
     let manifest = chrome.runtime.getManifest();
@@ -105,10 +114,13 @@ export const ServerManager = {
     });
 
     if (!cookie) {
-      return {
-        status: 401,
-        error: 'Not Authorized'
-      };
+      return [
+        401,
+        {
+          status: 401,
+          error: 'Not Authorized'
+        }
+      ];
     }
 
     // Note that any URL fetched here must be matched by a permission in
@@ -125,16 +137,22 @@ export const ServerManager = {
       body: JSON.stringify(body_data)
     };
     console.log('### ServerManager: fetching with ', fetchInit);
-    const response = await fetch(url, fetchInit);
+    let response;
+    try {
+      response = await fetch(url, fetchInit);
+    } catch {
+      return [404, null];
+    }
     if (response.status !== 200 || response.status !== 201) {
       console.log(
         '### ServerManager: ERROR, response status ' + response.status
       );
+      return [response.status, null];
     }
 
     const json = await response.json();
     console.log('### ServerManager: JSON response', json['data']);
-    return json.data;
+    return [200, json.data];
   },
 
   /**
@@ -146,7 +164,12 @@ export const ServerManager = {
   workspaces: async function(options) {
     console.log('### ServerManager: inside workspaces!');
 
-    const retrieved = await this.__request('GET', '/workspaces', {}, options);
+    const [status, retrieved] = await this.__request(
+      'GET',
+      '/workspaces',
+      {},
+      options
+    );
     return this._processResponse(retrieved);
   },
 
@@ -163,7 +186,12 @@ export const ServerManager = {
       limit: 100,
       workspace: workspace_id
     }; // assignee=me&completed_since=now&limit=100&workspace=[workspace_id]
-    const retrieved = await this.__request('GET', '/tasks', params, options);
+    const [status, retrieved] = await this.__request(
+      'GET',
+      '/tasks',
+      params,
+      options
+    );
 
     return this._processResponse(retrieved);
   },
@@ -175,7 +203,7 @@ export const ServerManager = {
    *     users {dict[]}
    */
   users: async function(workspace_id, options) {
-    const retrieved = await this.__request(
+    const [status, retrieved] = await this.__request(
       'GET',
       '/workspaces/' + workspace_id + '/users',
       { opt_fields: 'name,photo.image_60x60' },
@@ -193,7 +221,12 @@ export const ServerManager = {
    *     user {dict[]}
    */
   me: async function(options) {
-    const retrieved = await this.__request('GET', '/users/me', {}, options);
+    const [status, retrieved] = await this.__request(
+      'GET',
+      '/users/me',
+      {},
+      options
+    );
 
     return this._processResponse(retrieved);
   },
@@ -205,7 +238,7 @@ export const ServerManager = {
    * @param callback {Function(response)} Callback on success.
    */
   createTask: async function(workspace_id, task) {
-    const retrieved = await this.__request(
+    const [status, retrieved] = await this.__request(
       'POST',
       '/workspaces/' + workspace_id + '/tasks',
       task
@@ -221,7 +254,7 @@ export const ServerManager = {
    * @param callback {Function(response)} Callback on success.
    */
   modifyTask: async function(taskChangedID, changeMade) {
-    const retrieved = await this.__request(
+    const [status, retrieved] = await this.__request(
       'PUT',
       '/tasks/' + taskChangedID + '',
       changeMade
@@ -234,7 +267,7 @@ export const ServerManager = {
    * Requests user type-ahead completions for a query.
    */
   userTypeahead: async function(workspace_id, query) {
-    const retrieved = await this.__request(
+    const [status, retrieved] = await this.__request(
       'GET',
       '/workspaces/' + workspace_id + '/typeahead',
       {
