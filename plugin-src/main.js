@@ -87,7 +87,7 @@ const main = async () => {
     const task = {
       name: description,
       due_on: dateFormat(dueDate, 'YYYY-MM-DD'),
-      assignee: { id: me.id }
+      assignee: 'me'
     };
     AsanaFetcher.createTask(workspace.id, task);
 

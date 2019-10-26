@@ -167,12 +167,12 @@ const TaskCard = ({ title, tasks, onTasksChanged, ...rest }) => {
             translate
             opacity
           >
-            <TaskRow
-              task={task}
-              onTaskChanged={onTasksChanged}
-              workspaceRef={taskWorkspaceRefs[i]}
-              workspaceWidth={workspaceWidth}
-            />
+          <TaskRow
+            task={task}
+            onTaskChanged={onTasksChanged}
+            workspaceRef={taskWorkspaceRefs[i]}
+            workspaceWidth={workspaceWidth}
+          />
           </Flipped>
         ))}
       </CardBox>
