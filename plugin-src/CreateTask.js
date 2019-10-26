@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import ReactDOM from 'react-dom';
 import styled from '@emotion/styled';
 import { Global, css, cx } from '@emotion/core';
@@ -225,6 +225,18 @@ const CreateTask = ({ workspaces, onCreateTask }) => {
     parseDate(dueDate) instanceof Date &&
     workspaces.filter(ws => ws.name === workspaceState).length > 0;
 
+  useEffect(() => {
+    const keypressHandler = event => {
+      if( event.key === "c" )
+        setIsOpen(true);
+      else if ( isOpen && event.key === "Escape" )
+        setIsOpen(false);
+      // else if ( isOpen && readyForSubmit && (event.metaKey || event.ctrlKey) && event.key === 'Enter' )
+    };
+    window.addEventListener('keydown', keypressHandler);
+    return () => window.removeEventListener('keydown', keypressHandler);
+  });
+
   return (
     <>
       <FabOuter ref={fabRef} onClick={() => setIsOpen(!isOpen)}>
@@ -271,14 +283,13 @@ const CreateTask = ({ workspaces, onCreateTask }) => {
           <SubmitTaskButton
             disabled={!readyForSubmit}
             onClick={() => {
-              // TODO: get onCreateTask to work properly!
-              console.log('HELLO FROM THE UNDERWORLD!');
               onCreateTask(
                 description,
                 parseDate(startDate),
                 parseDate(dueDate),
                 workspaces.filter(ws => ws.name === workspaceState)[0]
               );
+              setIsOpen(false);
             }}
           >
             Submit Task
