@@ -9,8 +9,6 @@ const FormLabel = styled.label`
   position: relative;
   z-index: ${({ zIndex }) => zIndex || 997};
   color: #939393;
-  /* border-bottom: solid;
-  border-bottom-color: #1f6a9a; */
   font-size: 12px;
 `;
 
@@ -214,11 +212,6 @@ const CreateTask = ({ workspaces, onCreateTask }) => {
   const fabRef = useRef(null);
   const [suggestionPopup, setOpenSuggestionPopup] = useState('');
 
-  // console.log(
-  //   '### CreateTask: workspaces are ',
-  //   workspaces.filter(ws => ws.name === workspaceState)
-  // );
-
   // TODO: include better controlled input sanitization!
   const readyForSubmit =
     isOpen &&
@@ -240,9 +233,6 @@ const CreateTask = ({ workspaces, onCreateTask }) => {
     window.addEventListener('keydown', keypressHandler);
     return () => window.removeEventListener('keydown', keypressHandler);
   });
-
-  // TODO: include settings helper that allows people to submit feedback forms to me
-  // TODO: allow for local storage clearing
 
   return (
     <>

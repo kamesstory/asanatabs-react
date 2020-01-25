@@ -1,10 +1,7 @@
-import React, { useMemo, useCallback, useState, useEffect } from 'react';
-import ReactDOM from 'react-dom';
+import React, { useMemo, useCallback, useState } from 'react';
 import styled from '@emotion/styled';
-import { Global, css } from '@emotion/core';
-import { format } from 'url';
-import { parse, format as formatDate } from 'date-fns';
-import { Flipped, Flipper } from 'react-flip-toolkit';
+import { css } from '@emotion/core';
+import { Flipped } from 'react-flip-toolkit';
 
 const Title = styled.h1`
   font-size: 20px;

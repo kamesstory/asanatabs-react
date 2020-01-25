@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import ReactDOM from 'react-dom';
 import styled from '@emotion/styled';
-import { Global, css } from '@emotion/core';
 import { format } from 'date-fns';
 
 const DateTimeOuter = styled.div`

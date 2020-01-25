@@ -14,18 +14,15 @@ const checkLogin = async () => {
 };
 
 export const update = async () => {
-  console.log('### Background: this is version 1');
-
   const loggedIn = await checkLogin();
   if (!loggedIn) return;
 
   const workspaces = await ServerManager.workspaces();
   if (!workspaces) {
-    console.log('### Background: no workspaces!');
+    console.log('### Background: no workspaces detected! Nothing to update.');
     return;
   }
 
-  console.log('### Background: Saving workspaces!', workspaces);
   chrome.storage.local.set({ [ALL_WORKSPACES_KEY]: workspaces });
 
   const getAndSaveTasks = async workspace => {
@@ -49,8 +46,9 @@ export const update = async () => {
   );
 
   console.log(
-    '### Background: all tasks retrieved and saved to local storage!',
-    tasks.flat()
+    '### Background: all tasks and workspaces retrieved and saved to local storage!',
+    tasks.flat(),
+    workspaces
   );
   chrome.storage.local.set({ [ALL_TASKS_KEY]: tasks.flat() });
 
@@ -59,9 +57,7 @@ export const update = async () => {
 
 export const updateTask = async (taskChangedID, changeMade) => {
   const loggedIn = await checkLogin();
-  // TODO: make the error available to users!
-  // Attach the actual error to the general prompts that tell users
-  //  that something is wrong.
+  // TODO: make the error available (show it) to users!
   if (!loggedIn) return;
   const modifiedTask = await ServerManager.modifyTask(
     taskChangedID,
@@ -73,7 +69,6 @@ export const updateTask = async (taskChangedID, changeMade) => {
 export const createTask = async (workspace_id, task) => {
   const loggedIn = await checkLogin();
   if (!loggedIn) return;
-  console.log('### AsanaFetcher: workspace ID is ', workspace_id);
   const createdTask = await ServerManager.createTask(workspace_id, task);
   update();
 

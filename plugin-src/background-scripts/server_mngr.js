@@ -63,7 +63,6 @@ export const ServerManager = {
 
     if (http_method === 'PINGTEST') {
       console.log('### ServerManager: ping test registered!');
-      // alert('Greetings from ServerManager! Ping test received.');
       return;
     }
 
@@ -95,7 +94,6 @@ export const ServerManager = {
         Object.entries(url_params)
           .map(([key, value]) => key + '=' + value)
           .join('&');
-      console.log('### ServerManager: url is ', url);
     }
 
     const cookie = await chrome.cookies.get({
@@ -125,11 +123,10 @@ export const ServerManager = {
     };
     console.log('### ServerManager: fetching with ', fetchInit);
     const response = await fetch(url, fetchInit);
-    if (response.status !== 200 && response.status !== 201) {
+    if (response.status !== 200 && response.status !== 201)
       console.log(
         '### ServerManager: ERROR, response status ' + response.status
       );
-    }
 
     const json = await response.json();
     console.log('### ServerManager: JSON response', json['data']);
@@ -143,8 +140,6 @@ export const ServerManager = {
    *     workspaces {dict[]}
    */
   workspaces: async function(options) {
-    console.log('### ServerManager: inside workspaces!');
-
     const retrieved = await this.__request('GET', '/workspaces', {}, options);
     return this._processResponse(retrieved);
   },
@@ -247,12 +242,6 @@ export const ServerManager = {
       }
     );
 
-    // callback(retrieved, function(users) {
-    //         users.forEach(function(user) {
-    //           this._updateUser(workspace_id, user);
-    //         });
-    //         callback(users);
-    //       }, errback);
     return this._processResponse(retrieved);
   },
 
@@ -261,10 +250,8 @@ export const ServerManager = {
   },
 
   _processResponse: function(response) {
-    // console.log( "_processResponse method has been entered." );
-    if (response === undefined || response.errors) {
+    if (response === undefined || response.errors)
       console.log('### ServerManager: ERROR on _processResponse');
-    }
     return response;
   }
 };

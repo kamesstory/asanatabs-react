@@ -1,5 +1,4 @@
-import React, { useState } from 'react';
-import styled from '@emotion/styled';
+import React from 'react';
 import { Global, css } from '@emotion/core';
 import background from './images/ales-krivec-623996-unsplash.jpg';
 import DateTime from './DateTime.js';
@@ -45,7 +44,7 @@ export const App = ({
 }) => {
   // TODO: also think about how to get upcoming to have a user-controlled reminder
   //  date to see when to update the task to be worked on!
-  // TODO: parse out as Date objects and sort on main object!
+  // TODO: parse out as Date objects and sort on main file (not app file)!
   const mapped_tasks = tasks.map(
     ({ gid, name, workspace_name, due_on, completed }) => ({
       gid,
@@ -74,7 +73,6 @@ export const App = ({
   const todayTasks = filteredTasks.filter(
     task => task.duedate && task.duedate <= mingTian
   );
-  console.log('### App: today tasks', todayTasks);
   const tomorrowTasks = filteredTasks.filter(
     task => task.duedate && task.duedate > mingTian && task.duedate <= houTian
   );
@@ -84,14 +82,16 @@ export const App = ({
 
   // need aggregator at this top level
   const singleTaskChanged = (changeType, taskChangedID, changesMade) => {
-    console.log('### SingleTaskChanged: ID of task changed is ', taskChangedID);
+    console.log(
+      '### SingleTaskChanged: ID of task modified is ',
+      taskChangedID
+    );
     refetch(changeType, taskChangedID, changesMade);
   };
 
   const errorMessage =
     'AsanaTabs currently cannot connect to Asana. Please make sure you are logged in and have cookies enabled for Asana, and try again by opening a new tab page!';
 
-  // TODO: allow for offline!
   return (
     <>
       <Global

@@ -1,6 +1,5 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import ReactDOM from 'react-dom';
-import { ClassNames } from '@emotion/core';
 
 const CLOSED_STYLE = 'opacity: 0; pointer-events: none;';
 const OPEN_STYLE = 'opacity: 1; pointer-events: auto;';
