@@ -91,10 +91,9 @@ const TaskRowOuter = styled.div`
 
 const processDueDates = duedate => {
   if (!duedate) return null;
-  return formatDate(
-    parse(duedate, 'YYYY-MM-DD', new Date()),
-    'MMM DD'
-  ).toUpperCase();
+  return duedate
+    .toLocaleString('default', { month: 'short', day: '2-digit' })
+    .toUpperCase();
 };
 
 const TaskRow = ({
@@ -153,8 +152,6 @@ const TaskCard = ({ title, tasks, onTasksChanged, ...rest }) => {
       }
     });
   }, [tasks.length, updateWorkspaceWidth]);
-
-  console.log('### TaskCard: the tasks are here:', tasks);
 
   return (
     <Flipped flipId={title}>

@@ -45,12 +45,13 @@ export const App = ({
 }) => {
   // TODO: also think about how to get upcoming to have a user-controlled reminder
   //  date to see when to update the task to be worked on!
+  // TODO: parse out as Date objects and sort on main object!
   const mapped_tasks = tasks.map(
     ({ gid, name, workspace_name, due_on, completed }) => ({
       gid,
       title: name,
       workspace: workspace_name,
-      duedate: due_on, // TODO: to be replaced
+      duedate: Date.parse(due_on) ? new Date(Date.parse(due_on)) : undefined,
       completed
     })
   );
@@ -61,23 +62,24 @@ export const App = ({
       ...task,
       color: workspaceColors[task.workspace]
     }));
+  filteredTasks.sort((first, second) => {
+    if (!first.duedate && !second.duedate) return 0;
+    else if (!first.duedate) return 1;
+    else if (!second.duedate) return -1;
+    return first.duedate - second.duedate;
+  });
 
-  // TODO: decide if I want to include this on the App rendering method or
-  //  somewhere else, parsed out
   const mingTian = endOfDay(new Date());
   const houTian = endOfTomorrow();
   const todayTasks = filteredTasks.filter(
-    task => task.duedate && Date.parse(task.duedate) <= Date.parse(mingTian)
+    task => task.duedate && task.duedate <= mingTian
   );
   console.log('### App: today tasks', todayTasks);
   const tomorrowTasks = filteredTasks.filter(
-    task =>
-      task.duedate &&
-      Date.parse(task.duedate) >= Date.parse(mingTian) &&
-      Date.parse(task.duedate) <= Date.parse(houTian)
+    task => task.duedate && task.duedate > mingTian && task.duedate <= houTian
   );
   const upcomingTasks = filteredTasks.filter(
-    task => !task.duedate || Date.parse(task.duedate) >= Date.parse(houTian)
+    task => !task.duedate || task.duedate >= houTian
   );
 
   // need aggregator at this top level

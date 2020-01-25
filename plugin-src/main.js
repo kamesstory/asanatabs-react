@@ -11,7 +11,6 @@ import { format as dateFormat } from 'date-fns';
 // refetches on task update
 // TODO: need to set assignee_status
 const main = async () => {
-  // console.log('Editing on: 1/24/2020');
   // chrome.storage.local.clear();
 
   // TODO: let the user know if they are not logged into Asana / have cookies enabled!
@@ -22,13 +21,8 @@ const main = async () => {
     workspaceColors = [];
   let onChange;
   let onCreateTask;
-  let isOnline = true;
-  let [me, localTasks, localWorkspaces, localColors] = await Promise.all([
-    chrome.storage.local.get([AsanaFetcher.ME_INFO]),
-    chrome.storage.local.get([AsanaFetcher.ALL_TASKS_KEY]),
-    chrome.storage.local.get([AsanaFetcher.ALL_WORKSPACES_KEY]),
-    chrome.storage.local.get([AsanaFetcher.WORKSPACE_COLORS_KEY])
-  ]);
+  let isOnline = false;
+  let me;
 
   // TODO: figure out how to best architect this
   const retrieveMe = async () => {
@@ -114,6 +108,15 @@ const main = async () => {
   // MAIN RENDER APPS
   // ----------------------------------------------------
 
+  // Initial render (just to get the background up and running)
+  // renderApp();
+
+  let [localTasks, localWorkspaces, localColors] = await Promise.all([
+    chrome.storage.local.get([AsanaFetcher.ALL_TASKS_KEY]),
+    chrome.storage.local.get([AsanaFetcher.ALL_WORKSPACES_KEY]),
+    chrome.storage.local.get([AsanaFetcher.WORKSPACE_COLORS_KEY])
+  ]);
+
   if (
     AsanaFetcher.ALL_TASKS_KEY in localTasks &&
     AsanaFetcher.ALL_WORKSPACES_KEY in localWorkspaces &&
@@ -141,30 +144,32 @@ const main = async () => {
     updatedWorkspaces
   );
   if (updatedTasks && updatedWorkspaces) {
+    isOnline = true;
+
     tasks = updatedTasks.flat();
     workspaces = updatedWorkspaces;
+
+    workspaceColors = updatedWorkspaces.reduce(
+      (colorsMap, workspace) => ({
+        ...colorsMap,
+        [workspace.name]:
+          workspaceColors && workspaceColors[workspace.name]
+            ? workspaceColors[workspace.name]
+            : randomColor({
+                seed: workspace.gid
+              })
+      }),
+      {}
+    );
+    chrome.storage.local.set({
+      [AsanaFetcher.WORKSPACE_COLORS_KEY]: workspaceColors
+    });
+
+    console.log('### Main: workspace colors are ', workspaceColors);
+
+    // then render update
+    renderApp();
   }
-
-  workspaceColors = updatedWorkspaces.reduce(
-    (colorsMap, workspace) => ({
-      ...colorsMap,
-      [workspace.name]:
-        workspaceColors && workspaceColors[workspace.name]
-          ? workspaceColors[workspace.name]
-          : randomColor({
-              seed: workspace.gid
-            })
-    }),
-    {}
-  );
-  chrome.storage.local.set({
-    [AsanaFetcher.WORKSPACE_COLORS_KEY]: workspaceColors
-  });
-
-  console.log('### Main: workspace colors are ', workspaceColors);
-
-  // then render update
-  renderApp();
 
   // ----------------------------------------------------
   // SECONDARY FUNCTIONS AFTER MAIN RENDERS
