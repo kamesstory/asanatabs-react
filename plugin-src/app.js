@@ -5,6 +5,7 @@ import background from './images/ales-krivec-623996-unsplash.jpg';
 import DateTime from './DateTime.js';
 import TaskCard from './TaskCard.js';
 import CreateTask from './CreateTask.js';
+import ErrorFab from './ErrorFab.js';
 import { endOfDay, endOfTomorrow } from 'date-fns';
 import { Flipper } from 'react-flip-toolkit';
 
@@ -114,7 +115,11 @@ export const App = ({
           />
         </Flipper>
       )}
-
+      {/* {workspaces && workspaces.length > 0 ? (
+        <CreateTask workspaces={workspaces} onCreateTask={createTask} />
+      ) : (
+        <ErrorFab />
+      )} */}
       {workspaces && workspaces.length > 0 && (
         <CreateTask workspaces={workspaces} onCreateTask={createTask} />
       )}

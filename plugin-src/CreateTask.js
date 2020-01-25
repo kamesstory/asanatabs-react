@@ -9,7 +9,8 @@ const FormLabel = styled.label`
   position: relative;
   z-index: ${({ zIndex }) => zIndex || 997};
   color: #939393;
-  /* border-bottom: 2px solid red; */
+  /* border-bottom: solid;
+  border-bottom-color: #1f6a9a; */
   font-size: 12px;
 `;
 
@@ -147,7 +148,8 @@ const SubmitTaskButton = styled.button`
   height: 50px;
   color: #2b2647;
   background-color: #f2f1f7;
-  border: none;
+  border: ${({ disabled }) =>
+    disabled ? 'solid indianred' : 'solid darkseagreen'};
   outline: none;
   cursor: pointer;
 `;
