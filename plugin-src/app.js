@@ -40,7 +40,8 @@ export const App = ({
   tasks,
   workspaceColors,
   refetch,
-  createTask
+  createTask,
+  isOnline
 }) => {
   // TODO: also think about how to get upcoming to have a user-controlled reminder
   //  date to see when to update the task to be worked on!
@@ -85,9 +86,10 @@ export const App = ({
     refetch(changeType, taskChangedID, changesMade);
   };
 
-  // TODO: completely hide the Flipper section if workspaces are empty (there are
-  //  no workspaces)
+  const errorMessage =
+    'AsanaTabs currently cannot connect to Asana. Please make sure you are logged in and have cookies enabled for Asana, and try again by opening a new tab page!';
 
+  // TODO: allow for offline!
   return (
     <>
       <Global
@@ -115,13 +117,10 @@ export const App = ({
           />
         </Flipper>
       )}
-      {/* {workspaces && workspaces.length > 0 ? (
+      {isOnline && workspaces && workspaces.length > 0 ? (
         <CreateTask workspaces={workspaces} onCreateTask={createTask} />
       ) : (
-        <ErrorFab />
-      )} */}
-      {workspaces && workspaces.length > 0 && (
-        <CreateTask workspaces={workspaces} onCreateTask={createTask} />
+        <ErrorFab errorMessage={errorMessage} />
       )}
     </>
   );

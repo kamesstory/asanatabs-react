@@ -11,7 +11,7 @@ import { format as dateFormat } from 'date-fns';
 // refetches on task update
 // TODO: need to set assignee_status
 const main = async () => {
-  console.log('Editing on: 1/24/2020');
+  // console.log('Editing on: 1/24/2020');
   // chrome.storage.local.clear();
 
   // TODO: let the user know if they are not logged into Asana / have cookies enabled!
@@ -22,6 +22,7 @@ const main = async () => {
     workspaceColors = [];
   let onChange;
   let onCreateTask;
+  let isOnline = true;
   let [me, localTasks, localWorkspaces, localColors] = await Promise.all([
     chrome.storage.local.get([AsanaFetcher.ME_INFO]),
     chrome.storage.local.get([AsanaFetcher.ALL_TASKS_KEY]),
@@ -45,6 +46,7 @@ const main = async () => {
         workspaceColors={workspaceColors}
         refetch={onChange}
         createTask={onCreateTask}
+        isOnline={isOnline}
       />,
       document.getElementById('root')
     );
@@ -162,7 +164,7 @@ const main = async () => {
   console.log('### Main: workspace colors are ', workspaceColors);
 
   // then render update
-  // renderApp();
+  renderApp();
 
   // ----------------------------------------------------
   // SECONDARY FUNCTIONS AFTER MAIN RENDERS
