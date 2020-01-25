@@ -41,15 +41,11 @@ export const App = ({
   refetch,
   createTask
 }) => {
-  // TODO: sort tasks into different TaskCards depending on their duedate
-  //  assignee_status! use that in conjunction with other labels to provide
-  //  powerful Today/Tomorrow/Upcoming labels!
-  // also think about how to get upcoming to have a user-controlled reminder
+  // TODO: also think about how to get upcoming to have a user-controlled reminder
   //  date to see when to update the task to be worked on!
-  // tasks.sort(() => Math.random() - 0.5);
   const mapped_tasks = tasks.map(
-    ({ id, name, workspace_name, due_on, completed }) => ({
-      id,
+    ({ gid, name, workspace_name, due_on, completed }) => ({
+      gid,
       title: name,
       workspace: workspace_name,
       duedate: due_on, // TODO: to be replaced
@@ -68,10 +64,10 @@ export const App = ({
   //  somewhere else, parsed out
   const mingTian = endOfDay(new Date());
   const houTian = endOfTomorrow();
-  // TODO: fix this bs regarding date comparisons
   const todayTasks = filteredTasks.filter(
     task => task.duedate && Date.parse(task.duedate) <= Date.parse(mingTian)
   );
+  console.log('### App: today tasks', todayTasks);
   const tomorrowTasks = filteredTasks.filter(
     task =>
       task.duedate &&
@@ -88,6 +84,9 @@ export const App = ({
     refetch(changeType, taskChangedID, changesMade);
   };
 
+  // TODO: completely hide the Flipper section if workspaces are empty (there are
+  //  no workspaces)
+
   return (
     <>
       <Global
@@ -96,25 +95,29 @@ export const App = ({
         })}
       />
       <DateTime />
-      <Flipper flipKey={tasks}>
-        <TaskCard
-          title="Today"
-          tasks={todayTasks}
-          onTasksChanged={singleTaskChanged}
-        />
-        <TaskCard
-          title="Tomorrow"
-          tasks={tomorrowTasks}
-          onTasksChanged={singleTaskChanged}
-        />
-        <TaskCard
-          title="Upcoming"
-          tasks={upcomingTasks}
-          onTasksChanged={singleTaskChanged}
-        />
-      </Flipper>
+      {tasks && tasks.length > 0 && (
+        <Flipper flipKey={tasks}>
+          <TaskCard
+            title="Today"
+            tasks={todayTasks}
+            onTasksChanged={singleTaskChanged}
+          />
+          <TaskCard
+            title="Tomorrow"
+            tasks={tomorrowTasks}
+            onTasksChanged={singleTaskChanged}
+          />
+          <TaskCard
+            title="Upcoming"
+            tasks={upcomingTasks}
+            onTasksChanged={singleTaskChanged}
+          />
+        </Flipper>
+      )}
 
-      <CreateTask workspaces={workspaces} onCreateTask={createTask} />
+      {workspaces && workspaces.length > 0 && (
+        <CreateTask workspaces={workspaces} onCreateTask={createTask} />
+      )}
     </>
   );
 };

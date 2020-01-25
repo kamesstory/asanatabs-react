@@ -108,7 +108,7 @@ const TaskRow = ({
     <TaskRowOuter {...rest}>
       <CheckBox
         clickityClick={() =>
-          onTaskChanged('markdone', task.id, { completed: true })
+          onTaskChanged('markdone', task.gid, { completed: true })
         }
       />
       <WorkspaceName
@@ -154,25 +154,20 @@ const TaskCard = ({ title, tasks, onTasksChanged, ...rest }) => {
     });
   }, [tasks.length, updateWorkspaceWidth]);
 
-  // console.log('### TaskCard: the tasks are here:', tasks);
+  console.log('### TaskCard: the tasks are here:', tasks);
 
   return (
     <Flipped flipId={title}>
       <CardBox {...rest}>
         <Title>{title}</Title>
         {tasks.map((task, i) => (
-          <Flipped
-            flipId={task.id.toString()}
-            key={task.id.toString()}
-            translate
-            opacity
-          >
-          <TaskRow
-            task={task}
-            onTaskChanged={onTasksChanged}
-            workspaceRef={taskWorkspaceRefs[i]}
-            workspaceWidth={workspaceWidth}
-          />
+          <Flipped flipId={task.gid} key={task.gid} translate opacity>
+            <TaskRow
+              task={task}
+              onTaskChanged={onTasksChanged}
+              workspaceRef={taskWorkspaceRefs[i]}
+              workspaceWidth={workspaceWidth}
+            />
           </Flipped>
         ))}
       </CardBox>

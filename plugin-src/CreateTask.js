@@ -9,6 +9,7 @@ const FormLabel = styled.label`
   position: relative;
   z-index: ${({ zIndex }) => zIndex || 997};
   color: #939393;
+  /* border-bottom: 2px solid red; */
   font-size: 12px;
 `;
 
@@ -57,7 +58,7 @@ const roundedBox = css`
   z-index: 998;
 `;
 
-const DateSuggestionsPopup = styled.div`
+const SuggestionsPopup = styled.div`
   position: absolute;
   width: 210px;
   height: 150px;
@@ -86,7 +87,7 @@ const DateFormField = ({
   const zIndex = isOpen ? 999 : 997;
   return (
     <FormFieldDiv>
-      {isOpen && <DateSuggestionsPopup />}
+      {/* {isOpen && <SuggestionsPopup />} */}
       <FormLabel zIndex={zIndex}>{labelText}</FormLabel>
       <DateFormInput
         placeholder={inputText}
@@ -125,7 +126,7 @@ const WorkspaceFormField = ({
   // TODO: need colors here too!
   return (
     <FormFieldDiv>
-      {isOpen && <DateSuggestionsPopup />}
+      {/* {isOpen && <SuggestionsPopup />} */}
       <FormLabel zIndex={zIndex}>Workspace</FormLabel>
       <HorizontalFlex>
         <WorkspaceFormInput
@@ -216,7 +217,7 @@ const CreateTask = ({ workspaces, onCreateTask }) => {
   //   workspaces.filter(ws => ws.name === workspaceState)
   // );
 
-  // TODO: need to sanitize inputs more
+  // TODO: include better controlled input sanitization!
   const readyForSubmit =
     isOpen &&
     description != null &&
@@ -227,15 +228,19 @@ const CreateTask = ({ workspaces, onCreateTask }) => {
 
   useEffect(() => {
     const keypressHandler = event => {
-      if( event.key === "c" )
-        setIsOpen(true);
-      else if ( isOpen && event.key === "Escape" )
+      if (event.key === 'c') setIsOpen(true);
+      else if (isOpen && event.key === 'Escape') {
         setIsOpen(false);
+        // document.getElementById('root').focus();
+      }
       // else if ( isOpen && readyForSubmit && (event.metaKey || event.ctrlKey) && event.key === 'Enter' )
     };
     window.addEventListener('keydown', keypressHandler);
     return () => window.removeEventListener('keydown', keypressHandler);
   });
+
+  // TODO: include settings helper that allows people to submit feedback forms to me
+  // TODO: allow for local storage clearing
 
   return (
     <>

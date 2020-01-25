@@ -10,14 +10,16 @@ import { format as dateFormat } from 'date-fns';
 // re-renders on background update
 // refetches on task update
 // TODO: need to set assignee_status
-
-// yo im gonna start a connection to the background
 const main = async () => {
+  console.log('Editing on: 1/24/2020');
   // chrome.storage.local.clear();
 
   // TODO: let the user know if they are not logged into Asana / have cookies enabled!
-  // immediately pull storage
-  let tasks, workspaces, workspaceColors;
+  // TODO: actually build out a "no login, no saved storage" use case
+  //  set default values for tasks, workspaces, workspaceColors
+  let tasks = [],
+    workspaces = [],
+    workspaceColors = [];
   let onChange;
   let onCreateTask;
   let [me, localTasks, localWorkspaces, localColors] = await Promise.all([
@@ -34,7 +36,8 @@ const main = async () => {
     console.log('### Main: me is ', me);
   };
 
-  const renderApp = () =>
+  const renderApp = () => {
+    console.log('Rendering app with', workspaces, tasks, workspaceColors);
     ReactDOM.render(
       <App
         workspaces={workspaces}
@@ -45,13 +48,7 @@ const main = async () => {
       />,
       document.getElementById('root')
     );
-
-  console.log(
-    '### Main: workspaces and tasks retrieved from local storage!',
-    localTasks,
-    localWorkspaces,
-    localColors
-  );
+  };
 
   // ----------------------------------------------------
   // CALLBACKS
@@ -89,7 +86,7 @@ const main = async () => {
       due_on: dateFormat(dueDate, 'YYYY-MM-DD'),
       assignee: 'me'
     };
-    AsanaFetcher.createTask(workspace.id, task);
+    AsanaFetcher.createTask(workspace.gid, task);
 
     // TODO: add tasks to the list! bigger problem because of waiting for createTask
     //  to update
@@ -101,7 +98,7 @@ const main = async () => {
     //  then we also need full diff strategy
     tasks.push({
       ...task,
-      workspace: workspace.id,
+      workspace: workspace.gid,
       workspace_name: workspace.name,
       gid: fake_gid,
       id: fake_id
@@ -123,8 +120,16 @@ const main = async () => {
     tasks = localTasks[AsanaFetcher.ALL_TASKS_KEY];
     workspaces = localWorkspaces[AsanaFetcher.ALL_WORKSPACES_KEY];
     workspaceColors = localColors[AsanaFetcher.WORKSPACE_COLORS_KEY];
-    renderApp();
+
+    console.log(
+      '### Main: workspaces and tasks retrieved from local storage!',
+      tasks,
+      workspaces,
+      workspaceColors
+    );
   }
+
+  renderApp();
 
   // then immediate request from asana
   const [updatedTasks, updatedWorkspaces] = await AsanaFetcher.update();
@@ -145,7 +150,7 @@ const main = async () => {
         workspaceColors && workspaceColors[workspace.name]
           ? workspaceColors[workspace.name]
           : randomColor({
-              seed: workspace.id
+              seed: workspace.gid
             })
     }),
     {}
@@ -157,7 +162,7 @@ const main = async () => {
   console.log('### Main: workspace colors are ', workspaceColors);
 
   // then render update
-  renderApp();
+  // renderApp();
 
   // ----------------------------------------------------
   // SECONDARY FUNCTIONS AFTER MAIN RENDERS

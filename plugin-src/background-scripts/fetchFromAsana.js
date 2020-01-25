@@ -24,10 +24,12 @@ export const update = async () => {
     console.log('### Background: no workspaces!');
     return;
   }
+
+  console.log('### Background: Saving workspaces!', workspaces);
   chrome.storage.local.set({ [ALL_WORKSPACES_KEY]: workspaces });
 
   const getAndSaveTasks = async workspace => {
-    const { id: wid, name: wname } = workspace;
+    const { gid: wid, name: wname } = workspace;
     let options = ['due_on', 'name'];
     const tasksForWorkspace = await ServerManager.tasks(wid, options);
     if (!tasksForWorkspace) {
@@ -46,12 +48,11 @@ export const update = async () => {
     workspaces.map(workspace => getAndSaveTasks(workspace))
   );
 
-  chrome.storage.local.set({ [ALL_TASKS_KEY]: tasks.flat() });
-
   console.log(
-    '### Background: all the tasks retrieved, flattened!',
+    '### Background: all tasks retrieved and saved to local storage!',
     tasks.flat()
   );
+  chrome.storage.local.set({ [ALL_TASKS_KEY]: tasks.flat() });
 
   return [tasks, workspaces];
 };
@@ -59,6 +60,8 @@ export const update = async () => {
 export const updateTask = async (taskChangedID, changeMade) => {
   const loggedIn = await checkLogin();
   // TODO: make the error available to users!
+  // Attach the actual error to the general prompts that tell users
+  //  that something is wrong.
   if (!loggedIn) return;
   const modifiedTask = await ServerManager.modifyTask(
     taskChangedID,
