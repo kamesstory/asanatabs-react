@@ -1,7 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
-import ReactDOM from 'react-dom';
 import styled from '@emotion/styled';
-import { Global, css, cx } from '@emotion/core';
+import { css } from '@emotion/core';
 import Overlay from './Overlay';
 import { parseDate } from 'chrono-node';
 
@@ -217,9 +216,10 @@ const CreateTask = ({ workspaces, onCreateTask }) => {
     isOpen &&
     description != null &&
     description.length > 0 &&
-    parseDate(startDate) instanceof Date &&
-    parseDate(dueDate) instanceof Date &&
-    workspaces.filter(ws => ws.name === workspaceState).length > 0;
+    (parseDate(startDate) instanceof Date || startDate === '') &&
+    (parseDate(dueDate) instanceof Date || dueDate === '') &&
+    (workspaces.filter(ws => ws.name === workspaceState).length > 0 ||
+      workspaceState === '');
 
   useEffect(() => {
     const keypressHandler = event => {
@@ -255,7 +255,7 @@ const CreateTask = ({ workspaces, onCreateTask }) => {
           <HorizontalFlex>
             <DateFormField
               labelText="Start Date"
-              inputText="e.g. in 5 days"
+              inputText="today"
               parsedDate={startDate}
               setStartDate={setStartDate}
               isOpen={suggestionPopup == 'start_date'}
@@ -263,7 +263,7 @@ const CreateTask = ({ workspaces, onCreateTask }) => {
             />
             <DateFormField
               labelText="Due Date"
-              inputText="e.g. next Friday"
+              inputText="tomorrow"
               parsedDate={dueDate}
               setStartDate={setDueDate}
               isOpen={suggestionPopup == 'due_date'}
@@ -280,11 +280,15 @@ const CreateTask = ({ workspaces, onCreateTask }) => {
           <SubmitTaskButton
             disabled={!readyForSubmit}
             onClick={() => {
+              const submitted_workspace =
+                workspaceState === ''
+                  ? workspaces[workspaces.length - 1]
+                  : workspaces.filter(ws => ws.name === workspaceState)[0];
               onCreateTask(
                 description,
-                parseDate(startDate),
-                parseDate(dueDate),
-                workspaces.filter(ws => ws.name === workspaceState)[0]
+                parseDate(startDate === '' ? 'today' : startDate),
+                parseDate(dueDate === '' ? 'tomorrow' : dueDate),
+                submitted_workspace
               );
               setIsOpen(false);
             }}
