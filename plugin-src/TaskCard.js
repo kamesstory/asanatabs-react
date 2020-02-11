@@ -120,6 +120,7 @@ const TaskRow = ({
   );
 };
 
+// TODO: fix Shamikh's card width issues!
 const CardBox = styled.div`
   background-color: white;
   max-width: 960px;
