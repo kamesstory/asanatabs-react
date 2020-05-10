@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "AsanaTabs",
-  "version": "2.1.2",
+  "version": "2.2.0",
   "content_security_policy": "script-src 'self'; object-src 'self'",
   "description": "Quickly view Asana tasks from the new tab page.",
 
