@@ -37,7 +37,7 @@ const RowTextPadding = css`
 const MAX_WORKSPACE_WIDTH_PX = 180;
 
 const WorkspaceName = styled.span`
-  color: ${props => props.color};
+  color: ${(props) => props.color};
   font-weight: 600;
   flex-shrink: 0;
   white-space: nowrap;
@@ -48,10 +48,10 @@ const WorkspaceName = styled.span`
     css`
       width: ${Math.min(MAX_WORKSPACE_WIDTH_PX, workspaceWidth)}px;
       ${workspaceWidth >= MAX_WORKSPACE_WIDTH_PX &&
-        css`
-          white-space: nowrap;
-          text-overflow: ellipsis;
-        `}
+      css`
+        white-space: nowrap;
+        text-overflow: ellipsis;
+      `}
     `};
   ${RowTextPadding}
 `;
@@ -79,6 +79,7 @@ const TaskRowOuter = styled.div`
   display: flex;
   flex-direction: row;
   align-items: flex-start;
+  cursor: pointer;
 
   :last-child {
     padding-bottom: 0;
@@ -86,7 +87,7 @@ const TaskRowOuter = styled.div`
   }
 `;
 
-const processDueDates = duedate => {
+const processDueDates = (duedate) => {
   if (!duedate) return null;
   return duedate
     .toLocaleString('default', { month: 'short', day: '2-digit' })
@@ -100,19 +101,30 @@ const TaskRow = ({
   workspaceWidth,
   ...rest
 }) => {
+  const openTaskInNewWindow = () => {
+    if (window.getSelection().toString() === '') {
+      console.log(task, workspaceRef, workspaceWidth);
+      window.open(
+        `https://app.asana.com/0/${task.workspace}/${task.gid}`,
+        '_blank'
+      );
+    }
+  };
+
   return (
-    <TaskRowOuter {...rest}>
+    <TaskRowOuter onClick={openTaskInNewWindow} {...rest}>
       <CheckBox
-        clickityClick={() =>
-          onTaskChanged('markdone', task.gid, { completed: true })
-        }
+        clickityClick={(e) => {
+          e.stopPropagation();
+          onTaskChanged('markdone', task.gid, { completed: true });
+        }}
       />
       <WorkspaceName
         workspaceWidth={workspaceWidth}
         ref={workspaceRef}
         color={task.color}
       >
-        {task.workspace}
+        {task.workspace_name}
       </WorkspaceName>
       <TaskTitle>{task.title}</TaskTitle>
       <DueDate>{processDueDates(task.duedate)}</DueDate>
@@ -136,15 +148,15 @@ const CardBox = styled.div`
 
 const TaskCard = ({ title, tasks, onTasksChanged, ...rest }) => {
   const [workspaceWidth, setWorkspaceWidth] = useState(0);
-  const updateWorkspaceWidth = useCallback(widths => {
+  const updateWorkspaceWidth = useCallback((widths) => {
     setWorkspaceWidth(Math.max(...widths));
   });
   const taskWorkspaceRefs = useMemo(() => {
     const widths = Array(tasks.length).fill(null);
-    return widths.map((_, i) => el => {
+    return widths.map((_, i) => (el) => {
       if (el != null) {
         widths[i] = el.scrollWidth;
-        if (widths.every(el => el != null)) {
+        if (widths.every((el) => el != null)) {
           updateWorkspaceWidth(widths);
         }
       }

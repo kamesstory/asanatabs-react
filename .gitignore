@@ -2,3 +2,5 @@ node_modules/
 dist/
 old/
 .vscode/
+compiled/
+.DS_Store

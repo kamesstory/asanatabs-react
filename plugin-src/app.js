@@ -40,26 +40,35 @@ export const App = ({
   workspaceColors,
   refetch,
   createTask,
-  isOnline
+  isOnline,
 }) => {
+  console.log(
+    `raw tasks are`,
+    tasks,
+    `raw workspaces are`,
+    workspaces,
+    `workspace colors are`,
+    workspaceColors
+  );
   // TODO: also think about how to get upcoming to have a user-controlled reminder
   //  date to see when to update the task to be worked on!
   // TODO: parse out as Date objects and sort on main file (not app file)!
   const mapped_tasks = tasks.map(
-    ({ gid, name, workspace_name, due_on, completed }) => ({
+    ({ gid, name, workspace, workspace_name, due_on, completed }) => ({
       gid,
       title: name,
-      workspace: workspace_name,
+      workspace,
+      workspace_name,
       duedate: Date.parse(due_on) ? new Date(Date.parse(due_on)) : undefined,
-      completed
+      completed,
     })
   );
 
   const filteredTasks = mapped_tasks
-    .filter(task => !task.completed)
-    .map(task => ({
+    .filter((task) => !task.completed)
+    .map((task) => ({
       ...task,
-      color: workspaceColors[task.workspace]
+      color: workspaceColors[task.workspace_name],
     }));
   filteredTasks.sort((first, second) => {
     if (!first.duedate && !second.duedate) return 0;
@@ -71,13 +80,13 @@ export const App = ({
   const mingTian = endOfDay(new Date());
   const houTian = endOfTomorrow();
   const todayTasks = filteredTasks.filter(
-    task => task.duedate && task.duedate <= mingTian
+    (task) => task.duedate && task.duedate <= mingTian
   );
   const tomorrowTasks = filteredTasks.filter(
-    task => task.duedate && task.duedate > mingTian && task.duedate <= houTian
+    (task) => task.duedate && task.duedate > mingTian && task.duedate <= houTian
   );
   const upcomingTasks = filteredTasks.filter(
-    task => !task.duedate || task.duedate >= houTian
+    (task) => !task.duedate || task.duedate >= houTian
   );
 
   // need aggregator at this top level
@@ -97,7 +106,7 @@ export const App = ({
     <>
       <Global
         styles={customBackground({
-          backgroundImage: background
+          backgroundImage: background,
         })}
       />
       <DateTime />
