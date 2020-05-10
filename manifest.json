@@ -21,13 +21,9 @@
   },
   "permissions": [
     "background",
-    "tabs",
     "storage",
     "cookies",
     "activeTab",
-    "notifications",
-    "webRequest",
-    "webRequestBlocking",
     "*://*.asana.com/*"
   ],
   "web_accessible_resources": ["icon16.png", "icon48.png", "icon128.png"]
