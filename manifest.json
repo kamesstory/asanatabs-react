@@ -19,12 +19,6 @@
   "chrome_url_overrides": {
     "newtab": "index.html"
   },
-  "permissions": [
-    "background",
-    "storage",
-    "cookies",
-    "activeTab",
-    "*://*.asana.com/*"
-  ],
+  "permissions": ["background", "storage", "cookies", "*://*.asana.com/*"],
   "web_accessible_resources": ["icon16.png", "icon48.png", "icon128.png"]
 }
