@@ -11,13 +11,13 @@ module.exports = {
     'content-script': './plugin-src/my-content-script.js',
     background: './plugin-src/background-scripts/background.js',
     app: './plugin-src/app.js',
-    main: './plugin-src/main.js'
+    main: './plugin-src/main.js',
   },
   output: {
     publicPath: '.',
     path: resolve(__dirname, 'dist/'),
     filename: '[name].bundle.js',
-    libraryTarget: 'umd'
+    libraryTarget: 'umd',
   },
   plugins: [
     /***********************************************************************/
@@ -31,18 +31,24 @@ module.exports = {
               background: 'background' 
             }
             */
-      manifest: resolve(__dirname, 'manifest.json')
+      manifest: resolve(__dirname, 'manifest.json'),
     }),
 
     new MiniCssExtractPlugin({ filename: 'style.css' }),
     new CopyWebpackPlugin([
       { from: './plugin-src/index.html' },
       { from: './manifest.json' },
-      { from: './icons' }
-    ])
+      { from: './icons' },
+    ]),
   ],
   module: {
     rules: [
+      {
+        test: /\.(tsx|ts)$/,
+        use: {
+          loader: 'ts-loader',
+        },
+      },
       {
         test: /\.js?$/,
         exclude: /node_modules/,
@@ -51,23 +57,23 @@ module.exports = {
           options: {
             presets: [
               // require('@babel/preset-env'),
-              require('@babel/preset-react')
+              require('@babel/preset-react'),
             ],
             plugins: [
               'babel-plugin-emotion',
-              '@babel/plugin-proposal-class-properties'
-            ]
-          }
-        }
+              '@babel/plugin-proposal-class-properties',
+            ],
+          },
+        },
       },
       {
         test: /\.css$/,
         use: [
           {
-            loader: MiniCssExtractPlugin.loader
+            loader: MiniCssExtractPlugin.loader,
           },
-          'css-loader'
-        ]
+          'css-loader',
+        ],
       },
       {
         test: /\.(png|svg|jpg|gif)$/,
@@ -77,15 +83,15 @@ module.exports = {
             options: {
               name: '[hash].[ext]',
               // What the fuck?!
-              publicPath: url => url
-            }
-          }
-        ]
+              publicPath: (url) => url,
+            },
+          },
+        ],
       },
       {
         test: /\.txt$/,
-        use: 'raw-loader'
-      }
-    ]
-  }
+        use: 'raw-loader',
+      },
+    ],
+  },
 };
