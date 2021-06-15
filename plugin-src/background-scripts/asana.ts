@@ -52,6 +52,7 @@ export const update = async () => {
   //   tasks.flat(),
   //   workspaces
   // );
+
   chrome.storage.local.set({ [ALL_TASKS_KEY]: tasks.flat() });
 
   return [tasks, workspaces];

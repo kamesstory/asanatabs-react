@@ -4,7 +4,7 @@ import { Global, css, jsx } from '@emotion/core';
 import backgroundImageUrl from './images/ales-krivec-623996-unsplash.jpg';
 import DateTime from './DateTime.js';
 import TaskCard from './TaskCard.js';
-import CreateTask from './CreateTask.js';
+import CreateTask from './CreateTask';
 import ErrorFab from './ErrorFab.js';
 import { endOfDay, endOfTomorrow } from 'date-fns';
 import { Flipper } from 'react-flip-toolkit';
@@ -52,7 +52,12 @@ export const App: FunctionComponent<{
     taskChangedId: string,
     changesMade: object
   ) => void;
-  createTask: VoidFunction;
+  createTask: (
+    description: string,
+    startDate: Date,
+    dueDate: Date,
+    workspace: Workspace
+  ) => void;
   isOnline: boolean;
 }> = ({
   workspaces,
@@ -147,7 +152,7 @@ export const App: FunctionComponent<{
   return (
     <Fragment>
       <Global styles={getCustomBackground()} />
-      <div>hot reload testing time</div>
+      {/* <div>hot reload testing time 2</div> */}
       <DateTime />
       {tasks && tasks.length > 0 && (
         <Flipper flipKey={tasks}>

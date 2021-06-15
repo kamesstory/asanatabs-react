@@ -1,10 +1,24 @@
-import React, { useState, useRef, useEffect } from 'react';
+/** @jsx jsx */
+import {
+  FunctionComponent,
+  useState,
+  useRef,
+  useEffect,
+  SetStateAction,
+  Fragment,
+} from 'react';
 import styled from '@emotion/styled';
-import { css } from '@emotion/core';
+import { css, jsx } from '@emotion/core';
 import Overlay from './Overlay';
 import { parseDate } from 'chrono-node';
+import { Workspace } from './background-scripts/serverManager';
 
-const FormLabel = styled.label`
+type GenericProps = {
+  zIndex?: number;
+  isOpen?: boolean;
+};
+
+const FormLabel = styled.label<GenericProps>`
   position: relative;
   z-index: ${({ zIndex }) => zIndex || 997};
   color: #939393;
@@ -25,12 +39,18 @@ const DescFormInput = styled.textarea`
   outline: none;
 `;
 
-const DescFormField = ({
+const DescFormField: FunctionComponent<{
+  labelText: string;
+  inputText: string;
+  description: string;
+  setDescription: (v: string) => void;
+  setActiveInput: VoidFunction;
+}> = ({
   labelText,
   inputText,
   description,
   setDescription,
-  setActiveInput
+  setActiveInput,
 }) => {
   return (
     <FormFieldDiv>
@@ -39,8 +59,8 @@ const DescFormField = ({
         <DescFormInput
           placeholder={inputText}
           value={description}
-          onChange={e => setDescription(e.target.value)}
-          onFocus={e => setActiveInput()}
+          onChange={(e) => setDescription(e.target.value)}
+          onFocus={() => setActiveInput()}
         />
       </div>
     </FormFieldDiv>
@@ -56,16 +76,16 @@ const roundedBox = css`
   z-index: 998;
 `;
 
-const SuggestionsPopup = styled.div`
-  position: absolute;
-  width: 210px;
-  height: 150px;
-  left: -12px;
-  top: -12px;
-  ${roundedBox};
-`;
+// const SuggestionsPopup = styled.div`
+//   position: absolute;
+//   width: 210px;
+//   height: 150px;
+//   left: -12px;
+//   top: -12px;
+//   ${roundedBox};
+// `;
 
-const DateFormInput = styled.input`
+const DateFormInput = styled.input<GenericProps>`
   position: relative;
   color: #2b2647;
   font-size: 14px;
@@ -74,13 +94,20 @@ const DateFormInput = styled.input`
   z-index: ${({ zIndex }) => zIndex || 997};
 `;
 
-const DateFormField = ({
+const DateFormField: FunctionComponent<{
+  labelText: string;
+  inputText: string;
+  parsedDate: string;
+  setStartDate: (v: string) => void;
+  isOpen: boolean;
+  setActiveInput: VoidFunction;
+}> = ({
   labelText,
   inputText,
   parsedDate,
   setStartDate,
   isOpen,
-  setActiveInput
+  setActiveInput,
 }) => {
   const zIndex = isOpen ? 999 : 997;
   return (
@@ -90,8 +117,8 @@ const DateFormField = ({
       <DateFormInput
         placeholder={inputText}
         value={parsedDate}
-        onChange={e => setStartDate(e.target.value)}
-        onFocus={e => setActiveInput()}
+        onChange={(e) => setStartDate(e.target.value)}
+        onFocus={() => setActiveInput()}
         zIndex={zIndex}
       />
     </FormFieldDiv>
@@ -103,7 +130,7 @@ const HorizontalFlex = styled.div`
   flex-direction: horizontal;
 `;
 
-const WorkspaceFormInput = styled.input`
+const WorkspaceFormInput = styled.input<GenericProps>`
   position: relative;
   z-index: ${({ zIndex }) => zIndex || 997};
   color: #2b2647;
@@ -112,13 +139,13 @@ const WorkspaceFormInput = styled.input`
   outline: none;
 `;
 
-const WorkspaceFormField = ({
-  workspaces,
-  workspaceState,
-  setWorkspace,
-  isOpen,
-  setActiveInput
-}) => {
+const WorkspaceFormField: FunctionComponent<{
+  workspaces: Workspace[];
+  workspaceState: string;
+  setWorkspace: React.Dispatch<SetStateAction<string>>;
+  isOpen: boolean;
+  setActiveInput: VoidFunction;
+}> = ({ workspaces, workspaceState, setWorkspace, isOpen, setActiveInput }) => {
   const zIndex = isOpen ? 999 : 997;
   // TODO: insert workspace selection for inputs here!
   // TODO: need colors here too!
@@ -130,8 +157,8 @@ const WorkspaceFormField = ({
         <WorkspaceFormInput
           placeholder={workspaces[workspaces.length - 1].name}
           value={workspaceState}
-          onChange={e => setWorkspace(e.target.value)}
-          onFocus={e => setActiveInput()}
+          onChange={(e) => setWorkspace(e.target.value)}
+          onFocus={(e) => setActiveInput()}
           zIndex={zIndex}
         />
       </HorizontalFlex>
@@ -151,7 +178,7 @@ const SubmitTaskButton = styled.button`
   cursor: pointer;
 `;
 
-const Popover = styled.div`
+const Popover = styled.div<GenericProps>`
   opacity: 0;
   width: 420px;
   padding: 32px 28px;
@@ -189,18 +216,26 @@ const FabOuter = styled.div`
   box-shadow: 0 10px 20px rgba(0, 0, 0, 0.25);
 `;
 
-const FabPlus = styled.span`
+const FabPlus = styled.span<GenericProps>`
   display: inline-block;
   transform: rotate(0deg);
   transition: transform 0.2s;
-  ${props =>
-    props.isOpen &&
+  ${({ isOpen }) =>
+    isOpen &&
     css`
       transform: rotate(135deg);
     `}
 `;
 
-const CreateTask = ({ workspaces, onCreateTask }) => {
+const CreateTask: FunctionComponent<{
+  workspaces: Workspace[];
+  onCreateTask: (
+    description: string,
+    startDate: Date,
+    dueDate: Date,
+    workspace: Workspace
+  ) => void;
+}> = ({ workspaces, onCreateTask }) => {
   const descInputText = 'description + title of your task';
 
   const [isOpen, setIsOpen] = useState(false);
@@ -218,11 +253,11 @@ const CreateTask = ({ workspaces, onCreateTask }) => {
     description.length > 0 &&
     (parseDate(startDate) instanceof Date || startDate === '') &&
     (parseDate(dueDate) instanceof Date || dueDate === '') &&
-    (workspaces.filter(ws => ws.name === workspaceState).length > 0 ||
+    (workspaces.filter((ws) => ws.name === workspaceState).length > 0 ||
       workspaceState === '');
 
   useEffect(() => {
-    const keypressHandler = event => {
+    const keypressHandler = (event: KeyboardEvent) => {
       if (event.key === 'c') setIsOpen(true);
       else if (isOpen && event.key === 'Escape') {
         setIsOpen(false);
@@ -235,7 +270,7 @@ const CreateTask = ({ workspaces, onCreateTask }) => {
   });
 
   return (
-    <>
+    <Fragment>
       <FabOuter ref={fabRef} onClick={() => setIsOpen(!isOpen)}>
         <FabPlus isOpen={isOpen}>+</FabPlus>
       </FabOuter>
@@ -250,7 +285,7 @@ const CreateTask = ({ workspaces, onCreateTask }) => {
             inputText={descInputText}
             description={description}
             setDescription={setDescription}
-            setActiveInput={e => setOpenSuggestionPopup('')}
+            setActiveInput={() => setOpenSuggestionPopup('')}
           />
           <HorizontalFlex>
             <DateFormField
@@ -283,7 +318,7 @@ const CreateTask = ({ workspaces, onCreateTask }) => {
               const submitted_workspace =
                 workspaceState === ''
                   ? workspaces[workspaces.length - 1]
-                  : workspaces.filter(ws => ws.name === workspaceState)[0];
+                  : workspaces.filter((ws) => ws.name === workspaceState)[0];
               onCreateTask(
                 description,
                 parseDate(startDate === '' ? 'today' : startDate),
@@ -297,7 +332,7 @@ const CreateTask = ({ workspaces, onCreateTask }) => {
           </SubmitTaskButton>
         </Popover>
       </Overlay>
-    </>
+    </Fragment>
   );
 };
 
