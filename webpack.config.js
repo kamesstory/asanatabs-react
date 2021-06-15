@@ -8,9 +8,9 @@ module.exports = {
   mode,
   devtool: 'inline-source-map',
   entry: {
-    'content-script': './plugin-src/my-content-script.js',
+    'content-script': './plugin-src/contentScript.js',
     background: './plugin-src/background-scripts/background.js',
-    app: './plugin-src/app.js',
+    app: './plugin-src/App.js',
     main: './plugin-src/main.js',
   },
   output: {
@@ -48,6 +48,7 @@ module.exports = {
         use: {
           loader: 'ts-loader',
         },
+        exclude: /node_modules/,
       },
       {
         test: /\.js?$/,
