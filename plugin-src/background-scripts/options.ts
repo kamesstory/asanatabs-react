@@ -12,31 +12,37 @@
  * They are stored off in browser local storage for the extension as a
  * single serialized string, read/written all-or-nothing.
  */
+type Options = {
+  asana_host_port?: string;
+  default_workspace_id?: number;
+};
+
 export const Options = {
   /**
    * @param opt_options {dict} Options to use; if unspecified will be loaded.
    * @return {String} The URL for the login page.
    */
-  loginUrl: function(opt_options) {
-    var options = opt_options || Options.loadOptions();
-    return 'https://' + options.asana_host_port + '/';
+  loginUrl: function (options?: Options) {
+    return (
+      'https://' + (options ?? Options.loadOptions()).asana_host_port + '/'
+    );
   },
 
   /**
    * @param opt_options {dict} Options to use; if unspecified will be loaded.
    * @return {String} The URL for the signup page.
    */
-  signupUrl: function(opt_options) {
+  signupUrl: function () {
     return 'http://asana.com/?utm_source=chrome&utm_medium=ext&utm_campaign=ext';
   },
 
   /**
    * @return {dict} Default options.
    */
-  defaultOptions: function() {
+  defaultOptions: function (): Options {
     return {
       asana_host_port: 'app.asana.com',
-      default_workspace_id: 0
+      default_workspace_id: 0,
     };
   },
 
@@ -45,9 +51,9 @@ export const Options = {
    *
    * @return {dict} The user's stored options
    */
-  loadOptions: function() {
-    var options_json = localStorage.options;
-    var options;
+  loadOptions: function () {
+    const options_json = localStorage.options;
+    let options: Options;
     if (!options_json) {
       options = this.defaultOptions();
       localStorage.options = JSON.stringify(options);
@@ -64,15 +70,15 @@ export const Options = {
    *
    * @param options {dict} The user's options.
    */
-  saveOptions: function(options) {
+  saveOptions: function (options: Options) {
     localStorage.options = JSON.stringify(options);
   },
 
   /**
    * Reset the user's preferences to the defaults.
    */
-  resetOptions: function() {
+  resetOptions: function () {
     delete localStorage.options;
     this.loadOptions();
-  }
+  },
 };

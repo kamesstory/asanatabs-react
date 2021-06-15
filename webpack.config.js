@@ -8,7 +8,7 @@ module.exports = {
   mode,
   devtool: 'inline-source-map',
   entry: {
-    background: './plugin-src/background-scripts/background.js',
+    background: './plugin-src/background-scripts/background.ts',
     app: './plugin-src/App.js',
     main: './plugin-src/main.js',
   },
@@ -17,6 +17,9 @@ module.exports = {
     path: resolve(__dirname, 'dist/'),
     filename: '[name].bundle.js',
     libraryTarget: 'umd',
+  },
+  resolve: {
+    extensions: ['.tsx', '.ts', '.js'],
   },
   plugins: [
     /***********************************************************************/

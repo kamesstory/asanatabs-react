@@ -1,4 +1,4 @@
-import { Options } from './options.js';
+import { Options } from './options';
 
 /**
  * Library of functions for the "server" portion of an extension, which is
@@ -8,40 +8,7 @@ import { Options } from './options.js';
  * to the Asana API to get results.
  */
 export const ServerManager = {
-  ASANA_BRIDGE_BASE_URL: Options.loginUrl('') + 'api/' + '1.0',
-
-  /**
-   * Called by the model whenever a request is made and error occurs.
-   * Override to handle in a context-appropriate way. Some requests may
-   * also take an `errback` parameter which will handle errors with
-   * that particular request.
-   *
-   * @param response {dict} Response from the server.
-   */
-  onError: function(response) {
-    console.error('### ServerManager: ERROR thrown!');
-  },
-
-  /**
-   * Requests the user's preferences for the extension.
-   *
-   * @param callback {Function(options)} Callback on completion.
-   *     options {dict} See Options for details.
-   */
-  options: function(callback) {
-    callback(Options.loadOptions());
-  },
-
-  /**
-   * Saves the user's preferences for the extension.
-   *
-   * @param options {dict} See Options for details.
-   * @param callback {Function()} Callback on completion.
-   */
-  saveOptions: function(options, callback) {
-    Options.saveOptions(options);
-    callback();
-  },
+  ASANA_BRIDGE_BASE_URL: Options.loginUrl() + 'api/' + '1.0',
 
   /**
    * Determine if the user is logged in.
@@ -49,19 +16,24 @@ export const ServerManager = {
    * @param callback {Function(is_logged_in)} Called when request complete.
    *     is_logged_in {Boolean} True iff the user is logged in to Asana.
    */
-  isLoggedIn: async function() {
+  isLoggedIn: async function () {
     const cookie = await chrome.cookies.get({
       url: this.ASANA_BRIDGE_BASE_URL,
-      name: 'ticket'
+      name: 'ticket',
     });
 
     return !!(cookie && cookie.value);
   },
 
-  __request: async function(http_method, path, params, options) {
-    http_method = http_method.toUpperCase();
+  _request: async function (
+    httpMethod: string,
+    path: string,
+    params: object,
+    options?: any[]
+  ) {
+    const formattedRequest = httpMethod.toUpperCase();
 
-    if (http_method === 'PINGTEST') {
+    if (formattedRequest === 'PINGTEST') {
       console.log('### ServerManager: ping test registered!');
       return;
     }
@@ -72,21 +44,22 @@ export const ServerManager = {
       'chrome-extension',
       chrome.i18n.getMessage('@@extension_id'),
       manifest.version,
-      manifest.name
+      manifest.name,
     ].join(':');
 
     let url = this.ASANA_BRIDGE_BASE_URL + path;
     let body_data;
-    if (http_method === 'PUT' || http_method === 'POST') {
+    if (formattedRequest === 'PUT' || formattedRequest === 'POST') {
       // POST/PUT request, put params in body
       body_data = {
         data: params,
-        options: { client_name: client_name }
+        options: { client_name: client_name },
       };
     } else {
       // GET/DELETE request, add params as URL parameters.
-      let optionsString =
-        options != null ? 'opt_fields=' + options.join(',') + '&' : '';
+      let optionsString = !options
+        ? 'opt_fields=' + options.join(',') + '&'
+        : '';
       let url_params = { opt_client_name: client_name, ...params };
       url +=
         '?' +
@@ -98,31 +71,30 @@ export const ServerManager = {
 
     const cookie = await chrome.cookies.get({
       url: url,
-      name: 'ticket'
+      name: 'ticket',
     });
 
     if (!cookie) {
       return {
         status: 401,
-        error: 'Not Authorized'
+        error: 'Not Authorized',
       };
     }
 
     // Note that any URL fetched here must be matched by a permission in
     // the manifest.json file!
-    const fetchInit = {
-      method: http_method,
+    console.log('### ServerManager: fetching with body', body_data);
+    const response = await fetch(url, {
+      method: formattedRequest,
       mode: 'cors',
       cache: 'no-cache',
       headers: {
         'X-Requested-With': 'XMLHttpRequest',
         'X-Allow-Asana-Client': '1',
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
       },
-      body: JSON.stringify(body_data)
-    };
-    console.log('### ServerManager: fetching with ', fetchInit);
-    const response = await fetch(url, fetchInit);
+      body: JSON.stringify(body_data),
+    });
     if (response.status !== 200 && response.status !== 201)
       console.log(
         '### ServerManager: ERROR, response status ' + response.status
@@ -139,8 +111,8 @@ export const ServerManager = {
    * @param callback {Function(workspaces)} Callback on success.
    *     workspaces {dict[]}
    */
-  workspaces: async function(options) {
-    const retrieved = await this.__request('GET', '/workspaces', {}, options);
+  workspaces: async function (options: any[]) {
+    const retrieved = await this._request('GET', '/workspaces', {}, options);
     return this._processResponse(retrieved);
   },
 
@@ -150,35 +122,35 @@ export const ServerManager = {
    * @param callback {Function(workspaces)} Callback on success.
    *     workspaces {dict[]}
    */
-  tasks: async function(workspace_id, options) {
-    var params = {
+  tasks: async function (workspaceId: string, options: any[]) {
+    const params = {
       assignee: 'me',
       completed_since: 'now',
       limit: 100,
-      workspace: workspace_id
+      workspace: workspaceId,
     }; // assignee=me&completed_since=now&limit=100&workspace=[workspace_id]
-    const retrieved = await this.__request('GET', '/tasks', params, options);
+    const retrieved = await this._request('GET', '/tasks', params, options);
 
     return this._processResponse(retrieved);
   },
 
-  /**
-   * Requests the set of users in a workspace.
-   *
-   * @param callback {Function(users)} Callback on success.
-   *     users {dict[]}
-   */
-  users: async function(workspace_id, options) {
-    const retrieved = await this.__request(
-      'GET',
-      '/workspaces/' + workspace_id + '/users',
-      { opt_fields: 'name,photo.image_60x60' },
-      options
-    );
+  // /**
+  //  * Requests the set of users in a workspace.
+  //  *
+  //  * @param callback {Function(users)} Callback on success.
+  //  *     users {dict[]}
+  //  */
+  // users: async function (workspaceId: string, options: any[]) {
+  //   const retrieved: any[] = await this._request(
+  //     'GET',
+  //     '/workspaces/' + workspaceId + '/users',
+  //     { opt_fields: 'name,photo.image_60x60' },
+  //     options
+  //   );
 
-    retrieved.forEach(user => this._updateUser(workspace_id, user));
-    return this._processResponse(retrieved);
-  },
+  //   retrieved.forEach((user) => this._updateUser(workspaceId, user));
+  //   return this._processResponse(retrieved);
+  // },
 
   /**
    * Requests the user record for the logged-in user.
@@ -186,8 +158,8 @@ export const ServerManager = {
    * @param callback {Function(user)} Callback on success.
    *     user {dict[]}
    */
-  me: async function(options) {
-    const retrieved = await this.__request('GET', '/users/me', {}, options);
+  me: async function (options: any[]) {
+    const retrieved = await this._request('GET', '/users/me', {}, options);
 
     return this._processResponse(retrieved);
   },
@@ -198,10 +170,10 @@ export const ServerManager = {
    * @param task {dict} Task fields.
    * @param callback {Function(response)} Callback on success.
    */
-  createTask: async function(workspace_id, task) {
-    const retrieved = await this.__request(
+  createTask: async function (workspaceId: string, task: object) {
+    const retrieved = await this._request(
       'POST',
-      '/workspaces/' + workspace_id + '/tasks',
+      '/workspaces/' + workspaceId + '/tasks',
       task
     );
 
@@ -214,44 +186,44 @@ export const ServerManager = {
    * @param task {dict} Task fields.
    * @param callback {Function(response)} Callback on success.
    */
-  modifyTask: async function(taskChangedID, changeMade) {
-    const retrieved = await this.__request(
+  modifyTask: async function (taskChangedId: string, changeMade: object) {
+    const retrieved = await this._request(
       'PUT',
-      '/tasks/' + taskChangedID + '',
+      '/tasks/' + taskChangedId + '',
       changeMade
     );
 
     return this._processResponse(retrieved);
   },
 
-  /**
-   * Requests user type-ahead completions for a query.
-   */
-  userTypeahead: async function(workspace_id, query) {
-    const retrieved = await this.__request(
-      'GET',
-      '/workspaces/' + workspace_id + '/typeahead',
-      {
-        type: 'user',
-        query: query,
-        count: 10,
-        opt_fields: 'name,photo.image_60x60'
-      },
-      {
-        miss_cache: true // Always skip the cache.
-      }
-    );
+  // /**
+  //  * Requests user type-ahead completions for a query.
+  //  */
+  // userTypeahead: async function (workspaceId: string, query: string) {
+  //   const retrieved = await this._request(
+  //     'GET',
+  //     '/workspaces/' + workspaceId + '/typeahead',
+  //     {
+  //       type: 'user',
+  //       query,
+  //       count: 10,
+  //       opt_fields: 'name,photo.image_60x60',
+  //     },
+  //     {
+  //       miss_cache: true, // Always skip the cache.
+  //     }
+  //   );
 
-    return this._processResponse(retrieved);
+  //   return this._processResponse(retrieved);
+  // },
+
+  logEvent: async function (event: object) {
+    await this._request('POST', '/logs', event);
   },
 
-  logEvent: async function(event) {
-    await this.__request('POST', '/logs', event);
-  },
-
-  _processResponse: function(response) {
+  _processResponse: function (response: any) {
     if (response === undefined || response.errors)
       console.log('### ServerManager: ERROR on _processResponse');
     return response;
-  }
+  },
 };
