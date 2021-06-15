@@ -1,5 +1,5 @@
 import 'chrome-extension-async';
-import { update } from './asana.js';
+import { update } from './asana';
 
 update();
 setInterval(update, 60 * 1000);

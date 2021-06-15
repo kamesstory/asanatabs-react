@@ -1,7 +1,7 @@
 import 'chrome-extension-async';
-import { ServerManager } from './serverManager.ts';
+import { ServerManager, Workspace } from './serverManager';
 
-const GET_WORKSPACE_KEY = (workspace_id) => 'workspace_' + workspace_id;
+const GET_WORKSPACE_KEY = (workspaceId: string) => 'workspace_' + workspaceId;
 export const ALL_TASKS_KEY = 'all_tasks';
 export const ALL_WORKSPACES_KEY = 'all_workspaces';
 export const WORKSPACE_COLORS_KEY = 'all_workspace_colors';
@@ -25,19 +25,19 @@ export const update = async () => {
 
   chrome.storage.local.set({ [ALL_WORKSPACES_KEY]: workspaces });
 
-  const getAndSaveTasks = async (workspace) => {
-    const { gid: wid, name: wname } = workspace;
+  const getAndSaveTasks = async (workspace: Workspace) => {
+    const { gid: wid, name: workspaceName } = workspace;
     let options = ['due_on', 'name'];
     const tasksForWorkspace = await ServerManager.tasks(wid, options);
     if (!tasksForWorkspace) {
-      console.log('### Background: no tasks for workspace ' + wname);
+      console.log('### Background: no tasks for workspace ' + workspaceName);
       return;
     }
     chrome.storage.local.set({ [GET_WORKSPACE_KEY(wid)]: tasksForWorkspace });
     return tasksForWorkspace.map((task) => ({
       ...task,
       workspace: wid,
-      workspace_name: wname,
+      workspace_name: workspaceName,
     }));
   };
 
@@ -55,21 +55,21 @@ export const update = async () => {
   return [tasks, workspaces];
 };
 
-export const updateTask = async (taskChangedID, changeMade) => {
+export const updateTask = async (taskChangedId: string, changeMade: object) => {
   const loggedIn = await checkLogin();
   // TODO: make the error available (show it) to users!
   if (!loggedIn) return;
   const modifiedTask = await ServerManager.modifyTask(
-    taskChangedID,
+    taskChangedId,
     changeMade
   );
   return modifiedTask;
 };
 
-export const createTask = async (workspace_id, task) => {
+export const createTask = async (workspaceId: string, task: object) => {
   const loggedIn = await checkLogin();
   if (!loggedIn) return;
-  const createdTask = await ServerManager.createTask(workspace_id, task);
+  const createdTask = await ServerManager.createTask(workspaceId, task);
   update();
 
   return createdTask;

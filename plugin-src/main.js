@@ -3,7 +3,7 @@ import { App } from './App.js';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './style.css';
-import * as AsanaFetcher from './background-scripts/asana.js';
+import * as AsanaFetcher from './background-scripts/asana';
 import { randomColor } from 'randomcolor';
 import { format as dateFormat } from 'date-fns';
 

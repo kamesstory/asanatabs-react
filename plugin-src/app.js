@@ -109,6 +109,7 @@ export const App = ({
           backgroundImage: background,
         })}
       />
+      {/* <div>hot reload testing time</div> */}
       <DateTime />
       {tasks && tasks.length > 0 && (
         <Flipper flipKey={tasks}>
