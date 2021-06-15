@@ -1,7 +1,7 @@
 /** @jsx jsx */
 import { Fragment, FunctionComponent } from 'react';
 import { Global, css, jsx } from '@emotion/core';
-import BackgroundImage from './images/ales-krivec-623996-unsplash.jpg';
+import backgroundImageUrl from './images/ales-krivec-623996-unsplash.jpg';
 import DateTime from './DateTime.js';
 import TaskCard from './TaskCard.js';
 import CreateTask from './CreateTask.js';
@@ -10,13 +10,20 @@ import { endOfDay, endOfTomorrow } from 'date-fns';
 import { Flipper } from 'react-flip-toolkit';
 import { Task, Workspace } from './background-scripts/serverManager';
 
+const formattedBackgroundImageUrl = (backgroundImageUrl as string).startsWith(
+  '.'
+)
+  ? (backgroundImageUrl as string).slice(1)
+  : backgroundImageUrl;
+console.log(backgroundImageUrl, formattedBackgroundImageUrl);
+
 const getCustomBackground = () => css`
   html {
     height: 100%;
   }
 
   body {
-    background: url(${BackgroundImage}) no-repeat;
+    background: url(${formattedBackgroundImageUrl}) no-repeat;
     background-size: cover;
     background-position: center;
     background-attachment: fixed;
