@@ -8,7 +8,6 @@ module.exports = {
   mode,
   devtool: 'inline-source-map',
   entry: {
-    contentScript: './plugin-src/contentScript.ts',
     background: './plugin-src/background-scripts/background.js',
     app: './plugin-src/App.js',
     main: './plugin-src/main.js',
