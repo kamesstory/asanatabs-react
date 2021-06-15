@@ -1,7 +1,7 @@
 import 'chrome-extension-async';
-import { ServerManager } from './server_mngr.js';
+import { ServerManager } from './serverManager.js';
 
-const GET_WORKSPACE_KEY = workspace_id => 'workspace_' + workspace_id;
+const GET_WORKSPACE_KEY = (workspace_id) => 'workspace_' + workspace_id;
 export const ALL_TASKS_KEY = 'all_tasks';
 export const ALL_WORKSPACES_KEY = 'all_workspaces';
 export const WORKSPACE_COLORS_KEY = 'all_workspace_colors';
@@ -25,7 +25,7 @@ export const update = async () => {
 
   chrome.storage.local.set({ [ALL_WORKSPACES_KEY]: workspaces });
 
-  const getAndSaveTasks = async workspace => {
+  const getAndSaveTasks = async (workspace) => {
     const { gid: wid, name: wname } = workspace;
     let options = ['due_on', 'name'];
     const tasksForWorkspace = await ServerManager.tasks(wid, options);
@@ -34,15 +34,15 @@ export const update = async () => {
       return;
     }
     chrome.storage.local.set({ [GET_WORKSPACE_KEY(wid)]: tasksForWorkspace });
-    return tasksForWorkspace.map(task => ({
+    return tasksForWorkspace.map((task) => ({
       ...task,
       workspace: wid,
-      workspace_name: wname
+      workspace_name: wname,
     }));
   };
 
   const tasks = await Promise.all(
-    workspaces.map(workspace => getAndSaveTasks(workspace))
+    workspaces.map((workspace) => getAndSaveTasks(workspace))
   );
 
   console.log(

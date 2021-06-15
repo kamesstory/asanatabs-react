@@ -3,7 +3,7 @@ import { App } from './app.js';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './style.css';
-import * as AsanaFetcher from './background-scripts/fetchFromAsana.js';
+import * as AsanaFetcher from './background-scripts/asana.js';
 import { randomColor } from 'randomcolor';
 import { format as dateFormat } from 'date-fns';
 
@@ -51,7 +51,7 @@ const main = async () => {
   // ----------------------------------------------------
 
   onChange = async (changeType, taskChangedID, changeMade) => {
-    tasks = tasks.map(t =>
+    tasks = tasks.map((t) =>
       t.id === taskChangedID || t.gid === taskChangedID
         ? { ...t, ...changeMade }
         : t
@@ -75,7 +75,7 @@ const main = async () => {
     const task = {
       name: description,
       due_on: dateFormat(dueDate, 'YYYY-MM-DD'),
-      assignee: 'me'
+      assignee: 'me',
     };
     AsanaFetcher.createTask(workspace.gid, task);
 
@@ -89,7 +89,7 @@ const main = async () => {
       workspace: workspace.gid,
       workspace_name: workspace.name,
       gid: fake_gid,
-      id: fake_id
+      id: fake_id,
     });
 
     // Now re-render
@@ -107,7 +107,7 @@ const main = async () => {
   let [localTasks, localWorkspaces, localColors] = await Promise.all([
     chrome.storage.local.get([AsanaFetcher.ALL_TASKS_KEY]),
     chrome.storage.local.get([AsanaFetcher.ALL_WORKSPACES_KEY]),
-    chrome.storage.local.get([AsanaFetcher.WORKSPACE_COLORS_KEY])
+    chrome.storage.local.get([AsanaFetcher.WORKSPACE_COLORS_KEY]),
   ]);
 
   if (
@@ -143,13 +143,13 @@ const main = async () => {
           workspaceColors && workspaceColors[workspace.name]
             ? workspaceColors[workspace.name]
             : randomColor({
-                seed: workspace.gid
-              })
+                seed: workspace.gid,
+              }),
       }),
       {}
     );
     chrome.storage.local.set({
-      [AsanaFetcher.WORKSPACE_COLORS_KEY]: workspaceColors
+      [AsanaFetcher.WORKSPACE_COLORS_KEY]: workspaceColors,
     });
 
     console.log(
