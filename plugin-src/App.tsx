@@ -2,7 +2,7 @@
 import { Fragment, FunctionComponent } from 'react';
 import { Global, css, jsx } from '@emotion/core';
 import backgroundImageUrl from './images/ales-krivec-623996-unsplash.jpg';
-import DateTime from './DateTime.js';
+import DateTime from './DateTime';
 import TaskCard from './TaskCard.js';
 import CreateTask from './CreateTask';
 import ErrorFab from './ErrorFab.js';
