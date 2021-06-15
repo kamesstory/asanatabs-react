@@ -1,8 +1,15 @@
 /** @jsx jsx */
-import { Fragment, useState, useRef, useEffect } from 'react';
+import {
+  Fragment,
+  useState,
+  useRef,
+  useEffect,
+  FunctionComponent,
+} from 'react';
 import styled from '@emotion/styled';
 import { css, jsx } from '@emotion/core';
 import Overlay from './Overlay';
+import { GenericProps } from './CreateTask';
 
 const roundedBox = css`
   display: grid;
@@ -13,7 +20,7 @@ const roundedBox = css`
   z-index: 998;
 `;
 
-const Popover = styled.div`
+const Popover = styled.div<GenericProps>`
   opacity: 0;
   width: 420px;
   padding: 32px 28px;
@@ -62,7 +69,7 @@ const ErrorFab: FunctionComponent<{ errorMessage: string }> = ({
   const fabRef = useRef(null);
 
   useEffect(() => {
-    const keypressHandler = (event) => {
+    const keypressHandler = (event: KeyboardEvent) => {
       if (isOpen && event.key === 'Escape') setIsOpen(false);
     };
     window.addEventListener('keydown', keypressHandler);
@@ -75,7 +82,7 @@ const ErrorFab: FunctionComponent<{ errorMessage: string }> = ({
   return (
     <Fragment>
       <FabOuter ref={fabRef} onClick={() => setIsOpen(!isOpen)}>
-        <FabSymbol isOpen={isOpen}>!</FabSymbol>
+        <FabSymbol>!</FabSymbol>
       </FabOuter>
       <Overlay
         openerRef={fabRef}

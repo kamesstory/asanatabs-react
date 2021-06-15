@@ -13,7 +13,7 @@ import Overlay from './Overlay';
 import { parseDate } from 'chrono-node';
 import { Workspace } from './background-scripts/serverManager';
 
-type GenericProps = {
+export type GenericProps = {
   zIndex?: number;
   isOpen?: boolean;
 };
