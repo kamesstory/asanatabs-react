@@ -243,7 +243,7 @@ const CreateTask: FunctionComponent<{
   const [startDate, setStartDate] = useState('');
   const [dueDate, setDueDate] = useState('');
   const [workspaceState, setWorkspace] = useState('');
-  const fabRef = useRef(null);
+  const fabRef = useRef<HTMLDivElement | null>(null);
   const [suggestionPopup, setOpenSuggestionPopup] = useState('');
 
   // TODO: include better controlled input sanitization!
