@@ -9,7 +9,6 @@ module.exports = {
   devtool: 'inline-source-map',
   entry: {
     background: './plugin-src/background-scripts/background.ts',
-    app: './plugin-src/App.js',
     main: './plugin-src/main.js',
   },
   output: {
@@ -72,17 +71,8 @@ module.exports = {
         ],
       },
       {
-        test: /\.(png|svg|jpg|gif)$/,
-        use: [
-          {
-            loader: 'file-loader',
-            options: {
-              name: '[hash].[ext]',
-              // What the fuck?!
-              publicPath: (url) => url,
-            },
-          },
-        ],
+        test: /\.(png|svg|jpg|gif)$/i,
+        type: 'asset/resource',
       },
       {
         test: /\.txt$/,

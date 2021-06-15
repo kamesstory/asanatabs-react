@@ -1,5 +1,5 @@
 import 'chrome-extension-async';
-import { App } from './App.js';
+import { App } from './App';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './style.css';

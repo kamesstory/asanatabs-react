@@ -10,6 +10,10 @@ export type Task = {
   resource_type: 'task';
   gid: string;
   name: string;
+  workspace?: string;
+  workspace_name?: string;
+  due_on?: string;
+  completed?: boolean;
 };
 
 export type Me = {
@@ -71,7 +75,7 @@ export const ServerManager = {
       };
     } else {
       // GET/DELETE request, add params as URL parameters.
-      let optionsString = !options
+      let optionsString = options
         ? 'opt_fields=' + options.join(',') + '&'
         : '';
       let url_params = { opt_client_name: client_name, ...params };

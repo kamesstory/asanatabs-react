@@ -1,20 +1,22 @@
-import React from 'react';
-import { Global, css } from '@emotion/core';
-import background from './images/ales-krivec-623996-unsplash.jpg';
+/** @jsx jsx */
+import { Fragment, FunctionComponent } from 'react';
+import { Global, css, jsx } from '@emotion/core';
+import BackgroundImage from './images/ales-krivec-623996-unsplash.jpg';
 import DateTime from './DateTime.js';
 import TaskCard from './TaskCard.js';
 import CreateTask from './CreateTask.js';
 import ErrorFab from './ErrorFab.js';
 import { endOfDay, endOfTomorrow } from 'date-fns';
 import { Flipper } from 'react-flip-toolkit';
+import { Task, Workspace } from './background-scripts/serverManager';
 
-const customBackground = ({ backgroundImage }) => css`
+const getCustomBackground = () => css`
   html {
     height: 100%;
   }
 
   body {
-    background: url(${backgroundImage}) no-repeat;
+    background: url(${BackgroundImage}) no-repeat;
     background-size: cover;
     background-position: center;
     background-attachment: fixed;
@@ -34,7 +36,18 @@ const customBackground = ({ backgroundImage }) => css`
   }
 `;
 
-export const App = ({
+export const App: FunctionComponent<{
+  workspaces: Workspace[];
+  tasks: Task[];
+  workspaceColors: any; // TODO: actually type workspaceColors
+  refetch: (
+    changeType: string,
+    taskChangedId: string,
+    changesMade: object
+  ) => void;
+  createTask: VoidFunction;
+  isOnline: boolean;
+}> = ({
   workspaces,
   tasks,
   workspaceColors,
@@ -53,15 +66,29 @@ export const App = ({
   // TODO: also think about how to get upcoming to have a user-controlled reminder
   //  date to see when to update the task to be worked on!
   // TODO: parse out as Date objects and sort on main file (not app file)!
-  const mapped_tasks = tasks.map(
-    ({ gid, name, workspace, workspace_name, due_on, completed }) => ({
-      gid,
-      title: name,
-      workspace,
-      workspace_name,
-      duedate: Date.parse(due_on) ? new Date(Date.parse(due_on)) : undefined,
-      completed,
-    })
+  tasks.map((task) => {
+    // const { gid, name, workspace, workspace_name, due_on, completed } = task;
+    const workspace = task.workspace;
+  });
+  const mapped_tasks = tasks.flatMap(
+    ({ gid, name, workspace, workspace_name, due_on, completed }) => {
+      if (!workspace || !workspace_name || !due_on) {
+        return [];
+      }
+      return [
+        {
+          gid,
+          title: name,
+          workspace,
+          workspace_name,
+          duedate:
+            due_on && Date.parse(due_on)
+              ? new Date(Date.parse(due_on))
+              : undefined,
+          completed,
+        },
+      ];
+    }
   );
 
   const filteredTasks = mapped_tasks
@@ -74,28 +101,35 @@ export const App = ({
     if (!first.duedate && !second.duedate) return 0;
     else if (!first.duedate) return 1;
     else if (!second.duedate) return -1;
-    return first.duedate - second.duedate;
+    return first.duedate.getTime() - second.duedate.getTime();
   });
 
-  const mingTian = endOfDay(new Date());
-  const houTian = endOfTomorrow();
+  const tomorrow = endOfDay(new Date());
+  const dayAfterTomorrow = endOfTomorrow();
   const todayTasks = filteredTasks.filter(
-    (task) => task.duedate && task.duedate <= mingTian
+    (task) => task.duedate && task.duedate <= tomorrow
   );
   const tomorrowTasks = filteredTasks.filter(
-    (task) => task.duedate && task.duedate > mingTian && task.duedate <= houTian
+    (task) =>
+      task.duedate &&
+      task.duedate > tomorrow &&
+      task.duedate <= dayAfterTomorrow
   );
   const upcomingTasks = filteredTasks.filter(
-    (task) => !task.duedate || task.duedate >= houTian
+    (task) => !task.duedate || task.duedate >= dayAfterTomorrow
   );
 
   // need aggregator at this top level
-  const singleTaskChanged = (changeType, taskChangedID, changesMade) => {
+  const singleTaskChanged = (
+    changeType: string,
+    taskChangedId: string,
+    changesMade: object
+  ) => {
     console.log(
       '### SingleTaskChanged: ID of task modified is ',
-      taskChangedID
+      taskChangedId
     );
-    refetch(changeType, taskChangedID, changesMade);
+    refetch(changeType, taskChangedId, changesMade);
   };
 
   const errorMessage =
@@ -103,13 +137,9 @@ export const App = ({
     and have cookies enabled for Asana, and try again by opening a new tab page!';
 
   return (
-    <>
-      <Global
-        styles={customBackground({
-          backgroundImage: background,
-        })}
-      />
-      {/* <div>hot reload testing time</div> */}
+    <Fragment>
+      <Global styles={getCustomBackground()} />
+      <div>hot reload testing time</div>
       <DateTime />
       {tasks && tasks.length > 0 && (
         <Flipper flipKey={tasks}>
@@ -135,6 +165,6 @@ export const App = ({
       ) : (
         <ErrorFab errorMessage={errorMessage} />
       )}
-    </>
+    </Fragment>
   );
 };
