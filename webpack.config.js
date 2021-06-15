@@ -8,7 +8,7 @@ module.exports = {
   mode,
   devtool: 'inline-source-map',
   entry: {
-    'content-script': './plugin-src/contentScript.js',
+    contentScript: './plugin-src/contentScript.ts',
     background: './plugin-src/background-scripts/background.js',
     app: './plugin-src/App.js',
     main: './plugin-src/main.js',
@@ -24,13 +24,6 @@ module.exports = {
     /* By default the plugin will work only when NODE_ENV is "development" */
     /***********************************************************************/
     new ExtensionReloaderPlugin({
-      /*
-            // Also possible to use
-            entries: { 
-              contentScript: 'content-script', 
-              background: 'background' 
-            }
-            */
       manifest: resolve(__dirname, 'manifest.json'),
     }),
 
