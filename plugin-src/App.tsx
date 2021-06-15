@@ -15,7 +15,7 @@ const formattedBackgroundImageUrl = (backgroundImageUrl as string).startsWith(
 )
   ? (backgroundImageUrl as string).slice(1)
   : backgroundImageUrl;
-console.log(backgroundImageUrl, formattedBackgroundImageUrl);
+// console.log(backgroundImageUrl, formattedBackgroundImageUrl);
 
 const getCustomBackground = () => css`
   html {
@@ -62,14 +62,15 @@ export const App: FunctionComponent<{
   createTask,
   isOnline,
 }) => {
-  console.log(
-    `raw tasks are`,
-    tasks,
-    `raw workspaces are`,
-    workspaces,
-    `workspace colors are`,
-    workspaceColors
-  );
+  // console.log(
+  //   `raw tasks are`,
+  //   tasks,
+  //   `raw workspaces are`,
+  //   workspaces,
+  //   `workspace colors are`,
+  //   workspaceColors
+  // );
+
   // TODO: also think about how to get upcoming to have a user-controlled reminder
   //  date to see when to update the task to be worked on!
   // TODO: parse out as Date objects and sort on main file (not app file)!
@@ -132,10 +133,10 @@ export const App: FunctionComponent<{
     taskChangedId: string,
     changesMade: object
   ) => {
-    console.log(
-      '### SingleTaskChanged: ID of task modified is ',
-      taskChangedId
-    );
+    // console.log(
+    //   '### SingleTaskChanged: ID of task modified is ',
+    //   taskChangedId
+    // );
     refetch(changeType, taskChangedId, changesMade);
   };
 

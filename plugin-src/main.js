@@ -29,7 +29,7 @@ const main = async () => {
   const retrieveMe = async () => {
     me = await AsanaFetcher.retrieveMe();
     chrome.storage.local.set({ [AsanaFetcher.ME_INFO]: me });
-    console.log('### Main: me is ', me);
+    // console.log('### Main: me is ', me);
   };
 
   const renderApp = () => {
@@ -56,10 +56,10 @@ const main = async () => {
         ? { ...t, ...changeMade }
         : t
     );
-    console.log(
-      '### onChange: called with task ID ' + taskChangedID,
-      changeMade
-    );
+    // console.log(
+    //   '### onChange: called with task ID ' + taskChangedID,
+    //   changeMade
+    // );
     switch (changeType) {
       case 'markdone': {
         AsanaFetcher.updateTask(taskChangedID, changeMade);
@@ -119,12 +119,12 @@ const main = async () => {
     workspaces = localWorkspaces[AsanaFetcher.ALL_WORKSPACES_KEY];
     workspaceColors = localColors[AsanaFetcher.WORKSPACE_COLORS_KEY];
 
-    console.log(
-      '### Main: tasks, workspaces, and workspace colors retrieved from local storage!',
-      tasks,
-      workspaces,
-      workspaceColors
-    );
+    // console.log(
+    //     '### Main: tasks, workspaces, and workspace colors retrieved from local storage!',
+    //     tasks,
+    //     workspaces,
+    //     workspaceColors
+    //   );
   }
   renderApp();
 
@@ -152,12 +152,12 @@ const main = async () => {
       [AsanaFetcher.WORKSPACE_COLORS_KEY]: workspaceColors,
     });
 
-    console.log(
-      '### Main: tasks, workspaces, and workspace colors retrieved from update!',
-      updatedTasks.flat(),
-      updatedWorkspaces,
-      workspaceColors
-    );
+    // console.log(
+    //   '### Main: tasks, workspaces, and workspace colors retrieved from update!',
+    //   updatedTasks.flat(),
+    //   updatedWorkspaces,
+    //   workspaceColors
+    // );
 
     renderApp();
   }

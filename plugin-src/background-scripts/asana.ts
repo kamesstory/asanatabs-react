@@ -9,7 +9,9 @@ export const ME_INFO = 'me_info';
 
 const checkLogin = async () => {
   const loggedIn = await ServerManager.isLoggedIn();
-  if (!loggedIn) console.log('### Background: not logged in!');
+  // if (!loggedIn) {
+  //   console.log('### Background: not logged in!');
+  // }
   return loggedIn;
 };
 
@@ -19,7 +21,7 @@ export const update = async () => {
 
   const workspaces = await ServerManager.workspaces();
   if (!workspaces) {
-    console.log('### Background: no workspaces detected! Nothing to update.');
+    // console.log('### Background: no workspaces detected! Nothing to update.');
     return;
   }
 
@@ -30,7 +32,7 @@ export const update = async () => {
     let options = ['due_on', 'name'];
     const tasksForWorkspace = await ServerManager.tasks(wid, options);
     if (!tasksForWorkspace) {
-      console.log('### Background: no tasks for workspace ' + workspaceName);
+      // console.log('### Background: no tasks for workspace ' + workspaceName);
       return;
     }
     chrome.storage.local.set({ [GET_WORKSPACE_KEY(wid)]: tasksForWorkspace });
@@ -45,11 +47,11 @@ export const update = async () => {
     workspaces.map((workspace) => getAndSaveTasks(workspace))
   );
 
-  console.log(
-    '### Background: all tasks and workspaces retrieved and saved to local storage!',
-    tasks.flat(),
-    workspaces
-  );
+  // console.log(
+  //   '### Background: all tasks and workspaces retrieved and saved to local storage!',
+  //   tasks.flat(),
+  //   workspaces
+  // );
   chrome.storage.local.set({ [ALL_TASKS_KEY]: tasks.flat() });
 
   return [tasks, workspaces];

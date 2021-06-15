@@ -89,7 +89,7 @@ export const ServerManager = {
 
     // Note that any URL fetched here must be matched by a permission in
     // the manifest.json file!
-    console.log('### ServerManager: fetching with body', body_data);
+    // console.log('### ServerManager: fetching with body', body_data);
     const response = await fetch(url, {
       method: formattedRequest,
       mode: 'cors',
@@ -102,14 +102,14 @@ export const ServerManager = {
       body: JSON.stringify(body_data),
     });
     if (response.status !== 200 && response.status !== 201) {
-      console.log(
-        '### ServerManager: ERROR, response status ' + response.status
-      );
+      // console.log(
+      //   '### ServerManager: ERROR, response status ' + response.status
+      // );
       throw new Error(`Could not successfully ${formattedRequest} to ${url}`);
     }
 
     const json = await response.json();
-    console.log('### ServerManager: JSON response', json['data']);
+    // console.log('### ServerManager: JSON response', json['data']);
     return json.data;
   },
 

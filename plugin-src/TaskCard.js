@@ -103,7 +103,7 @@ const TaskRow = ({
 }) => {
   const openTaskInNewWindow = () => {
     if (window.getSelection().toString() === '') {
-      console.log(task, workspaceRef, workspaceWidth);
+      // console.log(task, workspaceRef, workspaceWidth);
       window.open(
         `https://app.asana.com/0/${task.workspace}/${task.gid}`,
         '_blank'
