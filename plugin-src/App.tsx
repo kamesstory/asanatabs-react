@@ -5,7 +5,7 @@ import backgroundImageUrl from './images/ales-krivec-623996-unsplash.jpg';
 import DateTime from './DateTime';
 import TaskCard from './TaskCard.js';
 import CreateTask from './CreateTask';
-import ErrorFab from './ErrorFab.js';
+import ErrorFab from './ErrorFab';
 import { endOfDay, endOfTomorrow } from 'date-fns';
 import { Flipper } from 'react-flip-toolkit';
 import { Task, Workspace } from './background-scripts/serverManager';

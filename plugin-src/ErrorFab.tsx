@@ -1,6 +1,7 @@
-import React, { useState, useRef, useEffect } from 'react';
+/** @jsx jsx */
+import { Fragment, useState, useRef, useEffect } from 'react';
 import styled from '@emotion/styled';
-import { css } from '@emotion/core';
+import { css, jsx } from '@emotion/core';
 import Overlay from './Overlay';
 
 const roundedBox = css`
@@ -54,12 +55,14 @@ const FabSymbol = styled.span`
   display: inline-block;
 `;
 
-const ErrorFab = ({ errorMessage }) => {
+const ErrorFab: FunctionComponent<{ errorMessage: string }> = ({
+  errorMessage,
+}) => {
   const [isOpen, setIsOpen] = useState(false);
   const fabRef = useRef(null);
 
   useEffect(() => {
-    const keypressHandler = event => {
+    const keypressHandler = (event) => {
       if (isOpen && event.key === 'Escape') setIsOpen(false);
     };
     window.addEventListener('keydown', keypressHandler);
@@ -70,7 +73,7 @@ const ErrorFab = ({ errorMessage }) => {
   // TODO: allow for local storage clearing
 
   return (
-    <>
+    <Fragment>
       <FabOuter ref={fabRef} onClick={() => setIsOpen(!isOpen)}>
         <FabSymbol isOpen={isOpen}>!</FabSymbol>
       </FabOuter>
@@ -81,7 +84,7 @@ const ErrorFab = ({ errorMessage }) => {
       >
         <Popover isOpen={isOpen}>{errorMessage}</Popover>
       </Overlay>
-    </>
+    </Fragment>
   );
 };
 
