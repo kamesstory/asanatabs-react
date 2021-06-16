@@ -52,12 +52,12 @@ const main = async () => {
     renderApp();
   };
 
-  const onTaskCreated: (
+  const onTaskCreated = async (
     description: string,
     startDate: Date,
     dueDate: Date,
     workspace: Workspace
-  ) => void = async (description, startDate, dueDate, workspace) => {
+  ) => {
     // TODO: need to incorporate startDate
     const task = {
       name: description,
