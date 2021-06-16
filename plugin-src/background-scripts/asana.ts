@@ -23,10 +23,6 @@ export const update = async (): Promise<[TaskWithWorkspace[], Workspace[]]> => {
     throw new Error('Cannot update since user is not logged in to Asana.');
   }
 
-  // TODO: retrieve workspaces from local storage and only update if parallelized
-  //  finds workspaces that weren't saved.
-  // TODO: add small loader to the bottom of the new tab when loading
-  // TODO: display that AsanaTabs is still requesting updates
   const workspaces = await ServerManager.workspaces();
   if (!workspaces) {
     throw new Error('Cannot update since user has no workspaces in Asana.');

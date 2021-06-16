@@ -76,15 +76,6 @@ const roundedBox = css`
   z-index: 998;
 `;
 
-// const SuggestionsPopup = styled.div`
-//   position: absolute;
-//   width: 210px;
-//   height: 150px;
-//   left: -12px;
-//   top: -12px;
-//   ${roundedBox};
-// `;
-
 const DateFormInput = styled.input<GenericProps>`
   position: relative;
   color: #2b2647;

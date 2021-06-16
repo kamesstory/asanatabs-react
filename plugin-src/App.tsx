@@ -125,9 +125,6 @@ export const App: FunctionComponent = () => {
   const [upcomingTasks, setUpcomingTasks] = useState<DisplayableTask[]>([]);
 
   useEffect(() => {
-    // TODO: also think about how to get upcoming to have a user-controlled reminder
-    //  date to see when to update the task to be worked on!
-    // TODO: parse out as Date objects and sort on main file (not app file)!
     const mappedTasks = tasks.flatMap(
       ({ gid, name, workspace, workspace_name, due_on, completed }) => {
         if (!workspace || !workspace_name || !due_on) {

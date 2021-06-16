@@ -128,7 +128,6 @@ const TaskRow: FunctionComponent<{
 }> = ({ task, onTaskChanged, workspaceRef, workspaceWidth, ...rest }) => {
   const openTaskInNewWindow = () => {
     if (window.getSelection()?.toString() === '') {
-      // console.log(task, workspaceRef, workspaceWidth);
       window.open(
         `https://app.asana.com/0/${task.workspace}/${task.gid}`,
         '_blank'
