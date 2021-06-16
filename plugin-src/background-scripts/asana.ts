@@ -79,7 +79,7 @@ export const createTask = async (workspaceId: string, task: object) => {
   return createdTask;
 };
 
-export const retrieveMe = async () => {
+export const me = async () => {
   const loggedIn = await checkLogin();
   if (!loggedIn) return;
   const me = await ServerManager.me();

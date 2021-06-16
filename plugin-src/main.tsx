@@ -4,7 +4,7 @@ import { App } from './App';
 import { jsx } from '@emotion/core';
 import ReactDOM from 'react-dom';
 import './style.css';
-import * as AsanaFetcher from './background-scripts/asana';
+import * as Asana from './background-scripts/asana';
 import randomColor from 'randomcolor';
 import { format as dateFormat } from 'date-fns';
 import { Workspace } from './background-scripts/serverManager';
@@ -41,8 +41,8 @@ const main = async () => {
     );
     switch (changeType) {
       case 'markdone': {
-        AsanaFetcher.updateTask(taskChangedId, changeMade);
-        chrome.storage.local.set({ [AsanaFetcher.ALL_TASKS_KEY]: tasks });
+        Asana.updateTask(taskChangedId, changeMade);
+        chrome.storage.local.set({ [Asana.ALL_TASKS_KEY]: tasks });
         break;
       }
       default: {
@@ -64,7 +64,7 @@ const main = async () => {
       due_on: dateFormat(dueDate, 'YYYY-MM-DD'),
       assignee: 'me',
     };
-    AsanaFetcher.createTask(workspace.gid, task);
+    Asana.createTask(workspace.gid, task);
 
     const fake_id = +new Date();
     const fake_gid = fake_id.toString(36);
@@ -107,24 +107,24 @@ const main = async () => {
 
   // Request storage locally
   let [localTasks, localWorkspaces, localColors] = await Promise.all([
-    chrome.storage.local.get([AsanaFetcher.ALL_TASKS_KEY]),
-    chrome.storage.local.get([AsanaFetcher.ALL_WORKSPACES_KEY]),
-    chrome.storage.local.get([AsanaFetcher.WORKSPACE_COLORS_KEY]),
+    chrome.storage.local.get([Asana.ALL_TASKS_KEY]),
+    chrome.storage.local.get([Asana.ALL_WORKSPACES_KEY]),
+    chrome.storage.local.get([Asana.WORKSPACE_COLORS_KEY]),
   ]);
 
   if (
-    AsanaFetcher.ALL_TASKS_KEY in localTasks &&
-    AsanaFetcher.ALL_WORKSPACES_KEY in localWorkspaces &&
-    AsanaFetcher.WORKSPACE_COLORS_KEY in localColors
+    Asana.ALL_TASKS_KEY in localTasks &&
+    Asana.ALL_WORKSPACES_KEY in localWorkspaces &&
+    Asana.WORKSPACE_COLORS_KEY in localColors
   ) {
-    tasks = localTasks[AsanaFetcher.ALL_TASKS_KEY];
-    workspaces = localWorkspaces[AsanaFetcher.ALL_WORKSPACES_KEY];
-    workspaceColors = localColors[AsanaFetcher.WORKSPACE_COLORS_KEY];
+    tasks = localTasks[Asana.ALL_TASKS_KEY];
+    workspaces = localWorkspaces[Asana.ALL_WORKSPACES_KEY];
+    workspaceColors = localColors[Asana.WORKSPACE_COLORS_KEY];
   }
   renderApp();
 
   // Request updates from Asana and re-render
-  const [updatedTasks, updatedWorkspaces] = await AsanaFetcher.update();
+  const [updatedTasks, updatedWorkspaces] = await Asana.update();
   if (updatedTasks && updatedWorkspaces) {
     isOnline = true;
     tasks = updatedTasks;
@@ -143,14 +143,14 @@ const main = async () => {
       {}
     );
     chrome.storage.local.set({
-      [AsanaFetcher.WORKSPACE_COLORS_KEY]: workspaceColors,
+      [Asana.WORKSPACE_COLORS_KEY]: workspaceColors,
     });
 
     renderApp();
   }
 
-  me = await AsanaFetcher.retrieveMe();
-  chrome.storage.local.set({ [AsanaFetcher.ME_INFO]: me });
+  me = await Asana.me();
+  chrome.storage.local.set({ [Asana.ME_INFO]: me });
 };
 
 main();
