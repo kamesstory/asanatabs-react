@@ -9,7 +9,6 @@
     "persistent": true,
     "scripts": ["background.bundle.js"]
   },
-  "content_scripts": [],
 
   "icons": {
     "16": "icon16.png",
