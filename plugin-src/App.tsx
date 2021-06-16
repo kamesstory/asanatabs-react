@@ -157,7 +157,8 @@ export const App: FunctionComponent = () => {
         color: workspaceColors[task.workspace_name],
       }));
     filteredTasks.sort((first, second) => {
-      if (!first.duedate && !second.duedate) return 0;
+      if (!first.duedate && !second.duedate)
+        return first.gid.localeCompare(second.gid);
       else if (!first.duedate) return 1;
       else if (!second.duedate) return -1;
       return first.duedate.getTime() - second.duedate.getTime();
