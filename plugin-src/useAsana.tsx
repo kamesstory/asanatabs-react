@@ -66,8 +66,6 @@ const useAsana = (): [
           chrome.storage.local.get([Asana.WORKSPACE_COLORS_KEY]),
         ]);
 
-        console.log(`Local colors`, localColors);
-
         // Needs to be done because for some reason localStorage nests it inside
         //  two layers of keys. Why?
         if (
