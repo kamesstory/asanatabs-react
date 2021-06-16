@@ -9,7 +9,7 @@ module.exports = {
   devtool: 'inline-source-map',
   entry: {
     background: './plugin-src/background-scripts/background.ts',
-    main: './plugin-src/main.js',
+    main: './plugin-src/main.tsx',
   },
   output: {
     publicPath: '.',

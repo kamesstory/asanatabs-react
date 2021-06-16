@@ -1,5 +1,5 @@
 import 'chrome-extension-async';
-import { ServerManager, Workspace } from './serverManager';
+import { ServerManager, Task, Workspace } from './serverManager';
 
 const GET_WORKSPACE_KEY = (workspaceId: string) => 'workspace_' + workspaceId;
 export const ALL_TASKS_KEY = 'all_tasks';
@@ -15,14 +15,22 @@ const checkLogin = async () => {
   return loggedIn;
 };
 
-export const update = async () => {
+export type TaskWithWorkspace = Task & {
+  workspace: string;
+  workspace_name: string;
+};
+
+export const update = async (): Promise<
+  [(TaskWithWorkspace[] | null)[], Workspace[]]
+> => {
   const loggedIn = await checkLogin();
-  if (!loggedIn) return;
+  if (!loggedIn) {
+    throw new Error('Cannot update since user is not logged in to Asana.');
+  }
 
   const workspaces = await ServerManager.workspaces();
   if (!workspaces) {
-    // console.log('### Background: no workspaces detected! Nothing to update.');
-    return;
+    throw new Error('Cannot update since user has no workspaces in Asana.');
   }
 
   chrome.storage.local.set({ [ALL_WORKSPACES_KEY]: workspaces });
@@ -33,10 +41,10 @@ export const update = async () => {
     const tasksForWorkspace = await ServerManager.tasks(wid, options);
     if (!tasksForWorkspace) {
       // console.log('### Background: no tasks for workspace ' + workspaceName);
-      return;
+      return null;
     }
     chrome.storage.local.set({ [GET_WORKSPACE_KEY(wid)]: tasksForWorkspace });
-    return tasksForWorkspace.map((task) => ({
+    return tasksForWorkspace.map<TaskWithWorkspace>((task) => ({
       ...task,
       workspace: wid,
       workspace_name: workspaceName,
@@ -46,6 +54,7 @@ export const update = async () => {
   const tasks = await Promise.all(
     workspaces.map((workspace) => getAndSaveTasks(workspace))
   );
+  // const filteredTasks = tasks.flatMap((t) => (!t ? [] : t));
 
   // console.log(
   //   '### Background: all tasks and workspaces retrieved and saved to local storage!',

@@ -1,11 +1,14 @@
+/** @jsx jsx */
 import 'chrome-extension-async';
 import { App } from './App';
-import React from 'react';
+import { jsx } from '@emotion/core';
 import ReactDOM from 'react-dom';
 import './style.css';
 import * as AsanaFetcher from './background-scripts/asana';
-import { randomColor } from 'randomcolor';
+import randomColor from 'randomcolor';
 import { format as dateFormat } from 'date-fns';
+import { Workspace } from './background-scripts/serverManager';
+import { TaskWithWorkspace } from './background-scripts/asana';
 
 /*
  * TODO: need to set assignee_status
@@ -17,14 +20,22 @@ import { format as dateFormat } from 'date-fns';
  */
 const main = async () => {
   // chrome.storage.local.clear();
-
-  let tasks = [],
-    workspaces = [],
-    workspaceColors = [];
-  let onChange;
-  let onCreateTask;
+  let tasks: TaskWithWorkspace[] = [],
+    workspaces: Workspace[] = [],
+    workspaceColors: Record<string, any> = {};
+  let onChange: (
+    changeType: string,
+    taskChangedId: string,
+    changesMade: object
+  ) => void;
+  let onCreateTask: (
+    description: string,
+    startDate: Date,
+    dueDate: Date,
+    workspace: Workspace
+  ) => void;
   let isOnline = false;
-  let me;
+  let me: any;
 
   const retrieveMe = async () => {
     me = await AsanaFetcher.retrieveMe();
@@ -86,6 +97,7 @@ const main = async () => {
     //  but requires full diff strategy
     tasks.push({
       ...task,
+      resource_type: 'task',
       workspace: workspace.gid,
       workspace_name: workspace.name,
       gid: fake_gid,
@@ -133,7 +145,7 @@ const main = async () => {
   if (updatedTasks && updatedWorkspaces) {
     isOnline = true;
 
-    tasks = updatedTasks.flat();
+    tasks = updatedTasks.flatMap((t) => (!t ? [] : t));
     workspaces = updatedWorkspaces;
 
     workspaceColors = updatedWorkspaces.reduce(

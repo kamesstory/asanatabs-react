@@ -10,6 +10,7 @@ export type Task = {
   resource_type: 'task';
   gid: string;
   name: string;
+  id?: string | number;
   workspace?: string;
   workspace_name?: string;
   due_on?: string;

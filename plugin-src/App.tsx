@@ -46,7 +46,7 @@ const getCustomBackground = () => css`
 export const App: FunctionComponent<{
   workspaces: Workspace[];
   tasks: Task[];
-  workspaceColors: any; // TODO: actually type workspaceColors
+  workspaceColors: Record<string, any>; // TODO: actually type workspaceColors
   refetch: (
     changeType: string,
     taskChangedId: string,
