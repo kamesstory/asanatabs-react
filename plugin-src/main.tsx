@@ -22,7 +22,7 @@ export type ChangeType = 'markdone';
 
 let tasks: TaskWithWorkspace[] = [],
   workspaces: Workspace[] = [],
-  workspaceColors: Record<string, any> = {},
+  workspaceColors: Record<string, string> = {},
   isOnline = false,
   me: any;
 

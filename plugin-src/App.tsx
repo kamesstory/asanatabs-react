@@ -47,7 +47,7 @@ const getCustomBackground = () => css`
 export const App: FunctionComponent<{
   workspaces: Workspace[];
   tasks: Task[];
-  workspaceColors: Record<string, any>; // TODO: actually type workspaceColors
+  workspaceColors: Record<string, string>; // TODO: actually type workspaceColors
   onTaskChanged: (
     changeType: ChangeType,
     taskChangedId: string,
@@ -68,15 +68,6 @@ export const App: FunctionComponent<{
   onTaskCreated,
   isOnline,
 }) => {
-  // console.log(
-  //   `raw tasks are`,
-  //   tasks,
-  //   `raw workspaces are`,
-  //   workspaces,
-  //   `workspace colors are`,
-  //   workspaceColors
-  // );
-
   // TODO: also think about how to get upcoming to have a user-controlled reminder
   //  date to see when to update the task to be worked on!
   // TODO: parse out as Date objects and sort on main file (not app file)!
