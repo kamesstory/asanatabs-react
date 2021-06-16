@@ -3,7 +3,7 @@ import { Fragment, FunctionComponent } from 'react';
 import { Global, css, jsx } from '@emotion/core';
 import backgroundImageUrl from './images/ales-krivec-623996-unsplash.jpg';
 import DateTime from './DateTime';
-import TaskCard from './TaskCard.js';
+import TaskCard from './TaskCard';
 import CreateTask from './CreateTask';
 import ErrorFab from './ErrorFab';
 import { endOfDay, endOfTomorrow } from 'date-fns';
