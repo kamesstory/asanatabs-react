@@ -168,6 +168,26 @@ const CardBox = styled.div`
   color: #2b2647;
   margin-bottom: 36px;
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+  -webkit-animation: fadein 0.5s;
+  animation: fadein 0.5s;
+
+  @keyframes fadein {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  @-webkit-keyframes fadein {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
 `;
 
 const TaskCard: FunctionComponent<{
