@@ -10,7 +10,7 @@ import { endOfDay, endOfTomorrow, format } from 'date-fns';
 import { Flipper } from 'react-flip-toolkit';
 import { Workspace } from './background-scripts/serverManager';
 import * as Asana from './background-scripts/asana';
-import { ChangeType } from './main';
+import { ChangeType } from './TaskCard';
 import useAsana from './useAsana';
 import { useEffect } from 'react';
 

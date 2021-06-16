@@ -9,7 +9,6 @@ import {
 import styled from '@emotion/styled';
 import { css, jsx } from '@emotion/core';
 import { Flipped } from 'react-flip-toolkit';
-import { ChangeType } from './main';
 
 export type DisplayableTask = {
   gid: string;
@@ -20,6 +19,8 @@ export type DisplayableTask = {
   duedate?: Date;
   completed?: boolean;
 };
+
+export type ChangeType = 'markdone';
 
 const Title = styled.h1`
   font-size: 20px;

@@ -4,7 +4,6 @@ import { App } from './App';
 import { jsx } from '@emotion/core';
 import ReactDOM from 'react-dom';
 import './style.css';
-import * as Asana from './background-scripts/asana';
 
 /*
  * TODO: need to set assignee_status
@@ -14,16 +13,11 @@ import * as Asana from './background-scripts/asana';
  *  set default values for tasks, workspaces, workspaceColors
  * TODO: allow for offline!
  */
-export type ChangeType = 'markdone';
-let me: any;
+// let me: any;
 
-const main = async () => {
-  chrome.storage.local.clear();
+// me = await Asana.me();
+// chrome.storage.local.set({ [Asana.ME_INFO]: me });
 
-  ReactDOM.render(<App />, document.getElementById('root'));
+chrome.storage.local.clear();
 
-  me = await Asana.me();
-  chrome.storage.local.set({ [Asana.ME_INFO]: me });
-};
-
-main();
+ReactDOM.render(<App />, document.getElementById('root'));
