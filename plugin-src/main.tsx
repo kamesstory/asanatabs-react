@@ -130,13 +130,6 @@ const main = async () => {
     tasks = localTasks[AsanaFetcher.ALL_TASKS_KEY];
     workspaces = localWorkspaces[AsanaFetcher.ALL_WORKSPACES_KEY];
     workspaceColors = localColors[AsanaFetcher.WORKSPACE_COLORS_KEY];
-
-    // console.log(
-    //     '### Main: tasks, workspaces, and workspace colors retrieved from local storage!',
-    //     tasks,
-    //     workspaces,
-    //     workspaceColors
-    //   );
   }
   renderApp();
 
