@@ -31,7 +31,7 @@ const main = async () => {
     taskChangedId: string,
     changesMade: object
   ) => void;
-  let onCreateTask: (
+  let onTaskCreated: (
     description: string,
     startDate: Date,
     dueDate: Date,
@@ -52,7 +52,7 @@ const main = async () => {
         tasks={tasks}
         workspaceColors={workspaceColors}
         onTaskChanged={onTaskChanged}
-        createTask={onCreateTask}
+        onTaskCreated={onTaskCreated}
         isOnline={isOnline}
       />,
       document.getElementById('root')
@@ -82,7 +82,7 @@ const main = async () => {
     renderApp();
   };
 
-  onCreateTask = async (description, startDate, dueDate, workspace) => {
+  onTaskCreated = async (description, startDate, dueDate, workspace) => {
     // TODO: need to incorporate startDate
     const task = {
       name: description,

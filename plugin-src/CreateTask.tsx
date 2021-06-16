@@ -229,13 +229,13 @@ const FabPlus = styled.span<GenericProps>`
 
 const CreateTask: FunctionComponent<{
   workspaces: Workspace[];
-  onCreateTask: (
+  onTaskCreated: (
     description: string,
     startDate: Date,
     dueDate: Date,
     workspace: Workspace
   ) => void;
-}> = ({ workspaces, onCreateTask }) => {
+}> = ({ workspaces, onTaskCreated }) => {
   const descInputText = 'description + title of your task';
 
   const [isOpen, setIsOpen] = useState(false);
@@ -319,7 +319,7 @@ const CreateTask: FunctionComponent<{
                 workspaceState === ''
                   ? workspaces[workspaces.length - 1]
                   : workspaces.filter((ws) => ws.name === workspaceState)[0];
-              onCreateTask(
+              onTaskCreated(
                 description,
                 parseDate(startDate === '' ? 'today' : startDate),
                 parseDate(dueDate === '' ? 'tomorrow' : dueDate),

@@ -53,7 +53,7 @@ export const App: FunctionComponent<{
     taskChangedId: string,
     changesMade: object
   ) => void;
-  createTask: (
+  onTaskCreated: (
     description: string,
     startDate: Date,
     dueDate: Date,
@@ -65,7 +65,7 @@ export const App: FunctionComponent<{
   tasks,
   workspaceColors,
   onTaskChanged,
-  createTask,
+  onTaskCreated,
   isOnline,
 }) => {
   // console.log(
@@ -161,7 +161,7 @@ export const App: FunctionComponent<{
         </Flipper>
       )}
       {isOnline && workspaces && workspaces.length > 0 ? (
-        <CreateTask workspaces={workspaces} onCreateTask={createTask} />
+        <CreateTask workspaces={workspaces} onTaskCreated={onTaskCreated} />
       ) : (
         <ErrorFab errorMessage={errorMessage} />
       )}
