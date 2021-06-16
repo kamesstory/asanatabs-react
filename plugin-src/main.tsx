@@ -20,6 +20,7 @@ import { TaskWithWorkspace } from './background-scripts/asana';
  */
 const main = async () => {
   // chrome.storage.local.clear();
+
   let tasks: TaskWithWorkspace[] = [],
     workspaces: Workspace[] = [],
     workspaceColors: Record<string, any> = {};
@@ -40,7 +41,6 @@ const main = async () => {
   const retrieveMe = async () => {
     me = await AsanaFetcher.retrieveMe();
     chrome.storage.local.set({ [AsanaFetcher.ME_INFO]: me });
-    // console.log('### Main: me is ', me);
   };
 
   const renderApp = () => {
@@ -61,9 +61,9 @@ const main = async () => {
   // CALLBACKS
   // ----------------------------------------------------
 
-  onChange = async (changeType, taskChangedID, changeMade) => {
+  onChange = async (changeType, taskChangedId, changeMade) => {
     tasks = tasks.map((t) =>
-      t.id === taskChangedID || t.gid === taskChangedID
+      t.id === taskChangedId || t.gid === taskChangedId
         ? { ...t, ...changeMade }
         : t
     );
@@ -73,7 +73,7 @@ const main = async () => {
     // );
     switch (changeType) {
       case 'markdone': {
-        AsanaFetcher.updateTask(taskChangedID, changeMade);
+        AsanaFetcher.updateTask(taskChangedId, changeMade);
         chrome.storage.local.set({ [AsanaFetcher.ALL_TASKS_KEY]: tasks });
       }
     }
