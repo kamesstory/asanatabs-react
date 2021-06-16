@@ -1,7 +1,9 @@
-import React, { useMemo, useCallback, useState } from 'react';
+/** @jsx jsx */
+import { useMemo, useCallback, useState, FunctionComponent } from 'react';
 import styled from '@emotion/styled';
-import { css } from '@emotion/core';
+import { css, jsx } from '@emotion/core';
 import { Flipped } from 'react-flip-toolkit';
+import { Task } from './background-scripts/serverManager';
 
 const Title = styled.h1`
   font-size: 20px;
@@ -22,9 +24,11 @@ const CheckBoxOuter = styled.div`
   cursor: pointer;
 `;
 
-const CheckBox = ({ clickityClick }) => {
+const CheckBox: FunctionComponent<{ onClick: (e: any) => void }> = ({
+  onClick,
+}) => {
   return (
-    <CheckBoxOuter onClick={clickityClick}>
+    <CheckBoxOuter onClick={onClick}>
       <i className="fa fa-check" aria-hidden="true" />
     </CheckBoxOuter>
   );
@@ -36,8 +40,8 @@ const RowTextPadding = css`
 
 const MAX_WORKSPACE_WIDTH_PX = 180;
 
-const WorkspaceName = styled.span`
-  color: ${(props) => props.color};
+const WorkspaceName = styled.span<{ workspaceWidth: number; color: string }>`
+  color: ${({ color }) => color};
   font-weight: 600;
   flex-shrink: 0;
   white-space: nowrap;
@@ -87,22 +91,26 @@ const TaskRowOuter = styled.div`
   }
 `;
 
-const processDueDates = (duedate) => {
+const processDueDates = (duedate: Date) => {
   if (!duedate) return null;
   return duedate
     .toLocaleString('default', { month: 'short', day: '2-digit' })
     .toUpperCase();
 };
 
-const TaskRow = ({
-  task,
-  onTaskChanged,
-  workspaceRef,
-  workspaceWidth,
-  ...rest
-}) => {
+// TODO: need to retype task and workspaceRef
+const TaskRow: FunctionComponent<{
+  task: any;
+  onTaskChanged: (
+    changeType: string,
+    taskChangedId: string,
+    changesMade: object
+  ) => void;
+  workspaceRef: any;
+  workspaceWidth: number;
+}> = ({ task, onTaskChanged, workspaceRef, workspaceWidth, ...rest }) => {
   const openTaskInNewWindow = () => {
-    if (window.getSelection().toString() === '') {
+    if (window.getSelection()?.toString() === '') {
       // console.log(task, workspaceRef, workspaceWidth);
       window.open(
         `https://app.asana.com/0/${task.workspace}/${task.gid}`,
@@ -114,7 +122,7 @@ const TaskRow = ({
   return (
     <TaskRowOuter onClick={openTaskInNewWindow} {...rest}>
       <CheckBox
-        clickityClick={(e) => {
+        onClick={(e) => {
           e.stopPropagation();
           onTaskChanged('markdone', task.gid, { completed: true });
         }}
@@ -146,17 +154,25 @@ const CardBox = styled.div`
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
 `;
 
-const TaskCard = ({ title, tasks, onTasksChanged, ...rest }) => {
+const TaskCard: FunctionComponent<{
+  title: string;
+  tasks: any[];
+  onTasksChanged: (
+    changeType: string,
+    taskChangedId: string,
+    changesMade: object
+  ) => void;
+}> = ({ title, tasks, onTasksChanged, ...rest }) => {
   const [workspaceWidth, setWorkspaceWidth] = useState(0);
   const updateWorkspaceWidth = useCallback((widths) => {
     setWorkspaceWidth(Math.max(...widths));
-  });
+  }, []);
   const taskWorkspaceRefs = useMemo(() => {
     const widths = Array(tasks.length).fill(null);
-    return widths.map((_, i) => (el) => {
-      if (el != null) {
+    return widths.map((_, i) => (el: HTMLElement) => {
+      if (el !== null) {
         widths[i] = el.scrollWidth;
-        if (widths.every((el) => el != null)) {
+        if (widths.every((el) => el !== null)) {
           updateWorkspaceWidth(widths);
         }
       }
