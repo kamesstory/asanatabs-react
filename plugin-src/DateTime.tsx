@@ -35,7 +35,7 @@ const DateTime = () => {
 
   return (
     <DateTimeOuter>
-      <Time>{`${format(time, 'hh:mm')}`}</Time>
+      <Time>{`${format(time, 'HH:mm')}`}</Time>
       <DateText>{`${format(time, 'ddd, MMM DD')}`}</DateText>
     </DateTimeOuter>
   );
