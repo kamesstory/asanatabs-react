@@ -4,6 +4,7 @@ import styled from '@emotion/styled';
 import { css, jsx } from '@emotion/core';
 import { Flipped } from 'react-flip-toolkit';
 import { Task } from './background-scripts/serverManager';
+import { ChangeType } from './main';
 
 const Title = styled.h1`
   font-size: 20px;
@@ -102,7 +103,7 @@ const processDueDates = (duedate: Date) => {
 const TaskRow: FunctionComponent<{
   task: any;
   onTaskChanged: (
-    changeType: string,
+    changeType: ChangeType,
     taskChangedId: string,
     changesMade: object
   ) => void;
@@ -158,7 +159,7 @@ const TaskCard: FunctionComponent<{
   title: string;
   tasks: any[];
   onTasksChanged: (
-    changeType: string,
+    changeType: ChangeType,
     taskChangedId: string,
     changesMade: object
   ) => void;

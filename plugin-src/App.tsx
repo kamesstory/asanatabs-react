@@ -9,6 +9,7 @@ import ErrorFab from './ErrorFab';
 import { endOfDay, endOfTomorrow } from 'date-fns';
 import { Flipper } from 'react-flip-toolkit';
 import { Task, Workspace } from './background-scripts/serverManager';
+import { ChangeType } from './main';
 
 const formattedBackgroundImageUrl = (backgroundImageUrl as string).startsWith(
   '.'
@@ -48,7 +49,7 @@ export const App: FunctionComponent<{
   tasks: Task[];
   workspaceColors: Record<string, any>; // TODO: actually type workspaceColors
   refetch: (
-    changeType: string,
+    changeType: ChangeType,
     taskChangedId: string,
     changesMade: object
   ) => void;
@@ -134,7 +135,7 @@ export const App: FunctionComponent<{
 
   // need aggregator at this top level
   const singleTaskChanged = (
-    changeType: string,
+    changeType: ChangeType,
     taskChangedId: string,
     changesMade: object
   ) => {

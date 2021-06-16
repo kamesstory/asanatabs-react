@@ -18,6 +18,8 @@ import { TaskWithWorkspace } from './background-scripts/asana';
  *  set default values for tasks, workspaces, workspaceColors
  * TODO: allow for offline!
  */
+export type ChangeType = 'markdone';
+
 const main = async () => {
   chrome.storage.local.clear();
 
@@ -25,7 +27,7 @@ const main = async () => {
     workspaces: Workspace[] = [],
     workspaceColors: Record<string, any> = {};
   let onChange: (
-    changeType: string,
+    changeType: ChangeType,
     taskChangedId: string,
     changesMade: object
   ) => void;
@@ -67,14 +69,14 @@ const main = async () => {
         ? { ...t, ...changeMade }
         : t
     );
-    // console.log(
-    //   '### onChange: called with task ID ' + taskChangedID,
-    //   changeMade
-    // );
     switch (changeType) {
       case 'markdone': {
         AsanaFetcher.updateTask(taskChangedId, changeMade);
         chrome.storage.local.set({ [AsanaFetcher.ALL_TASKS_KEY]: tasks });
+        return;
+      }
+      default: {
+        throw new Error(`Change of type ${changeType} is not implemented.`);
       }
     }
     renderApp();
@@ -82,7 +84,6 @@ const main = async () => {
 
   onCreateTask = async (description, startDate, dueDate, workspace) => {
     // TODO: need to incorporate startDate
-
     const task = {
       name: description,
       due_on: dateFormat(dueDate, 'YYYY-MM-DD'),
@@ -155,13 +156,6 @@ const main = async () => {
     chrome.storage.local.set({
       [AsanaFetcher.WORKSPACE_COLORS_KEY]: workspaceColors,
     });
-
-    // console.log(
-    //   '### Main: tasks, workspaces, and workspace colors retrieved from update!',
-    //   updatedTasks.flat(),
-    //   updatedWorkspaces,
-    //   workspaceColors
-    // );
 
     renderApp();
   }
