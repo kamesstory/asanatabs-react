@@ -6,7 +6,7 @@ import ReactDOM from 'react-dom';
 import './style.css';
 import * as Asana from './background-scripts/asana';
 import randomColor from 'randomcolor';
-import { format as dateFormat } from 'date-fns';
+import { format } from 'date-fns';
 import { Workspace } from './background-scripts/serverManager';
 import { TaskWithWorkspace } from './background-scripts/asana';
 
@@ -61,7 +61,7 @@ const main = async () => {
     // TODO: need to incorporate startDate
     const task = {
       name: description,
-      due_on: dateFormat(dueDate, 'YYYY-MM-DD'),
+      due_on: format(dueDate, 'YYYY-MM-DD'),
       assignee: 'me',
     };
     Asana.createTask(workspace.gid, task);
