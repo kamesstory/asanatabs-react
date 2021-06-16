@@ -112,6 +112,8 @@ const main = async () => {
     chrome.storage.local.get([Asana.WORKSPACE_COLORS_KEY]),
   ]);
 
+  // Needs to be done because for some reason localStorage nests it inside
+  //  two layers of keys. Why?
   if (
     Asana.ALL_TASKS_KEY in localTasks &&
     Asana.ALL_WORKSPACES_KEY in localWorkspaces &&
