@@ -20,50 +20,20 @@ import { TaskWithWorkspace } from './background-scripts/asana';
  */
 export type ChangeType = 'markdone';
 
+let tasks: TaskWithWorkspace[] = [],
+  workspaces: Workspace[] = [],
+  workspaceColors: Record<string, any> = {},
+  isOnline = false,
+  me: any;
+
 const main = async () => {
   chrome.storage.local.clear();
 
-  let tasks: TaskWithWorkspace[] = [],
-    workspaces: Workspace[] = [],
-    workspaceColors: Record<string, any> = {};
-  let onTaskChanged: (
+  const onTaskChanged = async (
     changeType: ChangeType,
     taskChangedId: string,
-    changesMade: object
-  ) => void;
-  let onTaskCreated: (
-    description: string,
-    startDate: Date,
-    dueDate: Date,
-    workspace: Workspace
-  ) => void;
-  let isOnline = false;
-  let me: any;
-
-  const retrieveMe = async () => {
-    me = await AsanaFetcher.retrieveMe();
-    chrome.storage.local.set({ [AsanaFetcher.ME_INFO]: me });
-  };
-
-  const renderApp = () => {
-    ReactDOM.render(
-      <App
-        workspaces={workspaces}
-        tasks={tasks}
-        workspaceColors={workspaceColors}
-        onTaskChanged={onTaskChanged}
-        onTaskCreated={onTaskCreated}
-        isOnline={isOnline}
-      />,
-      document.getElementById('root')
-    );
-  };
-
-  // ----------------------------------------------------
-  // CALLBACKS
-  // ----------------------------------------------------
-
-  onTaskChanged = async (changeType, taskChangedId, changeMade) => {
+    changeMade: object
+  ) => {
     tasks = tasks.map((t) =>
       t.id === taskChangedId || t.gid === taskChangedId
         ? { ...t, ...changeMade }
@@ -82,7 +52,12 @@ const main = async () => {
     renderApp();
   };
 
-  onTaskCreated = async (description, startDate, dueDate, workspace) => {
+  const onTaskCreated: (
+    description: string,
+    startDate: Date,
+    dueDate: Date,
+    workspace: Workspace
+  ) => void = async (description, startDate, dueDate, workspace) => {
     // TODO: need to incorporate startDate
     const task = {
       name: description,
@@ -107,6 +82,20 @@ const main = async () => {
 
     // Now re-render
     renderApp();
+  };
+
+  const renderApp = () => {
+    ReactDOM.render(
+      <App
+        workspaces={workspaces}
+        tasks={tasks}
+        workspaceColors={workspaceColors}
+        onTaskChanged={onTaskChanged}
+        onTaskCreated={onTaskCreated}
+        isOnline={isOnline}
+      />,
+      document.getElementById('root')
+    );
   };
 
   // ----------------------------------------------------
@@ -160,11 +149,8 @@ const main = async () => {
     renderApp();
   }
 
-  // ----------------------------------------------------
-  // SECONDARY FUNCTIONS AFTER MAIN RENDERS
-  // ----------------------------------------------------
-
-  retrieveMe();
+  me = await AsanaFetcher.retrieveMe();
+  chrome.storage.local.set({ [AsanaFetcher.ME_INFO]: me });
 };
 
 main();
