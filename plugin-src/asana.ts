@@ -1,5 +1,9 @@
 import 'chrome-extension-async';
-import { ServerManager, Task, Workspace } from './serverManager';
+import {
+  ServerManager,
+  Task,
+  Workspace,
+} from './background-scripts/serverManager';
 
 const GET_WORKSPACE_KEY = (workspaceId: string) => 'workspace_' + workspaceId;
 const ALL_TASKS_KEY = 'all_tasks';
