@@ -48,7 +48,7 @@ export const App: FunctionComponent<{
   workspaces: Workspace[];
   tasks: Task[];
   workspaceColors: Record<string, any>; // TODO: actually type workspaceColors
-  refetch: (
+  onTaskChanged: (
     changeType: ChangeType,
     taskChangedId: string,
     changesMade: object
@@ -64,7 +64,7 @@ export const App: FunctionComponent<{
   workspaces,
   tasks,
   workspaceColors,
-  refetch,
+  onTaskChanged,
   createTask,
   isOnline,
 }) => {
@@ -132,20 +132,6 @@ export const App: FunctionComponent<{
   const upcomingTasks = filteredTasks.filter(
     (task) => !task.duedate || task.duedate >= dayAfterTomorrow
   );
-
-  // need aggregator at this top level
-  const singleTaskChanged = (
-    changeType: ChangeType,
-    taskChangedId: string,
-    changesMade: object
-  ) => {
-    // console.log(
-    //   '### SingleTaskChanged: ID of task modified is ',
-    //   taskChangedId
-    // );
-    refetch(changeType, taskChangedId, changesMade);
-  };
-
   const errorMessage =
     'AsanaTabs currently cannot connect to Asana. Please make sure you are logged in \
     and have cookies enabled for Asana, and try again by opening a new tab page!';
@@ -160,17 +146,17 @@ export const App: FunctionComponent<{
           <TaskCard
             title="Today"
             tasks={todayTasks}
-            onTasksChanged={singleTaskChanged}
+            onTaskChanged={onTaskChanged}
           />
           <TaskCard
             title="Tomorrow"
             tasks={tomorrowTasks}
-            onTasksChanged={singleTaskChanged}
+            onTaskChanged={onTaskChanged}
           />
           <TaskCard
             title="Upcoming"
             tasks={upcomingTasks}
-            onTasksChanged={singleTaskChanged}
+            onTaskChanged={onTaskChanged}
           />
         </Flipper>
       )}

@@ -158,12 +158,12 @@ const CardBox = styled.div`
 const TaskCard: FunctionComponent<{
   title: string;
   tasks: any[];
-  onTasksChanged: (
+  onTaskChanged: (
     changeType: ChangeType,
     taskChangedId: string,
     changesMade: object
   ) => void;
-}> = ({ title, tasks, onTasksChanged, ...rest }) => {
+}> = ({ title, tasks, onTaskChanged, ...rest }) => {
   const [workspaceWidth, setWorkspaceWidth] = useState(0);
   const updateWorkspaceWidth = useCallback((widths) => {
     setWorkspaceWidth(Math.max(...widths));
@@ -188,7 +188,7 @@ const TaskCard: FunctionComponent<{
           <Flipped flipId={task.gid} key={task.gid} translate opacity>
             <TaskRow
               task={task}
-              onTaskChanged={onTasksChanged}
+              onTaskChanged={onTaskChanged}
               workspaceRef={taskWorkspaceRefs[i]}
               workspaceWidth={workspaceWidth}
             />

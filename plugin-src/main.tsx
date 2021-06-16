@@ -26,7 +26,7 @@ const main = async () => {
   let tasks: TaskWithWorkspace[] = [],
     workspaces: Workspace[] = [],
     workspaceColors: Record<string, any> = {};
-  let onChange: (
+  let onTaskChanged: (
     changeType: ChangeType,
     taskChangedId: string,
     changesMade: object
@@ -51,7 +51,7 @@ const main = async () => {
         workspaces={workspaces}
         tasks={tasks}
         workspaceColors={workspaceColors}
-        refetch={onChange}
+        onTaskChanged={onTaskChanged}
         createTask={onCreateTask}
         isOnline={isOnline}
       />,
@@ -63,7 +63,7 @@ const main = async () => {
   // CALLBACKS
   // ----------------------------------------------------
 
-  onChange = async (changeType, taskChangedId, changeMade) => {
+  onTaskChanged = async (changeType, taskChangedId, changeMade) => {
     tasks = tasks.map((t) =>
       t.id === taskChangedId || t.gid === taskChangedId
         ? { ...t, ...changeMade }
