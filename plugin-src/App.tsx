@@ -9,7 +9,7 @@ import ErrorFab from './ErrorFab';
 import { endOfDay, endOfTomorrow, format } from 'date-fns';
 import { Flipper } from 'react-flip-toolkit';
 import { Workspace } from './background-scripts/serverManager';
-import * as Asana from './background-scripts/asana';
+import * as Asana from './asana';
 import { ChangeType } from './TaskCard';
 import useAsana from './useAsana';
 import { useEffect } from 'react';

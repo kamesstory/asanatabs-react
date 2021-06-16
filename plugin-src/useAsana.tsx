@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Workspace } from './background-scripts/serverManager';
-import * as Asana from './background-scripts/asana';
+import * as Asana from './asana';
 import randomColor from 'randomcolor';
 import React from 'react';
 
