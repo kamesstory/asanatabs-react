@@ -71,11 +71,7 @@ export const App: FunctionComponent<{
   // TODO: also think about how to get upcoming to have a user-controlled reminder
   //  date to see when to update the task to be worked on!
   // TODO: parse out as Date objects and sort on main file (not app file)!
-  tasks.map((task) => {
-    // const { gid, name, workspace, workspace_name, due_on, completed } = task;
-    const workspace = task.workspace;
-  });
-  const mapped_tasks = tasks.flatMap(
+  const mappedTasks = tasks.flatMap(
     ({ gid, name, workspace, workspace_name, due_on, completed }) => {
       if (!workspace || !workspace_name || !due_on) {
         return [];
@@ -96,7 +92,7 @@ export const App: FunctionComponent<{
     }
   );
 
-  const filteredTasks = mapped_tasks
+  const filteredTasks = mappedTasks
     .filter((task) => !task.completed)
     .map((task) => ({
       ...task,
