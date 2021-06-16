@@ -126,7 +126,7 @@ export const App: FunctionComponent<{
   return (
     <Fragment>
       <Global styles={getCustomBackground()} />
-      <div>hot reload testing time 2</div>
+      {/* <div>hot reload testing time 2</div> */}
       <DateTime />
       {tasks && tasks.length > 0 && (
         <Flipper flipKey={tasks}>
