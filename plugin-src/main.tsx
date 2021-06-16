@@ -144,8 +144,7 @@ const main = async () => {
   const [updatedTasks, updatedWorkspaces] = await AsanaFetcher.update();
   if (updatedTasks && updatedWorkspaces) {
     isOnline = true;
-
-    tasks = updatedTasks.flatMap((t) => (!t ? [] : t));
+    tasks = updatedTasks;
     workspaces = updatedWorkspaces;
 
     workspaceColors = updatedWorkspaces.reduce(

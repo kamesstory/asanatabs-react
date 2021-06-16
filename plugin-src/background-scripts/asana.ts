@@ -20,9 +20,7 @@ export type TaskWithWorkspace = Task & {
   workspace_name: string;
 };
 
-export const update = async (): Promise<
-  [(TaskWithWorkspace[] | null)[], Workspace[]]
-> => {
+export const update = async (): Promise<[TaskWithWorkspace[], Workspace[]]> => {
   const loggedIn = await checkLogin();
   if (!loggedIn) {
     throw new Error('Cannot update since user is not logged in to Asana.');
@@ -54,7 +52,7 @@ export const update = async (): Promise<
   const tasks = await Promise.all(
     workspaces.map((workspace) => getAndSaveTasks(workspace))
   );
-  // const filteredTasks = tasks.flatMap((t) => (!t ? [] : t));
+  const filteredTasks = tasks.flatMap((t) => (!t ? [] : t));
 
   // console.log(
   //   '### Background: all tasks and workspaces retrieved and saved to local storage!',
@@ -62,9 +60,9 @@ export const update = async (): Promise<
   //   workspaces
   // );
 
-  chrome.storage.local.set({ [ALL_TASKS_KEY]: tasks.flat() });
+  chrome.storage.local.set({ [ALL_TASKS_KEY]: filteredTasks });
 
-  return [tasks, workspaces];
+  return [filteredTasks, workspaces];
 };
 
 export const updateTask = async (taskChangedId: string, changeMade: object) => {
