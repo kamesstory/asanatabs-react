@@ -1,10 +1,25 @@
 /** @jsx jsx */
-import { useMemo, useCallback, useState, FunctionComponent } from 'react';
+import {
+  useMemo,
+  useCallback,
+  useState,
+  FunctionComponent,
+  MouseEventHandler,
+} from 'react';
 import styled from '@emotion/styled';
 import { css, jsx } from '@emotion/core';
 import { Flipped } from 'react-flip-toolkit';
-import { Task } from './background-scripts/serverManager';
 import { ChangeType } from './main';
+
+export type DisplayableTask = {
+  gid: string;
+  title: string;
+  workspace: string;
+  workspace_name: string;
+  color: string;
+  duedate?: Date;
+  completed?: boolean;
+};
 
 const Title = styled.h1`
   font-size: 20px;
@@ -25,9 +40,9 @@ const CheckBoxOuter = styled.div`
   cursor: pointer;
 `;
 
-const CheckBox: FunctionComponent<{ onClick: (e: any) => void }> = ({
-  onClick,
-}) => {
+const CheckBox: FunctionComponent<{
+  onClick: MouseEventHandler<HTMLDivElement>;
+}> = ({ onClick }) => {
   return (
     <CheckBoxOuter onClick={onClick}>
       <i className="fa fa-check" aria-hidden="true" />
@@ -99,9 +114,9 @@ const processDueDates = (duedate: Date) => {
     .toUpperCase();
 };
 
-// TODO: need to retype task and workspaceRef
+// TODO: need to retype workspaceRef
 const TaskRow: FunctionComponent<{
-  task: any;
+  task: DisplayableTask;
   onTaskChanged: (
     changeType: ChangeType,
     taskChangedId: string,
@@ -123,7 +138,7 @@ const TaskRow: FunctionComponent<{
   return (
     <TaskRowOuter onClick={openTaskInNewWindow} {...rest}>
       <CheckBox
-        onClick={(e) => {
+        onClick={(e: any) => {
           e.stopPropagation();
           onTaskChanged('markdone', task.gid, { completed: true });
         }}
@@ -136,7 +151,7 @@ const TaskRow: FunctionComponent<{
         {task.workspace_name}
       </WorkspaceName>
       <TaskTitle>{task.title}</TaskTitle>
-      <DueDate>{processDueDates(task.duedate)}</DueDate>
+      {task.duedate && <DueDate>{processDueDates(task.duedate)}</DueDate>}
     </TaskRowOuter>
   );
 };
@@ -157,7 +172,7 @@ const CardBox = styled.div`
 
 const TaskCard: FunctionComponent<{
   title: string;
-  tasks: any[];
+  tasks: DisplayableTask[];
   onTaskChanged: (
     changeType: ChangeType,
     taskChangedId: string,
