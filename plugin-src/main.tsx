@@ -73,7 +73,7 @@ const main = async () => {
       case 'markdone': {
         AsanaFetcher.updateTask(taskChangedId, changeMade);
         chrome.storage.local.set({ [AsanaFetcher.ALL_TASKS_KEY]: tasks });
-        return;
+        break;
       }
       default: {
         throw new Error(`Change of type ${changeType} is not implemented.`);
