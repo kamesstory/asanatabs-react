@@ -40,11 +40,11 @@ const useAsana = (): [
       setTasks(updatedTasks);
       setWorkspaces(updatedWorkspaces);
 
-      await chrome.storage.local.set({
-        [Asana.ALL_TASKS_KEY]: updatedTasks,
-        [Asana.ALL_WORKSPACES_KEY]: updatedWorkspaces,
-        [Asana.WORKSPACE_COLORS_KEY]: updatedWorkspaceColors,
-      });
+      await Promise.all([
+        Asana.saveTasksToStorage(updatedTasks),
+        Asana.saveWorkspacesToStorage(updatedWorkspaces),
+        Asana.saveWorkspaceColorsToStorage(updatedWorkspaceColors),
+      ]);
     }
   }, [workspaceColors]);
 
@@ -55,23 +55,17 @@ const useAsana = (): [
       Object.keys(workspaceColors).length === 0
     ) {
       (async () => {
-        // Request storage locally
-        const [localTasks, localWorkspaces, localColors] = await Promise.all([
-          chrome.storage.local.get([Asana.ALL_TASKS_KEY]),
-          chrome.storage.local.get([Asana.ALL_WORKSPACES_KEY]),
-          chrome.storage.local.get([Asana.WORKSPACE_COLORS_KEY]),
-        ]);
+        const [localTasks, localWorkspaces, localColors] =
+          await Asana.getAllFromStorage();
 
-        // Needs to be done because for some reason localStorage nests it inside
-        //  two layers of keys. Why?
         if (
-          Asana.ALL_TASKS_KEY in localTasks &&
-          Asana.ALL_WORKSPACES_KEY in localWorkspaces &&
-          Asana.WORKSPACE_COLORS_KEY in localColors
+          localTasks.length > 0 &&
+          localWorkspaces.length > 0 &&
+          Object.keys(localColors).length > 0
         ) {
-          setTasks(localTasks[Asana.ALL_TASKS_KEY]);
-          setWorkspaces(localWorkspaces[Asana.ALL_WORKSPACES_KEY]);
-          setWorkspaceColors(localColors[Asana.WORKSPACE_COLORS_KEY]);
+          setTasks(localTasks);
+          setWorkspaces(localWorkspaces);
+          setWorkspaceColors(localColors);
         }
 
         await pullAllFromAsana();

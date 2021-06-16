@@ -2,10 +2,10 @@ import 'chrome-extension-async';
 import { ServerManager, Task, Workspace } from './serverManager';
 
 const GET_WORKSPACE_KEY = (workspaceId: string) => 'workspace_' + workspaceId;
-export const ALL_TASKS_KEY = 'all_tasks';
-export const ALL_WORKSPACES_KEY = 'all_workspaces';
-export const WORKSPACE_COLORS_KEY = 'all_workspace_colors';
-export const ME_INFO = 'me_info';
+const ALL_TASKS_KEY = 'all_tasks';
+const ALL_WORKSPACES_KEY = 'all_workspaces';
+const WORKSPACE_COLORS_KEY = 'all_workspace_colors';
+// export const ME_INFO = 'me_info';
 
 const checkLogin = async () => {
   const loggedIn = await ServerManager.isLoggedIn();
@@ -15,6 +15,46 @@ const checkLogin = async () => {
 export type TaskWithWorkspace = Task & {
   workspace: string;
   workspace_name: string;
+};
+
+export const getAllFromStorage = async (): Promise<
+  [TaskWithWorkspace[], Workspace[], Record<string, string>]
+> => {
+  const [localTasks, localWorkspaces, localColors] = await Promise.all([
+    chrome.storage.local.get([ALL_TASKS_KEY]),
+    chrome.storage.local.get([ALL_WORKSPACES_KEY]),
+    chrome.storage.local.get([WORKSPACE_COLORS_KEY]),
+  ]);
+
+  // Needs to be done because for some reason localStorage nests it inside
+  //  two layers of keys. Why?
+  if (
+    ALL_TASKS_KEY in localTasks &&
+    ALL_WORKSPACES_KEY in localWorkspaces &&
+    WORKSPACE_COLORS_KEY in localColors
+  ) {
+    const tasks = localTasks[ALL_TASKS_KEY];
+    const workspaces = localWorkspaces[ALL_WORKSPACES_KEY];
+    const colors = localColors[WORKSPACE_COLORS_KEY];
+    return [tasks, workspaces, colors];
+  }
+  return [[], [], {}];
+};
+
+export const saveTasksToStorage = async (tasks: TaskWithWorkspace[]) => {
+  await chrome.storage.local.set({ [ALL_TASKS_KEY]: tasks });
+};
+
+export const saveWorkspacesToStorage = async (workspaces: Workspace[]) => {
+  await chrome.storage.local.set({ [ALL_WORKSPACES_KEY]: workspaces });
+};
+
+export const saveWorkspaceColorsToStorage = async (
+  workspaceColors: Record<string, string>
+) => {
+  await chrome.storage.local.set({
+    [WORKSPACE_COLORS_KEY]: workspaceColors,
+  });
 };
 
 export const update = async (): Promise<[TaskWithWorkspace[], Workspace[]]> => {
@@ -28,7 +68,7 @@ export const update = async (): Promise<[TaskWithWorkspace[], Workspace[]]> => {
     throw new Error('Cannot update since user has no workspaces in Asana.');
   }
 
-  chrome.storage.local.set({ [ALL_WORKSPACES_KEY]: workspaces });
+  saveWorkspacesToStorage(workspaces);
 
   const getAndSaveTasks = async (workspace: Workspace) => {
     const { gid: wid, name: workspaceName } = workspace;
@@ -50,7 +90,7 @@ export const update = async (): Promise<[TaskWithWorkspace[], Workspace[]]> => {
     workspaces.map((workspace) => getAndSaveTasks(workspace))
   );
   const filteredTasks = tasks.flatMap((t) => (!t ? [] : t));
-  chrome.storage.local.set({ [ALL_TASKS_KEY]: filteredTasks });
+  saveTasksToStorage(filteredTasks);
 
   return [filteredTasks, workspaces];
 };

@@ -16,6 +16,7 @@ import './style.css';
  * TODO: retrieve workspaces from local storage and only update if parallelized finds workspaces that weren't saved.
  * TODO: add small loader to the bottom of the new tab when loading
  * TODO: display that AsanaTabs is still requesting updates
+ * TODO: load in background but don't prevent people from creating new tasks even if offline
  */
 // let me: any;
 
