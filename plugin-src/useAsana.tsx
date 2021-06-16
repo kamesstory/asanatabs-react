@@ -49,7 +49,14 @@ const useAsana = (): [
   }, [workspaceColors]);
 
   useEffect(() => {
-    if (!tasks && !workspaces && !workspaceColors) {
+    if (
+      tasks.length === 0 &&
+      workspaces.length === 0 &&
+      Object.keys(workspaceColors).length === 0
+    ) {
+      console.log(
+        `useEffect triggering without tasks, workspaces, or workspaceColors`
+      );
       (async () => {
         // Request storage locally
         const [localTasks, localWorkspaces, localColors] = await Promise.all([
