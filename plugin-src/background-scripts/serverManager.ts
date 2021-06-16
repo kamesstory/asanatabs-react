@@ -58,8 +58,8 @@ export const ServerManager = {
     const formattedRequest = httpMethod.toUpperCase();
 
     // Be polite to Asana API and tell them who we are.
-    let manifest = chrome.runtime.getManifest();
-    let client_name = [
+    const manifest = chrome.runtime.getManifest();
+    const client_name = [
       'chrome-extension',
       chrome.i18n.getMessage('@@extension_id'),
       manifest.version,
@@ -72,25 +72,22 @@ export const ServerManager = {
       // POST/PUT request, put params in body
       body_data = {
         data: params,
-        options: { client_name: client_name },
+        options: { client_name },
       };
     } else {
       // GET/DELETE request, add params as URL parameters.
-      let optionsString = options
+      const optionsString = options
         ? 'opt_fields=' + options.join(',') + '&'
         : '';
-      let url_params = { opt_client_name: client_name, ...params };
-      url +=
-        '?' +
-        optionsString +
-        Object.entries(url_params)
-          .map(([key, value]) => key + '=' + value)
-          .join('&');
+      const urlParams = new URLSearchParams({
+        opt_client_name: client_name,
+        ...params,
+      });
+      url += '?' + optionsString + urlParams.toString();
     }
 
     // Note that any URL fetched here must be matched by a permission in
     // the manifest.json file!
-    // console.log('### ServerManager: fetching with body', body_data);
     const response = await fetch(url, {
       method: formattedRequest,
       mode: 'cors',
@@ -102,15 +99,12 @@ export const ServerManager = {
       },
       body: JSON.stringify(body_data),
     });
+
     if (response.status !== 200 && response.status !== 201) {
-      // console.log(
-      //   '### ServerManager: ERROR, response status ' + response.status
-      // );
-      throw new Error(`Could not successfully ${formattedRequest} to ${url}`);
+      throw new Error(`Could not successfully ${formattedRequest} ${url}`);
     }
 
     const json = await response.json();
-    // console.log('### ServerManager: JSON response', json['data']);
     return json.data;
   },
 
@@ -142,7 +136,7 @@ export const ServerManager = {
       completed_since: 'now',
       limit: 100,
       workspace: workspaceId,
-    }; // assignee=me&completed_since=now&limit=100&workspace=[workspace_id]
+    };
     const retrieved: Task[] = await this._request(
       'GET',
       '/tasks',

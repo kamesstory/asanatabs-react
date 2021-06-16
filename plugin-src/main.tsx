@@ -19,7 +19,7 @@ import { TaskWithWorkspace } from './background-scripts/asana';
  * TODO: allow for offline!
  */
 const main = async () => {
-  // chrome.storage.local.clear();
+  chrome.storage.local.clear();
 
   let tasks: TaskWithWorkspace[] = [],
     workspaces: Workspace[] = [],

@@ -9,9 +9,6 @@ export const ME_INFO = 'me_info';
 
 const checkLogin = async () => {
   const loggedIn = await ServerManager.isLoggedIn();
-  // if (!loggedIn) {
-  //   console.log('### Background: not logged in!');
-  // }
   return loggedIn;
 };
 
@@ -26,6 +23,10 @@ export const update = async (): Promise<[TaskWithWorkspace[], Workspace[]]> => {
     throw new Error('Cannot update since user is not logged in to Asana.');
   }
 
+  // TODO: retrieve workspaces from local storage and only update if parallelized
+  //  finds workspaces that weren't saved.
+  // TODO: add small loader to the bottom of the new tab when loading
+  // TODO: display that AsanaTabs is still requesting updates
   const workspaces = await ServerManager.workspaces();
   if (!workspaces) {
     throw new Error('Cannot update since user has no workspaces in Asana.');
@@ -35,12 +36,12 @@ export const update = async (): Promise<[TaskWithWorkspace[], Workspace[]]> => {
 
   const getAndSaveTasks = async (workspace: Workspace) => {
     const { gid: wid, name: workspaceName } = workspace;
-    let options = ['due_on', 'name'];
-    const tasksForWorkspace = await ServerManager.tasks(wid, options);
-    if (!tasksForWorkspace) {
-      // console.log('### Background: no tasks for workspace ' + workspaceName);
-      return null;
-    }
+    const tasksForWorkspace = await ServerManager.tasks(wid, [
+      'due_on',
+      'name',
+    ]);
+    if (!tasksForWorkspace) return null;
+
     chrome.storage.local.set({ [GET_WORKSPACE_KEY(wid)]: tasksForWorkspace });
     return tasksForWorkspace.map<TaskWithWorkspace>((task) => ({
       ...task,
@@ -53,13 +54,6 @@ export const update = async (): Promise<[TaskWithWorkspace[], Workspace[]]> => {
     workspaces.map((workspace) => getAndSaveTasks(workspace))
   );
   const filteredTasks = tasks.flatMap((t) => (!t ? [] : t));
-
-  // console.log(
-  //   '### Background: all tasks and workspaces retrieved and saved to local storage!',
-  //   tasks.flat(),
-  //   workspaces
-  // );
-
   chrome.storage.local.set({ [ALL_TASKS_KEY]: filteredTasks });
 
   return [filteredTasks, workspaces];
