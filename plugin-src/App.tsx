@@ -19,7 +19,6 @@ const formattedBackgroundImageUrl = (backgroundImageUrl as string).startsWith(
 )
   ? (backgroundImageUrl as string).slice(1)
   : backgroundImageUrl;
-// console.log(backgroundImageUrl, formattedBackgroundImageUrl);
 
 const getCustomBackground = () => css`
   html {
