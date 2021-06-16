@@ -153,7 +153,7 @@ export const App: FunctionComponent = () => {
       .filter((task) => !task.completed)
       .map((task) => ({
         ...task,
-        color: workspaceColors[task.workspace_name],
+        color: workspaceColors[task.workspace],
       }));
     filteredTasks.sort((first, second) => {
       if (!first.duedate && !second.duedate)

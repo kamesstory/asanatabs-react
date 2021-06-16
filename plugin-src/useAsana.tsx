@@ -27,12 +27,11 @@ const useAsana = (): [
         updatedWorkspaces.reduce(
           (colorsMap, workspace) => ({
             ...colorsMap,
-            [workspace.name]:
-              workspaceColors && workspaceColors[workspace.name]
-                ? workspaceColors[workspace.name]
-                : randomColor({
-                    seed: workspace.gid,
-                  }),
+            [workspace.gid]:
+              workspaceColors[workspace.gid] ??
+              randomColor({
+                seed: workspace.gid,
+              }),
           }),
           {}
         );
