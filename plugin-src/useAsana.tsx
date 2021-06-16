@@ -23,10 +23,7 @@ const useAsana = (): [
     // Request updates from Asana and re-render
     const [updatedTasks, updatedWorkspaces] = await Asana.update();
     if (updatedTasks && updatedWorkspaces) {
-      setIsOnline(true);
-      setTasks(updatedTasks);
-      setWorkspaces(updatedWorkspaces);
-      setWorkspaceColors(
+      const updatedWorkspaceColors: Record<string, string> =
         updatedWorkspaces.reduce(
           (colorsMap, workspace) => ({
             ...colorsMap,
@@ -38,12 +35,16 @@ const useAsana = (): [
                   }),
           }),
           {}
-        )
-      );
-      chrome.storage.local.set({
-        [Asana.WORKSPACE_COLORS_KEY]: workspaceColors,
+        );
+      setIsOnline(true);
+      setWorkspaceColors(updatedWorkspaceColors);
+      setTasks(updatedTasks);
+      setWorkspaces(updatedWorkspaces);
+
+      await chrome.storage.local.set({
         [Asana.ALL_TASKS_KEY]: updatedTasks,
         [Asana.ALL_WORKSPACES_KEY]: updatedWorkspaces,
+        [Asana.WORKSPACE_COLORS_KEY]: updatedWorkspaceColors,
       });
     }
   }, [workspaceColors]);
@@ -54,9 +55,9 @@ const useAsana = (): [
       workspaces.length === 0 &&
       Object.keys(workspaceColors).length === 0
     ) {
-      console.log(
-        `useEffect triggering without tasks, workspaces, or workspaceColors`
-      );
+      // console.log(
+      //   `useEffect triggering without tasks, workspaces, or workspaceColors`
+      // );
       (async () => {
         // Request storage locally
         const [localTasks, localWorkspaces, localColors] = await Promise.all([
@@ -64,6 +65,8 @@ const useAsana = (): [
           chrome.storage.local.get([Asana.ALL_WORKSPACES_KEY]),
           chrome.storage.local.get([Asana.WORKSPACE_COLORS_KEY]),
         ]);
+
+        console.log(`Local colors`, localColors);
 
         // Needs to be done because for some reason localStorage nests it inside
         //  two layers of keys. Why?
