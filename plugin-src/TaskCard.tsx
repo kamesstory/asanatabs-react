@@ -30,8 +30,9 @@ const Title = styled.h1`
 `;
 
 const CheckBoxOuter = styled.div`
-  background-color: #f2f1f7;
+  background-color: white;
   border: #f2f1f7 1px solid;
+  color: #2b2647;
   border-radius: 50%;
   height: 26px;
   width: 26px;
@@ -41,10 +42,12 @@ const CheckBoxOuter = styled.div`
   justify-content: center;
   margin-right: 18px;
   cursor: pointer;
-  transition: border-color 0.1s linear;
+  transition: all 0.1s linear;
 
   :hover {
     border-color: #2b2647;
+    color: #2b2647;
+    background-color: #f2f1f7;
   }
 `;
 
