@@ -25,7 +25,8 @@ export type ChangeType = 'markdone';
 const Title = styled.h1`
   font-size: 20px;
   font-weight: 600;
-  margin-bottom: 8px;
+  margin-bottom: 18px;
+  padding: 0 24px;
 `;
 
 const CheckBoxOuter = styled.div`
@@ -94,8 +95,8 @@ const DueDate = styled.span`
 `;
 
 const TaskRowOuter = styled.div`
-  border-bottom: 1px solid #f2f1f7;
-  padding: 14px 0;
+  border-top: 1px solid #f2f1f7;
+  padding: 14px 24px;
   font-size: 14px;
   display: flex;
   flex-direction: row;
@@ -103,8 +104,11 @@ const TaskRowOuter = styled.div`
   cursor: pointer;
 
   :last-child {
-    padding-bottom: 0;
-    border-bottom: 0;
+    border-bottom: 1px solid #f2f1f7;
+  }
+
+  :hover {
+    background-color: #fafafa;
   }
 `;
 
@@ -161,7 +165,7 @@ const CardBox = styled.div`
   background-color: white;
   max-width: 960px;
   width: 100%;
-  padding: 24px;
+  padding: 24px 0;
   border-radius: 9px;
   display: flex;
   flex-direction: column;
