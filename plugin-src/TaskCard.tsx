@@ -29,9 +29,10 @@ const Title = styled.h1`
   padding: 0 24px;
 `;
 
-const CheckBoxOuter = styled.div`
-  background-color: white;
-  border: #f2f1f7 1px solid;
+const CheckBoxCircle = styled.div<{ hovered: boolean }>`
+  background-color: ${({ hovered }) => (hovered ? '#f2f1f7' : 'white')};
+  border: 1px solid;
+  border-color: ${({ hovered }) => (hovered ? '#2b2647' : '#f2f1f7')};
   color: #2b2647;
   border-radius: 50%;
   height: 26px;
@@ -40,23 +41,33 @@ const CheckBoxOuter = styled.div`
   flex-shrink: 0;
   align-items: center;
   justify-content: center;
+  transition: all 0.1s linear;
+`;
+
+const CheckBoxOuter = styled.div`
+  display: flex;
+  flex-shrink: 0;
+  height: 26px;
+  width: 26px;
+  align-items: center;
+  justify-content: center;
   margin-right: 18px;
   cursor: pointer;
-  transition: all 0.1s linear;
-
-  :hover {
-    border-color: #2b2647;
-    color: #2b2647;
-    background-color: #f2f1f7;
-  }
 `;
 
 const CheckBox: FunctionComponent<{
   onClick: MouseEventHandler<HTMLDivElement>;
 }> = ({ onClick }) => {
+  const [hovered, setHovered] = useState(false);
+
   return (
-    <CheckBoxOuter onClick={onClick}>
-      <i className="fa fa-check" aria-hidden="true" />
+    <CheckBoxOuter
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+    >
+      <CheckBoxCircle onClick={onClick} hovered={hovered}>
+        <i className="fa fa-check" aria-hidden="true" />
+      </CheckBoxCircle>
     </CheckBoxOuter>
   );
 };
