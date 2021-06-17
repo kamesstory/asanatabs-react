@@ -31,6 +31,7 @@ const Title = styled.h1`
 
 const CheckBoxOuter = styled.div`
   background-color: #f2f1f7;
+  border: #f2f1f7 1px solid;
   border-radius: 50%;
   height: 26px;
   width: 26px;
@@ -40,6 +41,11 @@ const CheckBoxOuter = styled.div`
   justify-content: center;
   margin-right: 18px;
   cursor: pointer;
+  transition: border-color 0.1s linear;
+
+  :hover {
+    border-color: #2b2647;
+  }
 `;
 
 const CheckBox: FunctionComponent<{
@@ -101,7 +107,7 @@ const TaskRowOuter = styled.div`
   display: flex;
   flex-direction: row;
   align-items: flex-start;
-  cursor: pointer;
+  cursor: default;
 
   :last-child {
     border-bottom: 1px solid #f2f1f7;
