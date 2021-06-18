@@ -8,6 +8,6 @@ import './style.css';
 // let me: any;
 // me = await Asana.me();
 // chrome.storage.local.set({ [Asana.ME_INFO]: me });
-chrome.storage.local.clear();
+// chrome.storage.local.clear();
 
 ReactDOM.render(<App />, document.getElementById('root'));
