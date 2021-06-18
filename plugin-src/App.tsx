@@ -181,10 +181,6 @@ export const App: FunctionComponent = () => {
     );
   }, [tasks, workspaceColors]);
 
-  const errorMessage =
-    'AsanaTabs currently cannot connect to Asana. Please make sure you are logged in \
-    and have cookies enabled for Asana, and try again by opening a new tab page!';
-
   return (
     <Fragment>
       <Global styles={getCustomBackground()} />
@@ -216,7 +212,7 @@ export const App: FunctionComponent = () => {
           onTaskCreated={onTaskCreated}
         />
       ) : (
-        <ErrorFab errorMessage={errorMessage} />
+        <ErrorFab />
       )}
     </Fragment>
   );

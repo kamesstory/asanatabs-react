@@ -62,9 +62,7 @@ const FabSymbol = styled.span`
   display: inline-block;
 `;
 
-const ErrorFab: FunctionComponent<{ errorMessage: string }> = ({
-  errorMessage,
-}) => {
+const ErrorFab: FunctionComponent = () => {
   const [isOpen, setIsOpen] = useState(false);
   const fabRef = useRef(null);
 
@@ -89,7 +87,14 @@ const ErrorFab: FunctionComponent<{ errorMessage: string }> = ({
         isOpen={isOpen}
         onClickOutside={() => setIsOpen(false)}
       >
-        <Popover isOpen={isOpen}>{errorMessage}</Popover>
+        <Popover isOpen={isOpen}>
+          <p>
+            To get started, please log into{' '}
+            <a href="https://app.asana.com">Asana</a>. You'll then be able to
+            access your tasks and workspaces in one centralized view in your new
+            tab page.
+          </p>
+        </Popover>
       </Overlay>
     </Fragment>
   );
