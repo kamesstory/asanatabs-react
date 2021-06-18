@@ -13,6 +13,7 @@ import * as Asana from './asana';
 import { ChangeType } from './TaskCard';
 import useAsana from './useAsana';
 import { useEffect } from 'react';
+import 'balloon-css';
 
 const formattedBackgroundImageUrl = (backgroundImageUrl as string).startsWith(
   '.'
@@ -208,8 +209,12 @@ export const App: FunctionComponent = () => {
           />
         </Flipper>
       )}
-      {isOnline && workspaces && workspaces.length > 0 ? (
-        <CreateTask workspaces={workspaces} onTaskCreated={onTaskCreated} />
+      {workspaces && workspaces.length > 0 ? (
+        <CreateTask
+          isOnline={isOnline}
+          workspaces={workspaces}
+          onTaskCreated={onTaskCreated}
+        />
       ) : (
         <ErrorFab errorMessage={errorMessage} />
       )}

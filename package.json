@@ -40,6 +40,7 @@
     "webpack-extension-reloader": "^1.1.4"
   },
   "dependencies": {
+    "balloon-css": "^1.2.0",
     "chrome-extension-async": "^3.3.2",
     "chrono-node": "^2.3.0",
     "date-fns": "^1.30.1",

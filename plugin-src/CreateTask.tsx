@@ -226,7 +226,8 @@ const CreateTask: FunctionComponent<{
     dueDate: Date,
     workspace: Workspace
   ) => void;
-}> = ({ workspaces, onTaskCreated }) => {
+  isOnline: boolean;
+}> = ({ workspaces, onTaskCreated, isOnline }) => {
   const descInputText = 'description + title of your task';
 
   const [isOpen, setIsOpen] = useState(false);
@@ -239,6 +240,7 @@ const CreateTask: FunctionComponent<{
 
   // TODO: include better controlled input sanitization!
   const readyForSubmit =
+    isOnline &&
     isOpen &&
     description != null &&
     description.length > 0 &&
@@ -318,6 +320,10 @@ const CreateTask: FunctionComponent<{
               );
               setIsOpen(false);
             }}
+            {...(!isOnline && {
+              'aria-label': 'Unable to connect to Asana.',
+              'data-balloon-pos': 'right',
+            })}
           >
             Submit Task
           </SubmitTaskButton>
