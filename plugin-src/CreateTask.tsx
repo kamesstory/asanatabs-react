@@ -195,16 +195,17 @@ const FabOuter = styled.div`
   background-color: #2b2647;
   border-radius: 50%;
   font-weight: 400;
-  text-align: center;
   font-size: 40px;
-  color: white;
+  color: #f2f1f7;
   width: 64px;
   height: 64px;
-  line-height: 64px;
-  vertical-align: middle;
   cursor: pointer;
   user-select: none;
   box-shadow: 0 10px 20px rgba(0, 0, 0, 0.25);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
 `;
 
 const FabPlus = styled.span<GenericProps>`
