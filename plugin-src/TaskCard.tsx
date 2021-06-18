@@ -22,10 +22,10 @@ export type DisplayableTask = {
 
 export type ChangeType = 'markdone';
 
-const Title = styled.h1`
+const Title = styled.h1<{ isEmpty: boolean }>`
   font-size: 20px;
   font-weight: 600;
-  margin-bottom: 18px;
+  margin-bottom: ${({ isEmpty }) => (isEmpty ? 0 : '18px')};
   padding: 0 24px;
 `;
 
@@ -242,7 +242,7 @@ const TaskCard: FunctionComponent<{
   return (
     <Flipped flipId={title}>
       <CardBox {...rest}>
-        <Title>{title}</Title>
+        <Title isEmpty={tasks.length === 0}>{title}</Title>
         {tasks.map((task, i) => (
           <Flipped flipId={task.gid} key={task.gid} translate opacity>
             <TaskRow
