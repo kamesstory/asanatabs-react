@@ -4,4 +4,4 @@ import { update } from '../asana';
 update();
 setInterval(update, 60 * 1000);
 
-chrome.runtime.setUninstallURL('http://jasonwa.ng/asanatabs/');
+chrome.runtime.setUninstallURL('https://jasonwa.ng/asanatabs/');
