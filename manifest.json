@@ -3,7 +3,7 @@
   "name": "AsanaTabs",
   "version": "3.0.0",
   "content_security_policy": "script-src 'self'; object-src 'self'",
-  "description": "Quickly view Asana tasks from the new tab page.",
+  "description": "A lightweight, clean way to view tasks from across all your workspaces in your new tab page.",
 
   "background": {
     "persistent": true,
