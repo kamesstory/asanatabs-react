@@ -33,6 +33,7 @@ const FormFieldDiv = styled.div`
 
 const DescFormInput = styled.textarea`
   color: #2b2647;
+  font-family: 'Libre Franklin', sans-serif;
   font-size: 18px;
   width: 100%;
   border: none;
@@ -163,10 +164,16 @@ const SubmitTaskButton = styled.button`
   height: 50px;
   color: #2b2647;
   background-color: #f2f1f7;
-  border: ${({ disabled }) =>
-    disabled ? 'solid indianred' : 'solid darkseagreen'};
+  border: none;
+  /* border: ${({ disabled }) =>
+    disabled ? 'solid indianred' : 'solid darkseagreen'}; */
   outline: none;
   cursor: pointer;
+`;
+
+const SubmitWarning = styled.div`
+  color: red;
+  margin-top: 10px;
 `;
 
 const Popover = styled.div<GenericProps>`
@@ -328,6 +335,7 @@ const CreateTask: FunctionComponent<{
           >
             Submit Task
           </SubmitTaskButton>
+          <SubmitWarning />
         </Popover>
       </Overlay>
     </Fragment>

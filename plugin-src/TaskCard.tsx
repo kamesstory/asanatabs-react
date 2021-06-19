@@ -109,7 +109,6 @@ const DueDate = styled.span`
   font-weight: 600;
   min-width: 90px;
   text-align: right;
-  font-family: 'IBM Plex Mono', monospace;
   font-size: 12px;
   ${RowTextPadding}
 `;
