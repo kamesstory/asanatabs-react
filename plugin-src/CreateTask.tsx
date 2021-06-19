@@ -39,6 +39,7 @@ const DescFormInput = styled.textarea`
   width: 100%;
   border: none;
   outline: none;
+  resize: vertical;
 `;
 
 const DescFormField: FunctionComponent<{
