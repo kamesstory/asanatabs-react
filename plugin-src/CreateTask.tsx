@@ -246,7 +246,6 @@ const CreateTask: FunctionComponent<{
   ) => void;
   isOnline: boolean;
 }> = ({ workspaces, onTaskCreated, isOnline }) => {
-  console.log(`isOnline`, isOnline);
   const descInputText = 'description & title of your task';
   const [isOpen, setIsOpen] = useState(false);
   const [description, setDescription] = useState('');
@@ -258,7 +257,7 @@ const CreateTask: FunctionComponent<{
   const [errorMessage, setErrorMessage] = useState<Error | null>(null);
 
   const getError = useCallback<() => Error | null>(() => {
-    // console.log(`getError`, isOnline);
+    // console.log(`getError isOnline`, isOnline);
     return !isOnline
       ? 'no_connection'
       : !isOpen
@@ -273,9 +272,16 @@ const CreateTask: FunctionComponent<{
         workspaces.filter((w) => w.name === workspace).length > 0
       ? 'workspace_invalid'
       : null;
-  }, []);
-  // TODO: this won't work since useCallback not being refreshed when variables change
-  //  why is eslint not catching this
+  }, [
+    isOnline,
+    isOpen,
+    description,
+    startDate,
+    dueDate,
+    workspace,
+    workspaces,
+  ]);
+  // Why is ESLint not linting this correctly
 
   useEffect(() => {
     const keypressHandler = (event: KeyboardEvent) => {

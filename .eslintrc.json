@@ -1,14 +1,5 @@
 {
-  "env": {
-    "browser": true,
-    "es2021": true,
-    "webextensions": true
-  },
-  "extends": [
-    "eslint:recommended",
-    "plugin:react/recommended",
-    "plugin:@typescript-eslint/no-unused-vars"
-  ],
+  "root": true,
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
     "ecmaFeatures": {
@@ -17,7 +8,17 @@
     "ecmaVersion": 12,
     "sourceType": "module"
   },
-  "plugins": ["react", "react-hooks"],
+  "env": {
+    "browser": true,
+    "es2021": true,
+    "webextensions": true
+  },
+  "plugins": ["@typescript-eslint", "react", "react-hooks"],
+  "extends": [
+    "eslint:recommended",
+    "plugin:react/recommended",
+    "plugin:@typescript-eslint/no-unused-vars"
+  ],
   "rules": {
     "react-hooks/rules-of-hooks": "warn", // Checks rules of Hooks
     "react-hooks/exhaustive-deps": "warn", // Checks effect dependencies
