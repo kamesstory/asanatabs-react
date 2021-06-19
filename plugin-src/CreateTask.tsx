@@ -257,7 +257,6 @@ const CreateTask: FunctionComponent<{
   const [errorMessage, setErrorMessage] = useState<Error | null>(null);
 
   const getError = useCallback<() => Error | null>(() => {
-    // console.log(`getError isOnline`, isOnline);
     return !isOnline
       ? 'no_connection'
       : !isOpen
@@ -282,6 +281,15 @@ const CreateTask: FunctionComponent<{
     workspaces,
   ]);
   // Why is ESLint not linting this correctly
+
+  useEffect(() => {
+    if (!isOpen) {
+      setDescription('');
+      setStartDate('');
+      setDueDate('');
+      setWorkspace('');
+    }
+  }, [isOpen]);
 
   useEffect(() => {
     const keypressHandler = (event: KeyboardEvent) => {
