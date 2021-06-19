@@ -6,6 +6,7 @@ import {
   useEffect,
   SetStateAction,
   Fragment,
+  useCallback,
 } from 'react';
 import styled from '@emotion/styled';
 import { css, jsx } from '@emotion/core';
@@ -171,9 +172,10 @@ const SubmitTaskButton = styled.button`
   cursor: pointer;
 `;
 
-const SubmitWarning = styled.div`
-  color: red;
-  margin-top: 10px;
+const SubmitErrorMessage = styled.div<{ opacity: number }>`
+  color: #ff0033;
+  margin-top: 8px;
+  opacity: ${({ opacity }) => opacity};
 `;
 
 const Popover = styled.div<GenericProps>`
@@ -226,6 +228,14 @@ const FabPlus = styled.span<GenericProps>`
     `}
 `;
 
+type Error =
+  | 'no_connection'
+  | 'desc_invalid'
+  | 'start_date_invalid'
+  | 'end_date_invalid'
+  | 'workspace_invalid'
+  | 'generic';
+
 const CreateTask: FunctionComponent<{
   workspaces: Workspace[];
   onTaskCreated: (
@@ -236,26 +246,36 @@ const CreateTask: FunctionComponent<{
   ) => void;
   isOnline: boolean;
 }> = ({ workspaces, onTaskCreated, isOnline }) => {
-  const descInputText = 'description + title of your task';
-
+  console.log(`isOnline`, isOnline);
+  const descInputText = 'description & title of your task';
   const [isOpen, setIsOpen] = useState(false);
   const [description, setDescription] = useState('');
   const [startDate, setStartDate] = useState('');
   const [dueDate, setDueDate] = useState('');
-  const [workspaceState, setWorkspace] = useState('');
+  const [workspace, setWorkspace] = useState('');
   const fabRef = useRef<HTMLDivElement | null>(null);
   const [suggestionPopup, setOpenSuggestionPopup] = useState('');
+  const [errorMessage, setErrorMessage] = useState<Error | null>(null);
 
-  // TODO: include better controlled input sanitization!
-  const readyForSubmit =
-    isOnline &&
-    isOpen &&
-    description != null &&
-    description.length > 0 &&
-    (parseDate(startDate) instanceof Date || startDate === '') &&
-    (parseDate(dueDate) instanceof Date || dueDate === '') &&
-    (workspaces.filter((ws) => ws.name === workspaceState).length > 0 ||
-      workspaceState === '');
+  const getError = useCallback<() => Error | null>(() => {
+    // console.log(`getError`, isOnline);
+    return !isOnline
+      ? 'no_connection'
+      : !isOpen
+      ? 'generic'
+      : description === null || description.length <= 0
+      ? 'desc_invalid'
+      : startDate !== '' && !(parseDate(startDate) instanceof Date)
+      ? 'start_date_invalid'
+      : dueDate !== '' && !(parseDate(dueDate) instanceof Date)
+      ? 'end_date_invalid'
+      : workspace !== '' &&
+        workspaces.filter((w) => w.name === workspace).length > 0
+      ? 'workspace_invalid'
+      : null;
+  }, []);
+  // TODO: this won't work since useCallback not being refreshed when variables change
+  //  why is eslint not catching this
 
   useEffect(() => {
     const keypressHandler = (event: KeyboardEvent) => {
@@ -268,7 +288,7 @@ const CreateTask: FunctionComponent<{
     };
     window.addEventListener('keydown', keypressHandler);
     return () => window.removeEventListener('keydown', keypressHandler);
-  });
+  }, []);
 
   return (
     <Fragment>
@@ -308,18 +328,23 @@ const CreateTask: FunctionComponent<{
           </HorizontalFlex>
           <WorkspaceFormField
             workspaces={workspaces}
-            workspaceState={workspaceState}
+            workspaceState={workspace}
             setWorkspace={setWorkspace}
             isOpen={suggestionPopup == 'workspace'}
             setActiveInput={() => setOpenSuggestionPopup('workspace')}
           />
           <SubmitTaskButton
-            disabled={!readyForSubmit}
             onClick={() => {
+              const error = getError();
+              console.log(`error`, error);
+              if (error) {
+                setErrorMessage(error);
+                return;
+              }
               const submitted_workspace =
-                workspaceState === ''
+                workspace === ''
                   ? workspaces[workspaces.length - 1]
-                  : workspaces.filter((ws) => ws.name === workspaceState)[0];
+                  : workspaces.filter((ws) => ws.name === workspace)[0];
               onTaskCreated(
                 description,
                 parseDate(startDate === '' ? 'today' : startDate),
@@ -328,14 +353,34 @@ const CreateTask: FunctionComponent<{
               );
               setIsOpen(false);
             }}
-            {...(!isOnline && {
-              'aria-label': 'Unable to connect to Asana.',
-              'data-balloon-pos': 'right',
-            })}
           >
             Submit Task
           </SubmitTaskButton>
-          <SubmitWarning />
+          {errorMessage && (
+            <SubmitErrorMessage opacity={errorMessage ? 1 : 0}>
+              {errorMessage === 'no_connection' ? (
+                <p>
+                  You are currently not logged in to{' '}
+                  <a style={{ color: '#ff0033' }} href="https://app.asana.com">
+                    Asana
+                  </a>
+                  . Please log in to continue using AsanaTabs.
+                </p>
+              ) : errorMessage === 'desc_invalid' ? (
+                'Invalid description.'
+              ) : errorMessage === 'start_date_invalid' ? (
+                `Invalid start date. Try typing in everyday language, like "5pm tomorrow"`
+              ) : errorMessage === 'end_date_invalid' ? (
+                `Invalid end date. Try typing in everyday language, like "5pm tomorrow"`
+              ) : errorMessage === 'workspace_invalid' ? (
+                `Invalid workspace.`
+              ) : errorMessage === 'generic' ? (
+                'Sorry, we ran into an issue.'
+              ) : (
+                ''
+              )}
+            </SubmitErrorMessage>
+          )}
         </Popover>
       </Overlay>
     </Fragment>

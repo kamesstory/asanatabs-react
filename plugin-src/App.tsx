@@ -13,7 +13,6 @@ import * as Asana from './asana';
 import { ChangeType } from './TaskCard';
 import useAsana from './useAsana';
 import { useEffect } from 'react';
-import 'balloon-css';
 
 const formattedBackgroundImageUrl = (backgroundImageUrl as string).startsWith(
   '.'
