@@ -175,7 +175,7 @@ export const App: FunctionComponent = () => {
     );
     setUpcomingTasks(
       filteredTasks.filter(
-        (task) => !task.duedate || task.duedate >= dayAfterTomorrow
+        (task) => !task.duedate || task.duedate > dayAfterTomorrow
       )
     );
   }, [tasks, workspaceColors]);
