@@ -352,7 +352,7 @@ const CreateTask: FunctionComponent<{
           <SubmitTaskButton
             onClick={() => {
               const error = getError();
-              console.log(`error`, error);
+              // console.log(`error`, error);
               if (error) {
                 setErrorMessage(error);
                 return;
