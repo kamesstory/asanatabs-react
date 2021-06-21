@@ -4,11 +4,7 @@ import * as Asana from './asana';
 import randomColor from 'randomcolor';
 import React from 'react';
 
-export enum OnlineStatus {
-  ONLINE = 'online',
-  OFFLINE = 'offline',
-  LOADING = 'loading',
-}
+export type OnlineStatus = 'online' | 'offline' | 'loading';
 
 const useAsana = (): [
   OnlineStatus,
@@ -23,9 +19,7 @@ const useAsana = (): [
   const [workspaceColors, setWorkspaceColors] = useState<
     Record<string, string>
   >({});
-  const [onlineStatus, setOnlineStatus] = useState<OnlineStatus>(
-    OnlineStatus.LOADING
-  );
+  const [onlineStatus, setOnlineStatus] = useState<OnlineStatus>('loading');
 
   const pullAllFromAsana = useCallback(async () => {
     // Request updates from Asana and re-render
@@ -45,7 +39,7 @@ const useAsana = (): [
             }),
             {}
           );
-        setOnlineStatus(OnlineStatus.ONLINE);
+        setOnlineStatus('online');
         setWorkspaceColors(updatedWorkspaceColors);
         setTasks(updatedTasks);
         setWorkspaces(updatedWorkspaces);
@@ -57,7 +51,7 @@ const useAsana = (): [
         ]);
       }
     } catch (e) {
-      setOnlineStatus(OnlineStatus.OFFLINE);
+      setOnlineStatus('offline');
     }
   }, [workspaceColors]);
 

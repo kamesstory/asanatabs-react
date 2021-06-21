@@ -13,6 +13,7 @@ import { css, jsx } from '@emotion/core';
 import Overlay from './Overlay';
 import { parseDate } from 'chrono-node';
 import { Workspace } from './background-scripts/serverManager';
+import { OnlineStatus } from './useAsana';
 
 export type GenericProps = {
   zIndex?: number;
@@ -245,8 +246,8 @@ const CreateTask: FunctionComponent<{
     dueDate: Date,
     workspace: Workspace
   ) => void;
-  isOnline: boolean;
-}> = ({ workspaces, onTaskCreated, isOnline }) => {
+  onlineStatus: OnlineStatus;
+}> = ({ workspaces, onTaskCreated, onlineStatus }) => {
   const descInputText = 'description & title of your task';
   const [isOpen, setIsOpen] = useState(false);
   const [description, setDescription] = useState('');
@@ -258,7 +259,7 @@ const CreateTask: FunctionComponent<{
   const [errorMessage, setErrorMessage] = useState<Error | null>(null);
 
   const getError = useCallback<() => Error | null>(() => {
-    return !isOnline
+    return onlineStatus !== 'online'
       ? 'no_connection'
       : !isOpen
       ? 'generic'
@@ -273,7 +274,7 @@ const CreateTask: FunctionComponent<{
       ? 'workspace_invalid'
       : null;
   }, [
-    isOnline,
+    onlineStatus,
     isOpen,
     description,
     startDate,
@@ -373,7 +374,8 @@ const CreateTask: FunctionComponent<{
           </SubmitTaskButton>
           {errorMessage && (
             <SubmitErrorMessage opacity={errorMessage ? 1 : 0}>
-              {errorMessage === 'no_connection' ? (
+              {errorMessage === 'no_connection' &&
+              onlineStatus === 'offline' ? (
                 <p>
                   You are currently not logged in to{' '}
                   <a style={{ color: '#ff0033' }} href="https://app.asana.com">
@@ -381,7 +383,10 @@ const CreateTask: FunctionComponent<{
                   </a>
                   . Please log in to continue using AsanaTabs.
                 </p>
-              ) : errorMessage === 'desc_invalid' ? (
+              ) : errorMessage === 'no_connection' &&
+                onlineStatus === 'loading' ? (
+                <p>Connecting to Asana...</p>
+              ) : 'desc_invalid' ? (
                 'Invalid description.'
               ) : errorMessage === 'start_date_invalid' ? (
                 `Invalid start date. Try typing in everyday language, like "5pm tomorrow"`

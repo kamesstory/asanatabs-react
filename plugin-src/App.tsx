@@ -48,7 +48,7 @@ const getCustomBackground = () => css`
 
 export const App: FunctionComponent = () => {
   const [
-    isOnline,
+    onlineStatus,
     tasks,
     workspaces,
     workspaceColors,
@@ -206,7 +206,7 @@ export const App: FunctionComponent = () => {
       )}
       {workspaces && workspaces.length > 0 ? (
         <CreateTask
-          isOnline={isOnline}
+          onlineStatus={onlineStatus}
           workspaces={workspaces}
           onTaskCreated={onTaskCreated}
         />
