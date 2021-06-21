@@ -4,8 +4,14 @@ import * as Asana from './asana';
 import randomColor from 'randomcolor';
 import React from 'react';
 
+export enum OnlineStatus {
+  ONLINE = 'online',
+  OFFLINE = 'offline',
+  LOADING = 'loading',
+}
+
 const useAsana = (): [
-  boolean,
+  OnlineStatus,
   Asana.TaskWithWorkspace[],
   Workspace[],
   Record<string, string>,
@@ -17,34 +23,41 @@ const useAsana = (): [
   const [workspaceColors, setWorkspaceColors] = useState<
     Record<string, string>
   >({});
-  const [isOnline, setIsOnline] = useState(false);
+  const [onlineStatus, setOnlineStatus] = useState<OnlineStatus>(
+    OnlineStatus.LOADING
+  );
 
   const pullAllFromAsana = useCallback(async () => {
     // Request updates from Asana and re-render
-    const [updatedTasks, updatedWorkspaces] = await Asana.update();
-    if (updatedTasks && updatedWorkspaces) {
-      const updatedWorkspaceColors: Record<string, string> =
-        updatedWorkspaces.reduce(
-          (colorsMap, workspace) => ({
-            ...colorsMap,
-            [workspace.gid]:
-              workspaceColors[workspace.gid] ??
-              randomColor({
-                seed: workspace.gid,
-              }),
-          }),
-          {}
-        );
-      setIsOnline(true);
-      setWorkspaceColors(updatedWorkspaceColors);
-      setTasks(updatedTasks);
-      setWorkspaces(updatedWorkspaces);
+    try {
+      const [updatedTasks, updatedWorkspaces] = await Asana.update();
 
-      await Promise.all([
-        Asana.saveTasksToStorage(updatedTasks),
-        Asana.saveWorkspacesToStorage(updatedWorkspaces),
-        Asana.saveWorkspaceColorsToStorage(updatedWorkspaceColors),
-      ]);
+      if (updatedTasks && updatedWorkspaces) {
+        const updatedWorkspaceColors: Record<string, string> =
+          updatedWorkspaces.reduce(
+            (colorsMap, workspace) => ({
+              ...colorsMap,
+              [workspace.gid]:
+                workspaceColors[workspace.gid] ??
+                randomColor({
+                  seed: workspace.gid,
+                }),
+            }),
+            {}
+          );
+        setOnlineStatus(OnlineStatus.ONLINE);
+        setWorkspaceColors(updatedWorkspaceColors);
+        setTasks(updatedTasks);
+        setWorkspaces(updatedWorkspaces);
+
+        await Promise.all([
+          Asana.saveTasksToStorage(updatedTasks),
+          Asana.saveWorkspacesToStorage(updatedWorkspaces),
+          Asana.saveWorkspaceColorsToStorage(updatedWorkspaceColors),
+        ]);
+      }
+    } catch (e) {
+      setOnlineStatus(OnlineStatus.OFFLINE);
     }
   }, [workspaceColors]);
 
@@ -74,7 +87,7 @@ const useAsana = (): [
   }, [pullAllFromAsana, tasks, workspaceColors, workspaces]);
 
   return [
-    isOnline,
+    onlineStatus,
     tasks,
     workspaces,
     workspaceColors,
