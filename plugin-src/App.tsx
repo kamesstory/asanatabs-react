@@ -50,6 +50,9 @@ const pad = (num: number) => {
   return String(num).padStart(2, '0');
 };
 
+// Needs to be done since Asana sends due_on dates without
+//  a timestamp, even though it's meant to be interpreted in
+//  local time.
 const appendLocalTimezone = (date: string) => {
   const offset = new Date().getTimezoneOffset();
   const hours = Math.abs(Math.trunc(offset / 60));
