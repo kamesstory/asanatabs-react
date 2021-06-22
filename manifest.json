@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "AsanaTabs",
-  "version": "3.0.0",
+  "version": "3.1.0",
   "content_security_policy": "script-src 'self'; object-src 'self'",
   "description": "A lightweight, clean way to view tasks from across all your workspaces in your new tab page.",
 
