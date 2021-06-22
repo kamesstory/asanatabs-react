@@ -127,7 +127,7 @@ export const App: FunctionComponent = () => {
   useEffect(() => {
     const mappedTasks = tasks.flatMap(
       ({ gid, name, workspace, workspace_name, due_on, completed }) => {
-        if (!workspace || !workspace_name || !due_on) {
+        if (!workspace || !workspace_name) {
           return [];
         }
         return [
@@ -163,19 +163,19 @@ export const App: FunctionComponent = () => {
     const tomorrow = endOfDay(new Date());
     const dayAfterTomorrow = endOfTomorrow();
     setTodayTasks(
-      filteredTasks.filter((task) => task.duedate && task.duedate <= tomorrow)
+      filteredTasks.filter((task) => task.duedate && task.duedate < tomorrow)
     );
     setTomorrowTasks(
       filteredTasks.filter(
         (task) =>
           task.duedate &&
-          task.duedate > tomorrow &&
-          task.duedate <= dayAfterTomorrow
+          task.duedate >= tomorrow &&
+          task.duedate < dayAfterTomorrow
       )
     );
     setUpcomingTasks(
       filteredTasks.filter(
-        (task) => !task.duedate || task.duedate > dayAfterTomorrow
+        (task) => !task.duedate || task.duedate >= dayAfterTomorrow
       )
     );
   }, [tasks, workspaceColors]);
