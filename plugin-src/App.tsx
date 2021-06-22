@@ -46,6 +46,19 @@ const getCustomBackground = () => css`
   }
 `;
 
+const pad = (num: number) => {
+  return String(num).padStart(2, '0');
+};
+
+const appendLocalTimezone = (date: string) => {
+  const offset = new Date().getTimezoneOffset();
+  const hours = Math.abs(Math.trunc(offset / 60));
+  const minutes = Math.abs(offset % 60);
+  const sign = offset > 0 ? '-' : '+';
+
+  return `${date} GMT${sign}${pad(hours)}${pad(minutes)}`;
+};
+
 export const App: FunctionComponent = () => {
   const [
     onlineStatus,
@@ -93,7 +106,7 @@ export const App: FunctionComponent = () => {
       // TODO: need to incorporate startDate
       const task = {
         name: description,
-        due_on: format(dueDate, 'YYYY-MM-DD'),
+        due_at: dueDate.toISOString(),
         assignee: 'me',
       };
 
@@ -137,8 +150,10 @@ export const App: FunctionComponent = () => {
             workspace,
             workspace_name,
             duedate:
-              due_on && Date.parse(due_on)
-                ? new Date(Date.parse(due_on))
+              due_at && Date.parse(due_at)
+                ? new Date(Date.parse(due_at))
+                : due_on && Date.parse(due_on)
+                ? new Date(Date.parse(appendLocalTimezone(due_on)))
                 : undefined,
             completed,
           },

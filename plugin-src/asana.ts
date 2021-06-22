@@ -76,6 +76,7 @@ export const update = async (): Promise<[TaskWithWorkspace[], Workspace[]]> => {
   const getAndSaveTasks = async (workspace: Workspace) => {
     const { gid: wid, name: workspaceName } = workspace;
     const tasksForWorkspace = await ServerManager.tasks(wid, [
+      'due_at',
       'due_on',
       'name',
     ]);

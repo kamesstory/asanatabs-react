@@ -13,6 +13,7 @@ export type Task = {
   id?: string | number;
   workspace?: string;
   workspace_name?: string;
+  due_at?: string;
   due_on?: string;
   completed?: boolean;
 };
