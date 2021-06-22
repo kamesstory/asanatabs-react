@@ -125,7 +125,7 @@ const HorizontalFlex = styled.div`
   flex-direction: horizontal;
 `;
 
-const WorkspaceFormInput = styled.input<GenericProps>`
+const WorkspaceFormInput = styled.select<GenericProps>`
   position: relative;
   z-index: ${({ zIndex }) => zIndex || 997};
   color: #2b2647;
@@ -153,9 +153,13 @@ const WorkspaceFormField: FunctionComponent<{
           placeholder={workspaces[workspaces.length - 1].name}
           value={workspaceState}
           onChange={(e) => setWorkspace(e.target.value)}
-          onFocus={(e) => setActiveInput()}
+          onFocus={() => setActiveInput()}
           zIndex={zIndex}
-        />
+        >
+          {workspaces.map((w) => (
+            <option value={w.name}>{w.name}</option>
+          ))}
+        </WorkspaceFormInput>
       </HorizontalFlex>
     </FormFieldDiv>
   );
