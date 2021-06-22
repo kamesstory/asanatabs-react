@@ -139,7 +139,7 @@ export const App: FunctionComponent = () => {
 
   useEffect(() => {
     const mappedTasks = tasks.flatMap(
-      ({ gid, name, workspace, workspace_name, due_on, completed }) => {
+      ({ gid, name, workspace, workspace_name, due_at, due_on, completed }) => {
         if (!workspace || !workspace_name) {
           return [];
         }
