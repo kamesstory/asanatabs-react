@@ -252,7 +252,6 @@ const CreateTask: FunctionComponent<{
   ) => void;
   onlineStatus: OnlineStatus;
 }> = ({ workspaces, onTaskCreated, onlineStatus }) => {
-  const descInputText = 'description & title of your task';
   const [isOpen, setIsOpen] = useState(false);
   const [description, setDescription] = useState('');
   const [startDate, setStartDate] = useState('');
@@ -267,14 +266,14 @@ const CreateTask: FunctionComponent<{
       ? 'no_connection'
       : !isOpen
       ? 'generic'
-      : description === null || description.length <= 0
+      : description === ''
       ? 'desc_invalid'
       : startDate !== '' && !(parseDate(startDate) instanceof Date)
       ? 'start_date_invalid'
       : dueDate !== '' && !(parseDate(dueDate) instanceof Date)
       ? 'end_date_invalid'
       : workspace !== '' &&
-        workspaces.filter((w) => w.name === workspace).length > 0
+        workspaces.filter((w) => w.name === workspace).length <= 0
       ? 'workspace_invalid'
       : null;
   }, [
@@ -323,7 +322,7 @@ const CreateTask: FunctionComponent<{
         <Popover isOpen={isOpen}>
           <DescFormField
             labelText="Description"
-            inputText={descInputText}
+            inputText="description & title of your task"
             description={description}
             setDescription={setDescription}
             setActiveInput={() => setOpenSuggestionPopup('')}
@@ -356,7 +355,6 @@ const CreateTask: FunctionComponent<{
           <SubmitTaskButton
             onClick={() => {
               const error = getError();
-              // console.log(`error`, error);
               if (error) {
                 setErrorMessage(error);
                 return;
@@ -390,7 +388,7 @@ const CreateTask: FunctionComponent<{
               ) : errorMessage === 'no_connection' &&
                 onlineStatus === 'loading' ? (
                 <p>Connecting to Asana...</p>
-              ) : 'desc_invalid' ? (
+              ) : errorMessage === 'desc_invalid' ? (
                 'Invalid description.'
               ) : errorMessage === 'start_date_invalid' ? (
                 `Invalid start date. Try typing in everyday language, like "5pm tomorrow"`
