@@ -5,7 +5,6 @@ import {
   Workspace,
 } from './background-scripts/serverManager';
 
-const GET_WORKSPACE_KEY = (workspaceId: string) => 'workspace_' + workspaceId;
 const ALL_TASKS_KEY = 'all_tasks';
 const ALL_WORKSPACES_KEY = 'all_workspaces';
 const WORKSPACE_COLORS_KEY = 'all_workspace_colors';
@@ -82,7 +81,6 @@ export const update = async (): Promise<[TaskWithWorkspace[], Workspace[]]> => {
     ]);
     if (!tasksForWorkspace) return null;
 
-    chrome.storage.local.set({ [GET_WORKSPACE_KEY(wid)]: tasksForWorkspace });
     return tasksForWorkspace.map<TaskWithWorkspace>((task) => ({
       ...task,
       workspace: wid,
