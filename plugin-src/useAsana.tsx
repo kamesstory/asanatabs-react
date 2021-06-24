@@ -24,6 +24,7 @@ const useAsana = (): [
   const pullAllFromAsana = useCallback(async () => {
     // Request updates from Asana and re-render
     try {
+      // TODO: switch to get emitted values from the background
       const [updatedTasks, updatedWorkspaces] = await Asana.update();
 
       if (updatedTasks && updatedWorkspaces) {
@@ -56,6 +57,7 @@ const useAsana = (): [
   }, [workspaceColors]);
 
   useEffect(() => {
+    // TODO: switch to get emitted values from the background
     if (
       tasks.length === 0 &&
       workspaces.length === 0 &&
