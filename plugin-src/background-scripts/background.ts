@@ -46,42 +46,45 @@ chrome.runtime.onConnect.addListener(async (port) => {
 
   const { emitToNewTab, emitUpdatedItems } = emitter;
 
+  const pullFromAsana = async () => {
+    try {
+      const [updatedTasks, updatedWorkspaces] = await update();
+
+      if (updatedTasks && updatedWorkspaces) {
+        const updatedWorkspaceColors: Record<string, string> =
+          updatedWorkspaces.reduce(
+            (colorsMap, workspace) => ({
+              ...colorsMap,
+              [workspace.gid]:
+                workspaceColors[workspace.gid] ??
+                randomColor({
+                  seed: workspace.gid,
+                }),
+            }),
+            {}
+          );
+        tasks = updatedTasks;
+        workspaces = updatedWorkspaces;
+        workspaceColors = updatedWorkspaceColors;
+
+        emitUpdatedItems();
+
+        await Promise.all([
+          saveTasksToStorage(tasks),
+          saveWorkspacesToStorage(workspaces),
+          saveWorkspaceColorsToStorage(workspaceColors),
+        ]);
+      }
+    } catch (e) {
+      emitToNewTab({ type: 'pullFailed' });
+    }
+  };
+
   port.onMessage.addListener(async (message) => {
     const msg = message as FromNewTabMessage;
 
     if (msg.type === 'pullFromAsana') {
-      try {
-        const [updatedTasks, updatedWorkspaces] = await update();
-
-        if (updatedTasks && updatedWorkspaces) {
-          const updatedWorkspaceColors: Record<string, string> =
-            updatedWorkspaces.reduce(
-              (colorsMap, workspace) => ({
-                ...colorsMap,
-                [workspace.gid]:
-                  workspaceColors[workspace.gid] ??
-                  randomColor({
-                    seed: workspace.gid,
-                  }),
-              }),
-              {}
-            );
-          tasks = updatedTasks;
-          workspaces = updatedWorkspaces;
-          workspaceColors = updatedWorkspaceColors;
-
-          emitUpdatedItems();
-
-          await Promise.all([
-            saveTasksToStorage(tasks),
-            saveWorkspacesToStorage(workspaces),
-            saveWorkspaceColorsToStorage(workspaceColors),
-          ]);
-        }
-      } catch (e) {
-        // TODO: emit "offline" signal
-        emitToNewTab({ type: 'pullFailed' });
-      }
+      pullFromAsana();
     }
   });
 
@@ -91,6 +94,7 @@ chrome.runtime.onConnect.addListener(async (port) => {
   workspaceColors = localColors;
 
   emitUpdatedItems(true);
+  await pullFromAsana();
 });
 
 update();
