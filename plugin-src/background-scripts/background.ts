@@ -45,6 +45,9 @@ const getEmitter = (port: chrome.runtime.Port) => {
   return { emitToNewTab, emitUpdatedItems };
 };
 
+// TODO: need to debounce updates that are pushed to Asana
+// TODO: debounce pullAllTasks
+
 chrome.runtime.onConnect.addListener(async (port) => {
   const emitter = getEmitter(port);
   if (!emitter) return;
