@@ -71,6 +71,8 @@ const useAsana = (): [
         setTasks(msg.tasks);
         setWorkspaces(msg.workspaces);
         setWorkspaceColors(msg.workspaceColors);
+      } else if (msg.type === 'pullFailed') {
+        if (onlineStatus === 'loading') setOnlineStatus('offline');
       }
     };
 

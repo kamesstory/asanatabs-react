@@ -50,32 +50,37 @@ chrome.runtime.onConnect.addListener(async (port) => {
     const msg = message as FromNewTabMessage;
 
     if (msg.type === 'pullFromAsana') {
-      const [updatedTasks, updatedWorkspaces] = await update();
+      try {
+        const [updatedTasks, updatedWorkspaces] = await update();
 
-      if (updatedTasks && updatedWorkspaces) {
-        const updatedWorkspaceColors: Record<string, string> =
-          updatedWorkspaces.reduce(
-            (colorsMap, workspace) => ({
-              ...colorsMap,
-              [workspace.gid]:
-                workspaceColors[workspace.gid] ??
-                randomColor({
-                  seed: workspace.gid,
-                }),
-            }),
-            {}
-          );
-        tasks = updatedTasks;
-        workspaces = updatedWorkspaces;
-        workspaceColors = updatedWorkspaceColors;
+        if (updatedTasks && updatedWorkspaces) {
+          const updatedWorkspaceColors: Record<string, string> =
+            updatedWorkspaces.reduce(
+              (colorsMap, workspace) => ({
+                ...colorsMap,
+                [workspace.gid]:
+                  workspaceColors[workspace.gid] ??
+                  randomColor({
+                    seed: workspace.gid,
+                  }),
+              }),
+              {}
+            );
+          tasks = updatedTasks;
+          workspaces = updatedWorkspaces;
+          workspaceColors = updatedWorkspaceColors;
 
-        emitUpdatedItems();
+          emitUpdatedItems();
 
-        await Promise.all([
-          saveTasksToStorage(tasks),
-          saveWorkspacesToStorage(workspaces),
-          saveWorkspaceColorsToStorage(workspaceColors),
-        ]);
+          await Promise.all([
+            saveTasksToStorage(tasks),
+            saveWorkspacesToStorage(workspaces),
+            saveWorkspaceColorsToStorage(workspaceColors),
+          ]);
+        }
+      } catch (e) {
+        // TODO: emit "offline" signal
+        emitToNewTab({ type: 'pullFailed' });
       }
     }
   });

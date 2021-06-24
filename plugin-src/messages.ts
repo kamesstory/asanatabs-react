@@ -15,4 +15,8 @@ export type UpdateAllMessage = {
   workspaceColors: Record<string, string>;
 };
 
-export type ToNewTabMessage = UpdateAllMessage;
+export type PullFailedMessage = {
+  type: 'pullFailed';
+};
+
+export type ToNewTabMessage = UpdateAllMessage | PullFailedMessage;
