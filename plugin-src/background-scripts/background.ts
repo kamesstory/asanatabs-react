@@ -10,21 +10,7 @@ import {
 } from '../asana';
 import { Workspace } from './serverManager';
 import debounce from 'lodash.debounce';
-
-export type PullFromAsanaMessage = {
-  type: 'pullFromAsana';
-};
-
-export type FromNewTabMessage = PullFromAsanaMessage;
-
-export type UpdateAllMessage = {
-  type: 'updateAll';
-  tasks: TaskWithWorkspace[];
-  workspaces: Workspace[];
-  workspaceColors: Record<string, string>;
-};
-
-export type ToNewTabMessage = UpdateAllMessage;
+import { FromNewTabMessage, ToNewTabMessage } from '../messages';
 
 // Do we have to do a read-write lock now?
 // Or batched updates? Thoughts for later.
@@ -39,8 +25,14 @@ const getEmitter = (port: chrome.runtime.Port) => {
     port.postMessage(message);
   };
 
-  const emitUpdatedItems = () =>
-    emitToNewTab({ type: 'updateAll', tasks, workspaces, workspaceColors });
+  const emitUpdatedItems = (isLocal?: boolean) =>
+    emitToNewTab({
+      type: 'updateAll',
+      isLocal,
+      tasks,
+      workspaces,
+      workspaceColors,
+    });
 
   return { emitToNewTab, emitUpdatedItems };
 };
@@ -93,7 +85,7 @@ chrome.runtime.onConnect.addListener(async (port) => {
   workspaces = localWorkspaces;
   workspaceColors = localColors;
 
-  emitUpdatedItems();
+  emitUpdatedItems(true);
 });
 
 update();

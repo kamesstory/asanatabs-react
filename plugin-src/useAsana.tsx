@@ -3,6 +3,7 @@ import { Workspace } from './background-scripts/serverManager';
 import * as Asana from './asana';
 import randomColor from 'randomcolor';
 import React from 'react';
+import { ToNewTabMessage } from './messages';
 
 export type OnlineStatus = 'online' | 'offline' | 'loading';
 
@@ -57,30 +58,29 @@ const useAsana = (): [
   }, [workspaceColors]);
 
   useEffect(() => {
-    // TODO: switch to get emitted values from the background
-    if (
-      tasks.length === 0 &&
-      workspaces.length === 0 &&
-      Object.keys(workspaceColors).length === 0
-    ) {
-      (async () => {
-        const [localTasks, localWorkspaces, localColors] =
-          await Asana.getAllFromStorage();
+    const port = chrome.runtime.connect({ name: 'asanatabs' });
 
-        if (
-          localTasks.length > 0 &&
-          localWorkspaces.length > 0 &&
-          Object.keys(localColors).length > 0
-        ) {
-          setTasks(localTasks);
-          setWorkspaces(localWorkspaces);
-          setWorkspaceColors(localColors);
+    const onMessageListener = (message: Object) => {
+      const msg = message as ToNewTabMessage;
+
+      if (msg.type === 'updateAll') {
+        // TODO: need better state for loading vs offline vs online
+        if (!msg.isLocal) {
+          setOnlineStatus('online');
         }
+        setTasks(msg.tasks);
+        setWorkspaces(msg.workspaces);
+        setWorkspaceColors(msg.workspaceColors);
+      }
+    };
 
-        await pullAllFromAsana();
-      })();
-    }
-  }, [pullAllFromAsana, tasks, workspaceColors, workspaces]);
+    port.onMessage.addListener(onMessageListener);
+
+    return () => {
+      port.onMessage.removeListener(onMessageListener);
+      port.disconnect();
+    };
+  }, []);
 
   return [
     onlineStatus,
