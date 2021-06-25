@@ -87,14 +87,18 @@ chrome.runtime.onConnect.addListener(async (port) => {
     }
   };
 
+  const debouncedGetUpdatesAndEmit = debounce(getUpdatesFromAsana, 1000);
+
   port.onMessage.addListener(async (message) => {
     const msg = message as FromNewTabMessage;
 
     if (msg.type === 'pullFromAsana') {
       await getUpdatesFromAsanaAndEmit();
     } else if (msg.type === 'createTask') {
+      debouncedGetUpdatesAndEmit();
       await createTask(msg.workspaceId, msg.task);
     } else if (msg.type === 'updateTask') {
+      debouncedGetUpdatesAndEmit();
       await updateTask(msg.taskChangedId, msg.changeMade);
     }
   });
