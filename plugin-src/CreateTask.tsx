@@ -126,6 +126,7 @@ const HorizontalFlex = styled.div`
 `;
 
 const WorkspaceFormInput = styled.select<GenericProps>`
+  font-family: 'Libre Franklin', sans-serif;
   position: relative;
   z-index: ${({ zIndex }) => zIndex || 997};
   color: #2b2647;
@@ -172,6 +173,7 @@ const SubmitTaskButton = styled.button`
   color: #2b2647;
   background-color: #f2f1f7;
   border: none;
+  font-weight: 600;
   /* border: ${({ disabled }) =>
     disabled ? 'solid indianred' : 'solid darkseagreen'}; */
   outline: none;
