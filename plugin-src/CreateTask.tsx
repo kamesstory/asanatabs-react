@@ -34,8 +34,8 @@ const FormFieldDiv = styled.div`
 `;
 
 const DescFormInput = styled.textarea`
-  color: #2b2647;
   font-family: 'Libre Franklin', sans-serif;
+  color: #2b2647;
   font-size: 18px;
   width: 100%;
   border: none;
@@ -81,6 +81,7 @@ const roundedBox = css`
 `;
 
 const DateFormInput = styled.input<GenericProps>`
+  font-family: 'Libre Franklin', sans-serif;
   position: relative;
   color: #2b2647;
   font-size: 14px;
@@ -167,6 +168,7 @@ const WorkspaceFormField: FunctionComponent<{
 };
 
 const SubmitTaskButton = styled.button`
+  font-family: 'Libre Franklin', sans-serif;
   border-radius: 5px;
   width: 150px;
   height: 50px;
@@ -174,8 +176,6 @@ const SubmitTaskButton = styled.button`
   background-color: #f2f1f7;
   border: none;
   font-weight: 600;
-  /* border: ${({ disabled }) =>
-    disabled ? 'solid indianred' : 'solid darkseagreen'}; */
   outline: none;
   cursor: pointer;
 `;
