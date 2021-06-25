@@ -1,12 +1,14 @@
 import 'chrome-extension-async';
 import randomColor from 'randomcolor';
 import {
+  createTask,
   getAllFromStorage,
   saveTasksToStorage,
   saveWorkspaceColorsToStorage,
   saveWorkspacesToStorage,
   TaskWithWorkspace,
   update,
+  updateTask,
 } from '../asana';
 import { Workspace } from './serverManager';
 import debounce from 'lodash.debounce';
@@ -37,6 +39,36 @@ const getEmitter = (port: chrome.runtime.Port) => {
   return { emitToNewTab, emitUpdatedItems };
 };
 
+// TODO: pull from Asana after createTask and updateTask return
+
+const getUpdatesFromAsana = async () => {
+  const [updatedTasks, updatedWorkspaces] = await update();
+
+  if (updatedTasks && updatedWorkspaces) {
+    const updatedWorkspaceColors: Record<string, string> =
+      updatedWorkspaces.reduce(
+        (colorsMap, workspace) => ({
+          ...colorsMap,
+          [workspace.gid]:
+            workspaceColors[workspace.gid] ??
+            randomColor({
+              seed: workspace.gid,
+            }),
+        }),
+        {}
+      );
+    tasks = updatedTasks;
+    workspaces = updatedWorkspaces;
+    workspaceColors = updatedWorkspaceColors;
+
+    await Promise.all([
+      saveTasksToStorage(tasks),
+      saveWorkspacesToStorage(workspaces),
+      saveWorkspaceColorsToStorage(workspaceColors),
+    ]);
+  }
+};
+
 // TODO: need to debounce updates that are pushed to Asana
 // TODO: debounce pullAllTasks
 
@@ -46,35 +78,10 @@ chrome.runtime.onConnect.addListener(async (port) => {
 
   const { emitToNewTab, emitUpdatedItems } = emitter;
 
-  const pullFromAsana = async () => {
+  const getUpdatesFromAsanaAndEmit = async () => {
     try {
-      const [updatedTasks, updatedWorkspaces] = await update();
-
-      if (updatedTasks && updatedWorkspaces) {
-        const updatedWorkspaceColors: Record<string, string> =
-          updatedWorkspaces.reduce(
-            (colorsMap, workspace) => ({
-              ...colorsMap,
-              [workspace.gid]:
-                workspaceColors[workspace.gid] ??
-                randomColor({
-                  seed: workspace.gid,
-                }),
-            }),
-            {}
-          );
-        tasks = updatedTasks;
-        workspaces = updatedWorkspaces;
-        workspaceColors = updatedWorkspaceColors;
-
-        emitUpdatedItems();
-
-        await Promise.all([
-          saveTasksToStorage(tasks),
-          saveWorkspacesToStorage(workspaces),
-          saveWorkspaceColorsToStorage(workspaceColors),
-        ]);
-      }
+      await getUpdatesFromAsana();
+      emitUpdatedItems();
     } catch (e) {
       emitToNewTab({ type: 'pullFailed' });
     }
@@ -84,7 +91,11 @@ chrome.runtime.onConnect.addListener(async (port) => {
     const msg = message as FromNewTabMessage;
 
     if (msg.type === 'pullFromAsana') {
-      pullFromAsana();
+      await getUpdatesFromAsanaAndEmit();
+    } else if (msg.type === 'createTask') {
+      await createTask(msg.workspaceId, msg.task);
+    } else if (msg.type === 'updateTask') {
+      await updateTask(msg.taskChangedId, msg.changeMade);
     }
   });
 
@@ -94,10 +105,10 @@ chrome.runtime.onConnect.addListener(async (port) => {
   workspaceColors = localColors;
 
   emitUpdatedItems(true);
-  await pullFromAsana();
+  await getUpdatesFromAsanaAndEmit();
 });
 
-update();
-setInterval(update, 60 * 1000);
+getUpdatesFromAsana();
+setInterval(getUpdatesFromAsana, 60 * 1000);
 
 chrome.runtime.setUninstallURL('https://jasonwa.ng/asanatabs/');

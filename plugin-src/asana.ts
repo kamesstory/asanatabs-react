@@ -71,8 +71,6 @@ export const update = async (): Promise<[TaskWithWorkspace[], Workspace[]]> => {
     throw new Error('Cannot update since user has no workspaces in Asana.');
   }
 
-  saveWorkspacesToStorage(workspaces);
-
   const getAndSaveTasks = async (workspace: Workspace) => {
     const { gid: wid, name: workspaceName } = workspace;
     const tasksForWorkspace = await ServerManager.tasks(wid, [
@@ -93,7 +91,6 @@ export const update = async (): Promise<[TaskWithWorkspace[], Workspace[]]> => {
     workspaces.map((workspace) => getAndSaveTasks(workspace))
   );
   const filteredTasks = tasks.flatMap((t) => (!t ? [] : t));
-  saveTasksToStorage(filteredTasks);
 
   return [filteredTasks, workspaces];
 };
@@ -113,8 +110,6 @@ export const createTask = async (workspaceId: string, task: object) => {
   const loggedIn = await checkLogin();
   if (!loggedIn) return;
   const createdTask = await ServerManager.createTask(workspaceId, task);
-  update();
-
   return createdTask;
 };
 

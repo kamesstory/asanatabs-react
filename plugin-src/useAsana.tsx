@@ -17,7 +17,9 @@ const useAsana = (): [
   Workspace[],
   Record<string, string>,
   React.Dispatch<React.SetStateAction<TaskWithWorkspace[]>>,
-  () => Promise<void>
+  () => Promise<void>,
+  (taskChangedId: string, changeMade: object) => Promise<void>,
+  (workspaceId: string, task: object) => Promise<void>
 ] => {
   const [tasks, setTasks] = useState<TaskWithWorkspace[]>([]);
   const [workspaces, setWorkspaces] = useState<Workspace[]>([]);
@@ -28,6 +30,17 @@ const useAsana = (): [
 
   const pullAllFromAsana = useCallback(async () => {
     emitToBackground({ type: 'pullFromAsana' });
+  }, []);
+
+  const updateTask = useCallback(
+    async (taskChangedId: string, changeMade: object) => {
+      emitToBackground({ type: 'updateTask', taskChangedId, changeMade });
+    },
+    []
+  );
+
+  const createTask = useCallback(async (workspaceId: string, task: object) => {
+    emitToBackground({ type: 'createTask', workspaceId, task });
   }, []);
 
   useEffect(() => {
@@ -61,6 +74,8 @@ const useAsana = (): [
     workspaceColors,
     setTasks,
     pullAllFromAsana,
+    updateTask,
+    createTask,
   ];
 };
 

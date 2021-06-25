@@ -5,7 +5,22 @@ export type PullFromAsanaMessage = {
   type: 'pullFromAsana';
 };
 
-export type FromNewTabMessage = PullFromAsanaMessage;
+export type UpdateTaskMessage = {
+  type: 'updateTask';
+  taskChangedId: string;
+  changeMade: object;
+};
+
+export type CreateTaskMessage = {
+  type: 'createTask';
+  workspaceId: string;
+  task: object;
+};
+
+export type FromNewTabMessage =
+  | PullFromAsanaMessage
+  | UpdateTaskMessage
+  | CreateTaskMessage;
 
 export type UpdateAllMessage = {
   type: 'updateAll';

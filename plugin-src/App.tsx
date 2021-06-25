@@ -9,7 +9,6 @@ import ErrorFab from './ErrorFab';
 import { endOfDay, endOfTomorrow, format } from 'date-fns';
 import { Flipper } from 'react-flip-toolkit';
 import { Workspace } from './background-scripts/serverManager';
-import * as Asana from './asana';
 import { ChangeType } from './TaskCard';
 import useAsana from './useAsana';
 import { useEffect } from 'react';
@@ -70,6 +69,8 @@ export const App: FunctionComponent = () => {
     workspaceColors,
     setTasks,
     pullAllFromAsana,
+    updateTask,
+    createTask,
   ] = useAsana();
 
   const onTaskChanged = useCallback(
@@ -87,8 +88,8 @@ export const App: FunctionComponent = () => {
       );
       switch (changeType) {
         case 'markdone': {
-          await Asana.updateTask(taskChangedId, changeMade);
-          await pullAllFromAsana();
+          // TODO: tasks should locally be updated
+          updateTask(taskChangedId, changeMade);
           break;
         }
         default: {
@@ -109,16 +110,14 @@ export const App: FunctionComponent = () => {
       // TODO: need to incorporate startDate
       const task = {
         name: description,
+        start_at: startDate.toISOString(),
         due_at: dueDate.toISOString(),
         assignee: 'me',
       };
 
-      const createAndUpdate = async () => {
-        await Asana.createTask(workspace.gid, task);
-        await pullAllFromAsana();
-      };
-      createAndUpdate();
+      createTask(workspace.gid, task);
 
+      // TODO: demarcate task as "placeholder"
       const fake_id = +new Date();
       const fake_gid = fake_id.toString(36);
       setTasks([
