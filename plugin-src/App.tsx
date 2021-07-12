@@ -26,7 +26,8 @@ const getCustomBackground = () => css`
   }
 
   body {
-    background: url(${formattedBackgroundImageUrl}) no-repeat;
+    background: url(${formattedBackgroundImageUrl}),
+      url('https://i.imgur.com/mpY2LpM.jpeg') no-repeat;
     background-size: cover;
     background-position: center;
     background-attachment: fixed;
