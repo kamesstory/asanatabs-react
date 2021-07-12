@@ -12,6 +12,7 @@ import { Workspace } from './background-scripts/serverManager';
 import { ChangeType } from './TaskCard';
 import useAsana from './useAsana';
 import { useEffect } from 'react';
+import Cohere from 'cohere-js';
 
 const formattedBackgroundImageUrl = (backgroundImageUrl as string).startsWith(
   '.'
@@ -196,6 +197,10 @@ export const App: FunctionComponent = () => {
       )
     );
   }, [tasks, workspaceColors]);
+
+  useEffect(() => {
+    Cohere.init('D8taUOQaRZBUZROQ9be4wBhx');
+  }, []);
 
   return (
     <Fragment>

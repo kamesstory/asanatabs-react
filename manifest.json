@@ -2,7 +2,7 @@
   "manifest_version": 2,
   "name": "AsanaTabs",
   "version": "3.3.0",
-  "content_security_policy": "script-src 'self'; object-src 'self'",
+  "content_security_policy": "script-src 'self' https://*.cohere.so; object-src 'self'",
   "description": "A lightweight, clean way to view tasks from across all your workspaces in your new tab page.",
 
   "background": {
