@@ -26,11 +26,11 @@ const getCustomBackground = () => css`
   }
 
   body {
-    background: url(${formattedBackgroundImageUrl}),
-      url('https://i.imgur.com/mpY2LpM.jpeg') no-repeat;
-    background-size: cover;
+    background: fixed center/cover no-repeat url(${formattedBackgroundImageUrl}),
+      fixed center/cover no-repeat url('https://i.imgur.com/mpY2LpM.jpeg');
+    /* background-size: cover;
     background-position: center;
-    background-attachment: fixed;
+    background-attachment: fixed; */
     height: 100%;
     font-family: 'Libre Franklin', sans-serif;
 
