@@ -1,6 +1,6 @@
 # AsanaTabs
 
-![](screenshot.jpg 'AsanaTabs New Tab Page')
+![](https://jason-wang-public.s3.amazonaws.com/screenshot.jpg 'AsanaTabs New Tab Page')
 
 AsanaTabs is an extension that allows users to overhaul their new tab page to view Asana projects from multiple workspaces in a single easy-to-access and uncluttered user interface. Featured in the Chrome web store and used by hundreds of Asana users.
 
